@@ -12,6 +12,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public GameObject RoomPanel;
     public Text MyNick;
     public Text OtherNick;
+    public Text NickError;
+    public Text StartError;
+    public bool isGameStart = false;
 
     [SerializeField]
     private byte maxPlayers = 2;
@@ -30,6 +33,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         if (string.IsNullOrEmpty(NickNameInput.text))
         {
             Debug.LogWarning("닉네임을 입력하세요.");
+            NickError.text = "닉네임을 입력하세요.";
+            Invoke("ClearText", 3f);
             return;
         }
 
@@ -62,10 +67,18 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     }
     public void GameStart()
     {
-        if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
+        if (PhotonNetwork.CurrentRoom == null || PhotonNetwork.CurrentRoom.PlayerCount != PhotonNetwork.CurrentRoom.MaxPlayers)
         {
-            RoomPanel.SetActive(false);
+            Debug.LogWarning("2명의 플레이어가 준비가 돼야 합니다.");
+            if (StartError != null)
+            {
+                StartError.text = "2명의 플레이어가 준비가 돼야 합니다.";
+                Invoke("ClearText", 3f);
+            }
+            return;
         }
+        RoomPanel.SetActive(false);
+        isGameStart = true;
     }
     public override void OnConnectedToMaster()
     {
@@ -82,5 +95,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnDisconnected(DisconnectCause cause)
     {
         DisconnectPanel.SetActive(true);
+    }
+    void ClearText()
+    {
+        if (NickError != null)
+            NickError.text = "";
+
+        if (StartError != null)
+            StartError.text = "";
     }
 }
