@@ -298,7 +298,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             Color maleColor = MaleSel.color;
             maleColor.a = 1f;
             MaleSel.color = maleColor;
-            MaleSel.size *= 1.2f;
 
             Color femaleColor = FemaleSel.color;
             femaleColor.a = 0.4f;
@@ -320,7 +319,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             Color femaleColor = FemaleSel.color;
             femaleColor.a = 1f;
             FemaleSel.color = femaleColor;
-            FemaleSel.size *= 1.2f;
 
             Color maleColor = MaleSel.color;
             maleColor.a = 0.4f;
