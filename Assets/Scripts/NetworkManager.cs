@@ -16,29 +16,43 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public Text StartError;
     public bool isGameStart = false;
     public bool isConnect = false;
+    public SpriteRenderer MaleSel;
+    public SpriteRenderer FemaleSel;
+    private bool isMaleSelected = false;
+    private bool isFemaleSelected = false;
+
+    private bool isCharSelectionLocked = false; // 캐릭터 선택 잠금
 
     [SerializeField]
     private byte maxPlayers = 2;
 
+    private bool isMyCharSelected = false;
+    private bool isOtherCharSelected = false;
+
     void Awake()
     {
-        // Photon App ID 설정 및 서버 연결
-        PhotonNetwork.PhotonServerSettings.AppSettings.AppIdRealtime = "47ced4ee-73fb-42d6-b169-d52aae1d7a91";
         PhotonNetwork.PhotonServerSettings.AppSettings.FixedRegion = "kr";
         PhotonNetwork.ConnectUsingSettings();
-
-        // 화면 해상도 및 네트워크 설정
         Screen.SetResolution(960, 540, false);
         PhotonNetwork.SendRate = 60;
         PhotonNetwork.SerializationRate = 30;
-
-        // 초기 UI 설정
         RoomPanel.SetActive(false);
+        SetInitialCharacterColors();
+    }
+
+    void SetInitialCharacterColors()
+    {
+        Color maleColor = MaleSel.color;
+        maleColor.a = 100 / 255f;
+        MaleSel.color = maleColor;
+
+        Color femaleColor = FemaleSel.color;
+        femaleColor.a = 100 / 255f;
+        FemaleSel.color = femaleColor;
     }
 
     public void Connect()
     {
-        // 닉네임이 입력되지 않았다면 경고 표시
         if (string.IsNullOrEmpty(NickNameInput.text))
         {
             Debug.LogWarning("닉네임을 입력하세요.");
@@ -47,7 +61,18 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             return;
         }
 
-        // 닉네임 설정 및 UI 업데이트
+        // 닉네임 중복 확인
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            if (player.NickName == NickNameInput.text)
+            {
+                Debug.LogWarning("이미 사용 중인 닉네임입니다.");
+                NickError.text = "이미 사용 중인 닉네임입니다.";
+                Invoke("ClearText", 3f);
+                return;
+            }
+        }
+
         PhotonNetwork.LocalPlayer.NickName = NickNameInput.text;
         DisconnectPanel.SetActive(false);
         RoomPanel.SetActive(true);
@@ -61,7 +86,17 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public void GameStart()
     {
-        // 방에 두 명의 플레이어가 모두 준비되었는지 확인
+        if (!isMyCharSelected || !isOtherCharSelected)
+        {
+            Debug.LogWarning("두 명의 플레이어가 모두 캐릭터를 선택해야 합니다.");
+            if (StartError != null)
+            {
+                StartError.text = "두 명의 플레이어가 모두 캐릭터를 선택해야 합니다.";
+                Invoke("ClearText", 3f);
+            }
+            return;
+        }
+
         if (PhotonNetwork.CurrentRoom == null || PhotonNetwork.CurrentRoom.PlayerCount != PhotonNetwork.CurrentRoom.MaxPlayers)
         {
             Debug.LogWarning("2명의 플레이어가 준비가 돼야 합니다.");
@@ -72,20 +107,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             }
             return;
         }
+
         RoomPanel.SetActive(false);
         isGameStart = true;
+        Debug.Log("게임이 시작됩니다.");
     }
 
     public override void OnConnectedToMaster()
     {
-        // 마스터 서버에 연결된 후 로비에 참가
         Debug.Log("Connected to Master Server");
         PhotonNetwork.JoinLobby();
     }
 
     public override void OnJoinedLobby()
     {
-        // 로비에 참가한 후 방을 생성하거나 참가
         Debug.Log("Joined lobby, now creating or joining a room...");
         RoomOptions roomOptions = new RoomOptions { MaxPlayers = maxPlayers };
         PhotonNetwork.JoinOrCreateRoom("Room", roomOptions, TypedLobby.Default);
@@ -98,28 +133,25 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        // 방에 성공적으로 참가한 경우
         Debug.Log("Successfully joined the room.");
         UpdateOtherPlayerNick();
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        // 새로운 플레이어가 방에 들어왔을 때
         Debug.Log("Player entered: " + newPlayer.NickName);
         UpdateOtherPlayerNick();
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        // 플레이어가 방에서 나갔을 때
         Debug.Log("Player left: " + otherPlayer.NickName);
         UpdateOtherPlayerNick();
+        ResetCharacterSelection();
     }
 
     void Update()
     {
-        // ESC 키를 눌렀을 때 Photon 연결 해제
         if (Input.GetKeyDown(KeyCode.Escape) && PhotonNetwork.IsConnected)
         {
             PhotonNetwork.Disconnect();
@@ -129,14 +161,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnDisconnected(DisconnectCause cause)
     {
-        // Photon 연결이 끊어졌을 때 UI 업데이트
         DisconnectPanel.SetActive(true);
         Debug.LogWarning($"Disconnected from Photon Server: {cause}");
     }
 
     void ClearText()
     {
-        // 경고 메시지 초기화
         if (NickError != null)
             NickError.text = "";
 
@@ -146,7 +176,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     void UpdateOtherPlayerNick()
     {
-        // 방에 다른 플레이어가 있다면 닉네임 업데이트
         if (PhotonNetwork.CurrentRoom != null && PhotonNetwork.CurrentRoom.PlayerCount > 1)
         {
             foreach (Player player in PhotonNetwork.PlayerList)
@@ -162,5 +191,172 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         {
             OtherNick.text = "Waiting for other player...";
         }
+    }
+
+    public void SelectChar(string character)
+    {
+        if (MaleSel == null || FemaleSel == null)
+        {
+            Debug.LogError("MaleSel 또는 FemaleSel이 null입니다. Unity Editor에서 이 필드들이 제대로 연결되었는지 확인하세요.");
+            return;
+        }
+
+        if (PhotonNetwork.CurrentRoom.PlayerCount < maxPlayers)
+        {
+            StartError.text = "두 명의 플레이어가 모두 입장해야 캐릭터를 선택할 수 있습니다.";
+            Invoke("ClearText", 3f);
+            return;
+        }
+
+        if (isGameStart || isCharSelectionLocked)
+        {
+            StartError.text = "당신은 이미 선택하였습니다.";
+            Invoke("ClearText", 3f);
+            return;
+        }
+
+        // 현재 캐릭터 선택 상태에 따라 처리
+        if (character == "male")
+        {
+            if (!isMaleSelected || (isMaleSelected && !isOtherCharSelected))
+            {
+                isMyCharSelected = true;
+                isMaleSelected = true;
+                isFemaleSelected = false;
+                isCharSelectionLocked = true;
+
+                // 남성 캐릭터 선택
+                Color maleColor = MaleSel.color;
+                maleColor.a = 1f;
+                MaleSel.color = maleColor;
+
+                Color femaleColor = FemaleSel.color;
+                femaleColor.a = 0.4f;
+                FemaleSel.color = femaleColor;
+
+                // 태그 설정
+                gameObject.tag = "player1";
+
+                PhotonView.Get(this).RPC("RPC_SelectChar", RpcTarget.Others, "male");
+            }
+            else
+            {
+                StartError.text = "이미 선택된 캐릭터입니다.";
+                Invoke("ClearText", 3f);
+            }
+        }
+        else if (character == "female")
+        {
+            if (!isFemaleSelected || (isFemaleSelected && !isOtherCharSelected))
+            {
+                isMyCharSelected = true;
+                isFemaleSelected = true;
+                isMaleSelected = false;
+                isCharSelectionLocked = true;
+
+                // 여성 캐릭터 선택
+                Color femaleColor = FemaleSel.color;
+                femaleColor.a = 1f;
+                FemaleSel.color = femaleColor;
+
+                Color maleColor = MaleSel.color;
+                maleColor.a = 0.4f;
+                MaleSel.color = maleColor;
+
+                // 태그 설정
+                gameObject.tag = "player2";
+
+                PhotonView.Get(this).RPC("RPC_SelectChar", RpcTarget.Others, "female");
+            }
+            else
+            {
+                StartError.text = "이미 선택된 캐릭터입니다.";
+                Invoke("ClearText", 3f);
+            }
+        }
+
+        CheckIfBothSelected();
+    }
+
+
+    [PunRPC]
+    void RPC_SelectChar(string character)
+    {
+        if (character == "male")
+        {
+            if (isMaleSelected && isOtherCharSelected)
+            {
+                StartError.text = "이미 선택된 캐릭터입니다.";
+                Invoke("ClearText", 3f);
+                return;
+            }
+
+            isOtherCharSelected = true;
+            isMaleSelected = true;
+            isFemaleSelected = false;
+
+            Color maleColor = MaleSel.color;
+            maleColor.a = 1f;
+            MaleSel.color = maleColor;
+            MaleSel.size *= 1.2f;
+
+            Color femaleColor = FemaleSel.color;
+            femaleColor.a = 0.4f;
+            FemaleSel.color = femaleColor;
+        }
+        else if (character == "female")
+        {
+            if (isFemaleSelected && isOtherCharSelected)
+            {
+                StartError.text = "이미 선택된 캐릭터입니다.";
+                Invoke("ClearText", 3f);
+                return;
+            }
+
+            isOtherCharSelected = true;
+            isFemaleSelected = true;
+            isMaleSelected = false;
+
+            Color femaleColor = FemaleSel.color;
+            femaleColor.a = 1f;
+            FemaleSel.color = femaleColor;
+            FemaleSel.size *= 1.2f;
+
+            Color maleColor = MaleSel.color;
+            maleColor.a = 0.4f;
+            MaleSel.color = maleColor;
+        }
+
+        isCharSelectionLocked = false; // 선택 완료 후 잠금 해제
+
+        CheckIfBothSelected();
+    }
+
+    void CheckIfBothSelected()
+    {
+        if (isMyCharSelected && isOtherCharSelected)
+        {
+            StartError.text = "모두 캐릭터를 선택했습니다. 게임을 시작할 수 있습니다.";
+
+            // 두 캐릭터 모두 불투명하게 설정
+            Color maleColor = MaleSel.color;
+            maleColor.a = 1f;
+            MaleSel.color = maleColor;
+
+            Color femaleColor = FemaleSel.color;
+            femaleColor.a = 1f;
+            FemaleSel.color = femaleColor;
+        }
+    }
+
+    void ResetCharacterSelection()
+    {
+        isMyCharSelected = false;
+        isOtherCharSelected = false;
+        isMaleSelected = false;
+        isFemaleSelected = false;
+        isCharSelectionLocked = false; // 선택 상태 초기화
+
+        SetInitialCharacterColors();
     }
 }
