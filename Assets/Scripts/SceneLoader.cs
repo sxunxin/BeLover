@@ -1,18 +1,30 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
 
-public class SceneLoader : MonoBehaviour
+public class SceneLoader : MonoBehaviourPunCallbacks
 {
     private NetworkManager NM;
+
     void Awake()
     {
         NM = FindObjectOfType<NetworkManager>();
     }
+
     void Update()
     {
         if (NM != null && NM.isGameStart)
         {
-            SceneManager.LoadScene("MainScene");  // 전환할 씬 이름으로 변경
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.LoadScene("MainScene");
+        }
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "MainScene")
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
     }
 }

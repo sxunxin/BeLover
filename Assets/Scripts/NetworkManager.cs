@@ -21,7 +21,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     private bool isMaleSelected = false;
     private bool isFemaleSelected = false;
 
+    private bool isOtherMaleSelected = false;
+    private bool isOtherFemaleSelected = false;
     private bool isCharSelectionLocked = false; // 캐릭터 선택 잠금
+
+    Animator anim;
+    [SerializeField]
+    private RuntimeAnimatorController[] animatorControllers; // 애니메이션 컨트롤러 배열
 
     [SerializeField]
     private byte maxPlayers = 2;
@@ -36,6 +42,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         Screen.SetResolution(960, 540, false);
         PhotonNetwork.SendRate = 60;
         PhotonNetwork.SerializationRate = 30;
+        DontDestroyOnLoad(this.gameObject);
+        anim = GetComponent<Animator>();
         RoomPanel.SetActive(false);
         SetInitialCharacterColors();
     }
@@ -108,10 +116,49 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             return;
         }
 
-        RoomPanel.SetActive(false);
-        isGameStart = true;
-        Debug.Log("게임이 시작됩니다.");
+        // 모든 클라이언트에서 GameStart 상태를 동기화하고 씬 전환 유도
+        photonView.RPC("RPC_StartGame", RpcTarget.All);
     }
+
+    [PunRPC]
+    void RPC_StartGame()
+    {
+        isGameStart = true;
+    }
+
+    public void Spawn()
+    {
+        // 로컬 플레이어가 선택한 캐릭터에 따라 태그와 애니메이션 설정
+        string localTag = isMaleSelected ? "player1" : "player2";
+
+        // 플레이어를 생성합니다.
+        GameObject player = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
+        Animator playerAnimator = player.GetComponent<Animator>();
+
+        // 로컬 플레이어 설정
+        player.tag = localTag;
+        playerAnimator.runtimeAnimatorController = isMaleSelected ? animatorControllers[0] : animatorControllers[1];
+
+        // 상대방에게 로컬 플레이어의 선택 정보를 전송
+        photonView.RPC("SetRemotePlayerAppearance", RpcTarget.OthersBuffered, player.GetComponent<PhotonView>().ViewID, isMaleSelected);
+    }
+
+    [PunRPC]
+    void SetRemotePlayerAppearance(int viewID, bool isRemoteMale)
+    {
+        PhotonView targetView = PhotonView.Find(viewID);
+        if (targetView != null)
+        {
+            // 상대방이 선택한 캐릭터를 그대로 반영
+            string remoteTag = isRemoteMale ? "player1" : "player2";
+            targetView.gameObject.tag = remoteTag;
+
+            Animator playerAnimator = targetView.gameObject.GetComponent<Animator>();
+            playerAnimator.runtimeAnimatorController = isRemoteMale ? animatorControllers[0] : animatorControllers[1];
+        }
+    }
+
+
 
     public override void OnConnectedToMaster()
     {
@@ -203,7 +250,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.CurrentRoom.PlayerCount < maxPlayers)
         {
-            StartError.text = "두 명의 플레이어가 모두 입장해야 캐릭터를 선택할 수 있습니다.";
+            StartError.text = "두 명의 플레이어가 모두 입장해야\n캐릭터를 선택할 수 있습니다.";
             Invoke("ClearText", 3f);
             return;
         }
@@ -218,82 +265,76 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         // 현재 캐릭터 선택 상태에 따라 처리
         if (character == "male")
         {
-            if (!isMaleSelected || (isMaleSelected && !isOtherCharSelected))
-            {
-                isMyCharSelected = true;
-                isMaleSelected = true;
-                isFemaleSelected = false;
-                isCharSelectionLocked = true;
-
-                // 남성 캐릭터 선택
-                Color maleColor = MaleSel.color;
-                maleColor.a = 1f;
-                MaleSel.color = maleColor;
-
-                Color femaleColor = FemaleSel.color;
-                femaleColor.a = 0.4f;
-                FemaleSel.color = femaleColor;
-
-                // 태그 설정
-                gameObject.tag = "player1";
-
-                PhotonView.Get(this).RPC("RPC_SelectChar", RpcTarget.Others, "male");
-            }
-            else
-            {
-                StartError.text = "이미 선택된 캐릭터입니다.";
-                Invoke("ClearText", 3f);
-            }
-        }
-        else if (character == "female")
-        {
-            if (!isFemaleSelected || (isFemaleSelected && !isOtherCharSelected))
-            {
-                isMyCharSelected = true;
-                isFemaleSelected = true;
-                isMaleSelected = false;
-                isCharSelectionLocked = true;
-
-                // 여성 캐릭터 선택
-                Color femaleColor = FemaleSel.color;
-                femaleColor.a = 1f;
-                FemaleSel.color = femaleColor;
-
-                Color maleColor = MaleSel.color;
-                maleColor.a = 0.4f;
-                MaleSel.color = maleColor;
-
-                // 태그 설정
-                gameObject.tag = "player2";
-
-                PhotonView.Get(this).RPC("RPC_SelectChar", RpcTarget.Others, "female");
-            }
-            else
-            {
-                StartError.text = "이미 선택된 캐릭터입니다.";
-                Invoke("ClearText", 3f);
-            }
-        }
-
-        CheckIfBothSelected();
-    }
-
-
-    [PunRPC]
-    void RPC_SelectChar(string character)
-    {
-        if (character == "male")
-        {
-            if (isMaleSelected && isOtherCharSelected)
+            // 이미 로컬 또는 원격에서 남성 캐릭터가 선택된 경우
+            if (isMaleSelected || isOtherMaleSelected)
             {
                 StartError.text = "이미 선택된 캐릭터입니다.";
                 Invoke("ClearText", 3f);
                 return;
             }
 
-            isOtherCharSelected = true;
+            isMyCharSelected = true;
             isMaleSelected = true;
             isFemaleSelected = false;
+            isCharSelectionLocked = true;
+
+            // 남성 캐릭터 선택
+            Color maleColor = MaleSel.color;
+            maleColor.a = 1f;
+            MaleSel.color = maleColor;
+
+            Color femaleColor = FemaleSel.color;
+            femaleColor.a = 0.4f;
+            FemaleSel.color = femaleColor;
+
+            PhotonView.Get(this).RPC("RPC_SelectChar", RpcTarget.OthersBuffered, "male");
+        }
+        else if (character == "female")
+        {
+            // 이미 로컬 또는 원격에서 여성 캐릭터가 선택된 경우
+            if (isFemaleSelected || isOtherFemaleSelected)
+            {
+                StartError.text = "이미 선택된 캐릭터입니다.";
+                Invoke("ClearText", 3f);
+                return;
+            }
+
+            isMyCharSelected = true;
+            isFemaleSelected = true;
+            isMaleSelected = false;
+            isCharSelectionLocked = true;
+
+            // 여성 캐릭터 선택
+            Color femaleColor = FemaleSel.color;
+            femaleColor.a = 1f;
+            FemaleSel.color = femaleColor;
+
+            Color maleColor = MaleSel.color;
+            maleColor.a = 0.4f;
+            MaleSel.color = maleColor;
+
+            PhotonView.Get(this).RPC("RPC_SelectChar", RpcTarget.OthersBuffered, "female");
+        }
+
+        CheckIfBothSelected();
+    }
+
+    [PunRPC]
+    void RPC_SelectChar(string character)
+    {
+        if (character == "male")
+        {
+            // 이미 원격에서 남성 캐릭터가 선택된 경우
+            if (isOtherMaleSelected || isMaleSelected)
+            {
+                StartError.text = "이미 선택된 캐릭터입니다.";
+                Invoke("ClearText", 3f);
+                return;
+            }
+
+            isOtherMaleSelected = true;
+            isOtherFemaleSelected = false;
+            isOtherCharSelected = true; // 상대방 캐릭터가 선택되었음을 표시
 
             Color maleColor = MaleSel.color;
             maleColor.a = 1f;
@@ -305,16 +346,17 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
         else if (character == "female")
         {
-            if (isFemaleSelected && isOtherCharSelected)
+            // 이미 원격에서 여성 캐릭터가 선택된 경우
+            if (isOtherFemaleSelected || isFemaleSelected)
             {
                 StartError.text = "이미 선택된 캐릭터입니다.";
                 Invoke("ClearText", 3f);
                 return;
             }
 
-            isOtherCharSelected = true;
-            isFemaleSelected = true;
-            isMaleSelected = false;
+            isOtherFemaleSelected = true;
+            isOtherMaleSelected = false;
+            isOtherCharSelected = true; // 상대방 캐릭터가 선택되었음을 표시
 
             Color femaleColor = FemaleSel.color;
             femaleColor.a = 1f;
@@ -329,6 +371,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         CheckIfBothSelected();
     }
+
 
     void CheckIfBothSelected()
     {
@@ -346,6 +389,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             FemaleSel.color = femaleColor;
         }
     }
+
 
     void ResetCharacterSelection()
     {

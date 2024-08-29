@@ -40,6 +40,17 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - RPC_SelectChar
+  - RPC_StartGame
+  - RPC_SpawnPlayer
+  - SetOtherPlayerTag
+  - SetPlayerTag
+  - RPC_SetOpponentTagAndAnimator
+  - SetPlayerTagAndAnimator
+  - SetRemotePlayerTagAndAnimator
+  - ApplyRemotePlayerSettings
+  - SetRemotePlayerSettings
+  - SetPlayerAppearance
+  - SetRemotePlayerAppearance
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

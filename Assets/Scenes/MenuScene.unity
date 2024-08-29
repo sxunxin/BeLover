@@ -734,6 +734,9 @@ MonoBehaviour:
   isConnect: 0
   MaleSel: {fileID: 1391707792}
   FemaleSel: {fileID: 1062336061}
+  animatorControllers:
+  - {fileID: 9100000, guid: 0437260d89cdc1040b623ec1954d850b, type: 2}
+  - {fileID: 9100000, guid: d1e3e8a5a072bf74a896d1a939a7d072, type: 2}
   maxPlayers: 2
 --- !u!114 &558800072
 MonoBehaviour:
