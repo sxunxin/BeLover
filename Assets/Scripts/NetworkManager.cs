@@ -44,6 +44,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         UpdateOtherPlayerNick();
     }
 
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            photonView.RPC("RPC_StartScene1", RpcTarget.All);
+        }
+    }
+
     public bool GetIsGameStart()
     {
         return isGameStart;
@@ -59,14 +68,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         if (!isMyCharSelected || !isOtherCharSelected)
         {
-            StartError.text = "µÎ ¸íÀÇ ÇÃ·¹ÀÌ¾î°¡ ¸ğµÎ Ä³¸¯ÅÍ¸¦ ¼±ÅÃÇØ¾ß ÇÕ´Ï´Ù.";
+            StartError.text = "ë‘ ëª…ì˜ í”Œë ˆì´ì–´ê°€ ëª¨ë‘ ìºë¦­í„°ë¥¼ ì„ íƒí•´ì•¼ í•©ë‹ˆë‹¤.";
             Invoke("ClearText", 3f);
             return;
         }
 
         if (PhotonNetwork.CurrentRoom == null || PhotonNetwork.CurrentRoom.PlayerCount != PhotonNetwork.CurrentRoom.MaxPlayers)
         {
-            StartError.text = "2¸íÀÇ ÇÃ·¹ÀÌ¾î°¡ ÁØºñ°¡ µÅ¾ß ÇÕ´Ï´Ù.";
+            StartError.text = "2ëª…ì˜ í”Œë ˆì´ì–´ê°€ ì¤€ë¹„ê°€ ë¼ì•¼ í•©ë‹ˆë‹¤.";
             Invoke("ClearText", 3f);
             return;
         }
@@ -79,6 +88,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     void RPC_StartGame()
     {
         Debug.Log("Game Start Triggered");
+    }
+
+    [PunRPC]
+    void RPC_StartScene1()
+    {
+        PhotonNetwork.LoadLevel("Scene1");
     }
 
     public void Spawn()
@@ -110,10 +125,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         Debug.Log($"Player entered: {newPlayer.NickName}");
 
-        // »õ·Î¿î ÇÃ·¹ÀÌ¾î¿¡°Ô ÇöÀç Å¬¶óÀÌ¾ğÆ®ÀÇ ´Ğ³×ÀÓÀ» ¾Ë·ÁÁÜ
+        // ìƒˆë¡œìš´ í”Œë ˆì´ì–´ì—ê²Œ í˜„ì¬ í´ë¼ì´ì–¸íŠ¸ì˜ ë‹‰ë„¤ì„ì„ ì•Œë ¤ì¤Œ
         photonView.RPC("RPC_UpdateOtherPlayerNick", newPlayer, PhotonNetwork.LocalPlayer.NickName);
 
-        // »õ ÇÃ·¹ÀÌ¾îÀÇ ´Ğ³×ÀÓ ¾÷µ¥ÀÌÆ®
+        // ìƒˆ í”Œë ˆì´ì–´ì˜ ë‹‰ë„¤ì„ ì—…ë°ì´íŠ¸
         UpdateOtherPlayerNick();
     }
 
@@ -128,7 +143,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         if (isGameStart || isCharSelectionLocked)
         {
-            StartError.text = "Ä³¸¯ÅÍ¸¦ ÀÌ¹Ì ¼±ÅÃÇß½À´Ï´Ù.";
+            StartError.text = "ìºë¦­í„°ë¥¼ ì´ë¯¸ ì„ íƒí–ˆìŠµë‹ˆë‹¤.";
+
             Invoke("ClearText", 3f);
             return;
         }
@@ -137,7 +153,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         {
             if (isMaleSelected || isOtherMaleSelected)
             {
-                StartError.text = "ÀÌ¹Ì ¼±ÅÃµÈ Ä³¸¯ÅÍÀÔ´Ï´Ù.";
+                StartError.text = "???? ?????? ????????????.";
                 Invoke("ClearText", 3f);
                 return;
             }
@@ -155,7 +171,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         {
             if (isFemaleSelected || isOtherFemaleSelected)
             {
-                StartError.text = "ÀÌ¹Ì ¼±ÅÃµÈ Ä³¸¯ÅÍÀÔ´Ï´Ù.";
+                StartError.text = "???? ?????? ????????????.";
                 Invoke("ClearText", 3f);
                 return;
             }
@@ -197,7 +213,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         if (isMyCharSelected && isOtherCharSelected)
         {
-            StartError.text = "Ä³¸¯ÅÍ ¼±ÅÃ ¿Ï·á! °ÔÀÓÀ» ½ÃÀÛÇÏ¼¼¿ä.";
+            StartError.text = "ìºë¦­í„° ì„ íƒ ì™„ë£Œ! ê²Œì„ì„ ì‹œì‘í•˜ì„¸ìš”.";
 
             SetCharacterColor(MaleSel, 1f);
             SetCharacterColor(FemaleSel, 1f);
