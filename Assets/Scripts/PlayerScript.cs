@@ -11,12 +11,13 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private float speed;
 
-
     float h;
     float v;
 
     bool isHorizonMove;
     bool isVerticalMove;
+
+    bool hasSpawned = false; // 태어난 위치가 설정되었는지 확인
 
     string playerTag;
 
@@ -38,15 +39,23 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
     void Update()
     {
-        if (pv.IsMine)  // ???? ?????????? ?????? ?????? ????
+        if (pv.IsMine) // 자신의 플레이어만 동작
         {
+            // Scene1일 때
             if (SceneManager.GetActiveScene().name == "Scene1")
             {
-                // ?1? ? ???? ?? ??? ??
+                // 플레이어를 화면 밖으로 이동시켜서 보이지 않게 함
                 transform.position = new Vector3(10000f, 10000f, 10000f);
-
             }
 
+            // MainScene일 때
+            else if (SceneManager.GetActiveScene().name == "MainScene" && !hasSpawned)
+            {
+                transform.position = new Vector3(0f, 0f, 0f); // 태어나는 위치
+                hasSpawned = true; // 초기 위치 설정 완료
+            }
+
+            // 태그 설정
             playerTag = gameObject.CompareTag("player1") ? "player1" : "player2";
             ExitGames.Client.Photon.Hashtable playerInput = new ExitGames.Client.Photon.Hashtable
             {
@@ -56,7 +65,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             };
             PhotonNetwork.LocalPlayer.SetCustomProperties(playerInput);
 
-
+            // 입력값 처리
             h = Input.GetAxisRaw("Horizontal");
             v = Input.GetAxisRaw("Vertical");
 
@@ -72,6 +81,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             else if (vUp || hUp)
                 isHorizonMove = h != 0;
 
+            // 애니메이션 상태 처리
             if (anim.GetInteger("hAxisRaw") != h)
             {
                 anim.SetBool("isChange", true);
@@ -89,7 +99,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
     void FixedUpdate()
     {
-        if (pv.IsMine)  // ???? ?????????? ???? ?????? ?????????? ????
+        if (pv.IsMine) // 자신의 플레이어만 물리 업데이트
         {
             Vector2 moveVec = isHorizonMove ? new Vector2(h, 0) : new Vector2(0, v);
             rd.velocity = moveVec * speed;
@@ -98,6 +108,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-
+        // Photon 상태 동기화용 (필요 시 구현)
     }
 }

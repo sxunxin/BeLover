@@ -2,10 +2,10 @@ using UnityEngine;
 using Photon.Realtime;
 using Photon.Pun;
 using ExitGames.Client.Photon;
+using UnityEngine.SceneManagement;
 
 public class S1PlayerScript : MonoBehaviourPunCallbacks
 {
-
     public float speed;
 
     Animator anim;
@@ -17,6 +17,7 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
     void Awake()
     {
+        DontDestroyOnLoad(gameObject); // 씬 전환 시 객체 유지
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -26,34 +27,35 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
     {
         foreach (Player player in PhotonNetwork.PlayerList)
         {
-
-            float h = (float)player.CustomProperties["Horizontal"];
-            float v = (float)player.CustomProperties["Vertical"];
-            string tag = (string)player.CustomProperties["Tag"];
-
-            // 플레이어 값 전송 확인
-            // Debug.Log($"{tag} : Input - Horizontal: {h}, Vertical: {v}");
-
-            if (tag == "player1")
+            // Player의 CustomProperties에 값이 있는지 확인
+            if (player.CustomProperties.ContainsKey("Horizontal") &&
+                player.CustomProperties.ContainsKey("Vertical") &&
+                player.CustomProperties.ContainsKey("Tag"))
             {
-                if (h != 0f && v == 0f)  // 수평 입력만 있을 때
+                float h = (float)player.CustomProperties["Horizontal"];
+                float v = (float)player.CustomProperties["Vertical"];
+                string tag = (string)player.CustomProperties["Tag"];
+
+                if (tag == "player1")
                 {
-                    horizontalInput = h;
-                    verticalInput = 0f;  // 수직 입력을 0으로
-                }
-                else if (v != 0f && h == 0f)  // 수직 입력만 있을 때
-                {
-                    verticalInput = v;
-                    horizontalInput = 0f;  // 수평 입력을 0으로
-                }
-                else if (h == 0f && v == 0f)  // 아무 입력도 없을 때 (가만히 있을 때)
-                {
-                    horizontalInput = 0f;
-                    verticalInput = 0f;  // 가만히 있을 때는 입력을 0으로
+                    if (h != 0f && v == 0f)  // 수평 입력만 있을 때
+                    {
+                        horizontalInput = h;
+                        verticalInput = 0f;  // 수직 입력을 0으로
+                    }
+                    else if (v != 0f && h == 0f)  // 수직 입력만 있을 때
+                    {
+                        verticalInput = v;
+                        horizontalInput = 0f;  // 수평 입력을 0으로
+                    }
+                    else if (h == 0f && v == 0f)  // 아무 입력도 없을 때 (가만히 있을 때)
+                    {
+                        horizontalInput = 0f;
+                        verticalInput = 0f;  // 가만히 있을 때는 입력을 0으로
+                    }
                 }
             }
         }
-
     }
 
     void FixedUpdate()
@@ -67,8 +69,6 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
         anim.SetInteger("vAxisRaw", (int)moveVec.y);
     }
 
-
-    // DeathZone ???? ?? ?????? ????
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.tag == "DeathZone" && !isFalling)
@@ -76,17 +76,23 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
             StartCoroutine(FallAndRespawn());
         }
 
+        if (other.gameObject.tag == "Goal")
+        {
+            if (PhotonNetwork.IsMasterClient) // 마스터 클라이언트만 씬 전환 제어
+            {
+                PhotonNetwork.LoadLevel("MainScene");
+            }
+        }
     }
 
     System.Collections.IEnumerator FallAndRespawn()
     {
         isFalling = true;
-        rigid.velocity = Vector2.zero;  // ???? ????
+        rigid.velocity = Vector2.zero;  // 이동 정지
 
-        // ???? ????
-        float fallDuration = 0.5f;  // ???????? ????
+        float fallDuration = 0.5f;  // 낙하 시간
         float elapsedTime = 0f;
-        Vector3 initialPosition = transform.position; // ???? ???? ????
+        Vector3 initialPosition = transform.position; // 초기 위치
 
         while (elapsedTime < fallDuration)
         {
@@ -98,11 +104,28 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
             yield return null;
         }
 
-        // ???????? ????
+        // 리스폰
         transform.position = Vector2.zero;
         transform.rotation = Quaternion.identity;
 
         isFalling = false;
     }
-}
 
+    new void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    new void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "MainScene")
+        {
+            Destroy(gameObject); // MainScene으로 전환 후 객체 삭제
+        }
+    }
+}

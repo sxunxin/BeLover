@@ -90,6 +90,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         Debug.Log("Game Start Triggered");
     }
 
+    public void StartScene1()
+    {
+        photonView.RPC("RPC_StartScene1", RpcTarget.All);
+    }
+
     [PunRPC]
     void RPC_StartScene1()
     {
