@@ -51,6 +51,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         {
             photonView.RPC("RPC_StartScene1", RpcTarget.All);
         }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            photonView.RPC("RPC_StartScene2", RpcTarget.All);
+        }
     }
 
     public bool GetIsGameStart()
@@ -100,7 +104,16 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.LoadLevel("Scene1");
     }
+    public void StartScene2()
+    {
+        photonView.RPC("RPC_StartScene2", RpcTarget.All);
+    }
 
+    [PunRPC]
+    void RPC_StartScene2()
+    {
+        PhotonNetwork.LoadLevel("Scene2");
+    }
     public void Spawn()
     {
         string localTag = isMaleSelected ? "player1" : "player2";

@@ -17,10 +17,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     bool isHorizonMove;
     bool isVerticalMove;
 
-    bool hasSpawned = false; // 태어난 위치가 설정되었는지 확인
-
     string playerTag;
 
+    GameManager gm;
     Rigidbody2D rd;
     Animator anim;
     public PhotonView pv;
@@ -28,6 +27,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
     void Awake()
     {
+        gm = FindObjectOfType<GameManager>();
         rd = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
 
@@ -46,13 +46,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             {
                 // 플레이어를 화면 밖으로 이동시켜서 보이지 않게 함
                 transform.position = new Vector3(10000f, 10000f, 10000f);
-            }
-
-            // MainScene일 때
-            else if (SceneManager.GetActiveScene().name == "MainScene" && !hasSpawned)
-            {
-                transform.position = new Vector3(0f, 0f, 0f); // 태어나는 위치
-                hasSpawned = true; // 초기 위치 설정 완료
             }
 
             // 태그 설정

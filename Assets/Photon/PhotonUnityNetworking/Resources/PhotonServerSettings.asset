@@ -53,6 +53,7 @@ MonoBehaviour:
   - SetRemotePlayerAppearance
   - RPC_UpdateOtherPlayerNick
   - RPC_StartScene1
+  - RPC_StartScene2
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
