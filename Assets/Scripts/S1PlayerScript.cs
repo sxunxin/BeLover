@@ -203,6 +203,8 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
         {
             mirrorCount++;
             Debug.Log("MirrorPiece 개수 : " + mirrorCount);
+
+            Destroy(other.gameObject);
         }
     }
 
