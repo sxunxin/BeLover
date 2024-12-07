@@ -35,6 +35,7 @@ public class MainSceneManager : MonoBehaviour
         // storyPanel 숨김 상태 저장
         PlayerPrefs.SetInt("StoryPanelHidden", 1);
 
+        // Spawn 전에 ViewID 관리
         nm.Spawn();
 
         // 버튼을 누른 플레이어 정보 업데이트

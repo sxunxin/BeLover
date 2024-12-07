@@ -42,12 +42,11 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         if (pv.IsMine) // 자신의 플레이어만 동작
         {
             // Scene1일 때
-            if (SceneManager.GetActiveScene().name == "Scene1")
+            if (SceneManager.GetActiveScene().name == "Scene1" || SceneManager.GetActiveScene().name == "Scene2")
             {
                 // 플레이어를 화면 밖으로 이동시켜서 보이지 않게 함
                 transform.position = new Vector3(10000f, 10000f, 10000f);
             }
-
             // 태그 설정
             playerTag = gameObject.CompareTag("player1") ? "player1" : "player2";
             ExitGames.Client.Photon.Hashtable playerInput = new ExitGames.Client.Photon.Hashtable

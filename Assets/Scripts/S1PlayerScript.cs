@@ -6,13 +6,26 @@ using UnityEngine.SceneManagement;
 
 public class S1PlayerScript : MonoBehaviourPunCallbacks
 {
+    // scene2에서의 거울조각 개수
+    public int mirrorCount = 0;
+
     public float speed;
 
     Animator anim;
     SpriteRenderer spriteRenderer;
     Rigidbody2D rigid;
-    private float horizontalInput = 0f; // 수평 입력값
-    private float verticalInput = 0f;   // 수직 입력값
+
+    // Player 1과 Player 2의 입력을 따로 관리 (Scene2)
+    private float horizontalInputPlayer1 = 0f;
+    private float verticalInputPlayer1 = 0f;
+
+    private float horizontalInputPlayer2 = 0f;
+    private float verticalInputPlayer2 = 0f;
+
+    // Scene1의 입력을 관리 (Scene1)
+    private float horizontalInput = 0f;
+    private float verticalInput = 0f;
+
     bool isFalling = false;
 
     void Awake()
@@ -25,33 +38,123 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
     void Update()
     {
-        foreach (Player player in PhotonNetwork.PlayerList)
+        if (SceneManager.GetActiveScene().name == "Scene1")
         {
-            // Player의 CustomProperties에 값이 있는지 확인
-            if (player.CustomProperties.ContainsKey("Horizontal") &&
-                player.CustomProperties.ContainsKey("Vertical") &&
-                player.CustomProperties.ContainsKey("Tag"))
+            foreach (Player player in PhotonNetwork.PlayerList)
             {
-                float h = (float)player.CustomProperties["Horizontal"];
-                float v = (float)player.CustomProperties["Vertical"];
-                string tag = (string)player.CustomProperties["Tag"];
-
-                if (tag == "player1")
+                if (player.CustomProperties.ContainsKey("Horizontal") &&
+                    player.CustomProperties.ContainsKey("Vertical") &&
+                    player.CustomProperties.ContainsKey("Tag"))
                 {
-                    if (h != 0f && v == 0f)  // 수평 입력만 있을 때
+                    float h = (float)player.CustomProperties["Horizontal"];
+                    float v = (float)player.CustomProperties["Vertical"];
+                    string tag = (string)player.CustomProperties["Tag"];
+
+                    if (tag == "player1")
                     {
-                        horizontalInput = h;
-                        verticalInput = 0f;  // 수직 입력을 0으로
+                        if (h != 0f && v == 0f)
+                        {
+                            horizontalInput = h;
+                            verticalInput = 0f;
+                        }
+                        else if (v != 0f && h == 0f)
+                        {
+                            verticalInput = v;
+                            horizontalInput = 0f;
+                        }
+                        else if (h == 0f && v == 0f)
+                        {
+                            horizontalInput = 0f;
+                            verticalInput = 0f;
+                        }
                     }
-                    else if (v != 0f && h == 0f)  // 수직 입력만 있을 때
+                }
+            }
+        }
+        else if (SceneManager.GetActiveScene().name == "Scene2")
+        {
+            if (photonView.IsMine)
+            {
+                float localHorizontal = Input.GetAxisRaw("Horizontal");
+                float localVertical = Input.GetAxisRaw("Vertical");
+
+                Hashtable props = new Hashtable
+                {
+                    { "Horizontal", localHorizontal },
+                    { "Vertical", localVertical }
+                };
+                PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+            }
+
+            foreach (Player player in PhotonNetwork.PlayerList)
+            {
+                if (player.CustomProperties.ContainsKey("Horizontal") &&
+                    player.CustomProperties.ContainsKey("Vertical") &&
+                    player.CustomProperties.ContainsKey("Tag"))
+                {
+                    float h = (float)player.CustomProperties["Horizontal"];
+                    float v = (float)player.CustomProperties["Vertical"];
+                    string tag = (string)player.CustomProperties["Tag"];
+
+                    if (tag == "player1")
                     {
-                        verticalInput = v;
-                        horizontalInput = 0f;  // 수평 입력을 0으로
+                        switch (mirrorCount)
+                        {
+                            case 0:
+                                horizontalInputPlayer1 = 0f;
+                                verticalInputPlayer1 = v;
+                                break;
+                            case 1:
+                                horizontalInputPlayer1 = Mathf.Max(0f, h);
+                                verticalInputPlayer1 = Mathf.Max(0f, v);
+                                break;
+                            case 2:
+                                horizontalInputPlayer1 = Mathf.Max(0f, h);
+                                verticalInputPlayer1 = Mathf.Min(0f, v);
+                                break;
+                            case 3:
+                                horizontalInputPlayer1 = Mathf.Min(0f, h);
+                                verticalInputPlayer1 = Mathf.Min(0f, v);
+                                break;
+                            case 4:
+                                horizontalInputPlayer1 = Mathf.Min(0f, h);
+                                verticalInputPlayer1 = Mathf.Max(0f, v);
+                                break;
+                            default:
+                                horizontalInputPlayer1 = 0f;
+                                verticalInputPlayer1 = 0f;
+                                break;
+                        }
                     }
-                    else if (h == 0f && v == 0f)  // 아무 입력도 없을 때 (가만히 있을 때)
+                    else if (tag == "player2")
                     {
-                        horizontalInput = 0f;
-                        verticalInput = 0f;  // 가만히 있을 때는 입력을 0으로
+                        switch (mirrorCount)
+                        {
+                            case 0:
+                                horizontalInputPlayer2 = h;
+                                verticalInputPlayer2 = 0f;
+                                break;
+                            case 1:
+                                horizontalInputPlayer2 = Mathf.Min(0f, h);
+                                verticalInputPlayer2 = Mathf.Min(0f, v);
+                                break;
+                            case 2:
+                                horizontalInputPlayer2 = Mathf.Min(0f, h);
+                                verticalInputPlayer2 = Mathf.Max(0f, v);
+                                break;
+                            case 3:
+                                horizontalInputPlayer2 = Mathf.Max(0f, h);
+                                verticalInputPlayer2 = Mathf.Max(0f, v);
+                                break;
+                            case 4:
+                                horizontalInputPlayer2 = Mathf.Max(0f, h);
+                                verticalInputPlayer2 = Mathf.Min(0f, v);
+                                break;
+                            default:
+                                horizontalInputPlayer2 = 0f;
+                                verticalInputPlayer2 = 0f;
+                                break;
+                        }
                     }
                 }
             }
@@ -62,7 +165,20 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
     {
         if (isFalling) return;
 
-        Vector2 moveVec = new Vector2(horizontalInput, verticalInput) * speed;
+        Vector2 moveVec;
+        if (SceneManager.GetActiveScene().name == "Scene1")
+        {
+            moveVec = new Vector2(horizontalInput, verticalInput) * speed;
+        }
+        else if (SceneManager.GetActiveScene().name == "Scene2")
+        {
+            moveVec = new Vector2(horizontalInputPlayer1 + horizontalInputPlayer2, verticalInputPlayer1 + verticalInputPlayer2) * speed;
+        }
+        else
+        {
+            moveVec = Vector2.zero;
+        }
+
         rigid.velocity = moveVec;
 
         anim.SetInteger("hAxisRaw", (int)moveVec.x);
@@ -78,36 +194,35 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
         if (other.gameObject.tag == "Goal")
         {
-            if (PhotonNetwork.IsMasterClient) // 마스터 클라이언트만 씬 전환 제어
+            if (PhotonNetwork.IsMasterClient)
             {
                 PhotonNetwork.LoadLevel("MainScene");
             }
+        }
+
+        if (other.gameObject.tag == "MirrorPiece")
+        {
+            mirrorCount++;
+            Debug.Log("MirrorPiece 개수 : " + mirrorCount);
         }
     }
 
     System.Collections.IEnumerator FallAndRespawn()
     {
         isFalling = true;
-        rigid.velocity = Vector2.zero;  // 이동 정지
+        rigid.velocity = Vector2.zero;
 
-        float fallDuration = 0.5f;  // 낙하 시간
+        float fallDuration = 0.5f;
         float elapsedTime = 0f;
-        Vector3 initialPosition = transform.position; // 초기 위치
 
         while (elapsedTime < fallDuration)
         {
             elapsedTime += Time.deltaTime;
-
-            transform.position = Vector3.Lerp(initialPosition, initialPosition + Vector3.down * 2, elapsedTime / fallDuration);
-            transform.Rotate(Vector3.forward * 360 * Time.deltaTime);
-
             yield return null;
         }
 
-        // 리스폰
         transform.position = Vector2.zero;
         transform.rotation = Quaternion.identity;
-
         isFalling = false;
     }
 
@@ -121,11 +236,11 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "MainScene")
         {
-            Destroy(gameObject); // MainScene으로 전환 후 객체 삭제
+            PhotonNetwork.Destroy(gameObject);
         }
     }
 }

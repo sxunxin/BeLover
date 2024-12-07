@@ -28,10 +28,30 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
+        // Remove DontDestroyOnLoad if not necessary for the NetworkManager.
+        if (FindObjectsOfType<NetworkManager>().Length > 1)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            DontDestroyOnLoad(this.gameObject);
+        }
+
         RoomPanel.SetActive(false);
         SetInitialCharacterColors();
     }
+
+
+    void OnDestroy()
+    {
+        if (PhotonNetwork.IsConnected)
+        {
+            // Properly clean up Photon objects when NetworkManager is destroyed.
+            PhotonNetwork.DestroyPlayerObjects(PhotonNetwork.LocalPlayer);
+        }
+    }
+
 
     void Start()
     {
@@ -112,18 +132,33 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     [PunRPC]
     void RPC_StartScene2()
     {
+        // PhotonNetwork를 통해 씬 전환
         PhotonNetwork.LoadLevel("Scene2");
+
+        // NetworkManager를 수동으로 유지
+        DontDestroyOnLoad(this.gameObject);
     }
     public void Spawn()
     {
         string localTag = isMaleSelected ? "player1" : "player2";
-        GameObject player = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
-        Animator playerAnimator = player.GetComponent<Animator>();
 
+        // PhotonNetwork.Instantiate는 네트워크에 객체를 자동으로 동기화
+        GameObject player = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
+        PhotonView playerPhotonView = player.GetComponent<PhotonView>();
+
+        // 객체가 중복 생성되는 문제를 방지하기 위해 추가적인 처리가 필요 없다
+        // PhotonNetwork.Instantiate가 객체를 네트워크에 고유하게 관리
+
+        // Animator와 태그 설정
+        Animator playerAnimator = player.GetComponent<Animator>();
         player.tag = localTag;
         playerAnimator.runtimeAnimatorController = isMaleSelected ? animatorControllers[0] : animatorControllers[1];
-        photonView.RPC("SetRemotePlayerAppearance", RpcTarget.OthersBuffered, player.GetComponent<PhotonView>().ViewID, isMaleSelected);
+
+        // 원격 플레이어에게 캐릭터 정보를 전송
+        photonView.RPC("SetRemotePlayerAppearance", RpcTarget.OthersBuffered, playerPhotonView.ViewID, isMaleSelected);
     }
+
+
 
     [PunRPC]
     void SetRemotePlayerAppearance(int viewID, bool isRemoteMale)

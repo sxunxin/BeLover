@@ -54,6 +54,9 @@ MonoBehaviour:
   - RPC_UpdateOtherPlayerNick
   - RPC_StartScene1
   - RPC_StartScene2
+  - SyncInputs
+  - SyncMirrorCount
+  - UpdatePlayerMovement
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
