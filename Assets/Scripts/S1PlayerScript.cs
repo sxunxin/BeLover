@@ -30,7 +30,6 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
     void Awake()
     {
-        DontDestroyOnLoad(gameObject); // 씬 전환 시 객체 유지
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();

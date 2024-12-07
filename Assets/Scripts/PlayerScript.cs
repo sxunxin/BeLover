@@ -55,22 +55,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             bool hUp = Input.GetButtonUp("Horizontal");
             bool vUp = Input.GetButtonUp("Vertical");
 
-            // Scene1일 때
-            if (SceneManager.GetActiveScene().name == "Scene1" || SceneManager.GetActiveScene().name == "Scene2")
-            {
-                // 플레이어를 화면 밖으로 이동시켜서 보이지 않게 함
-                transform.position = new Vector3(10000f, 10000f, 10000f);
-            }
-            else if(SceneManager.GetActiveScene().name == "Scene3-1")
-            {
-                transform.position = new Vector3(-0.5f, -2f, 0f);
-                SetDirection(hDown, vDown);
-                if (Input.GetButtonDown("Jump") && scanObject != null)
-                {
-                    Debug.Log(scanObject.name);
-                    S3sm.Action(scanObject);
-                }
-            }
             // 태그 설정
             playerTag = gameObject.CompareTag("player1") ? "player1" : "player2";
             ExitGames.Client.Photon.Hashtable playerInput = new ExitGames.Client.Photon.Hashtable
@@ -81,7 +65,21 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             };
             PhotonNetwork.LocalPlayer.SetCustomProperties(playerInput);
 
-            
+            // Scene1일 때
+            if (SceneManager.GetActiveScene().name == "Scene1" || SceneManager.GetActiveScene().name == "Scene2")
+            {
+                // 플레이어를 화면 밖으로 이동시켜서 보이지 않게 함
+                transform.position = new Vector3(10000f, 10000f, 10000f);
+            }
+            else if(SceneManager.GetActiveScene().name == "Scene3-1" || SceneManager.GetActiveScene().name == "MainScene")
+            {
+                SetDirection(hDown, vDown);
+                if (Input.GetButtonDown("Jump") && scanObject != null)
+                {
+                    Debug.Log(scanObject.name);
+                    S3sm.Action(scanObject);
+                }
+            }    
 
             if (hDown)
                 isHorizonMove = true;
@@ -108,17 +106,28 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
     void FixedUpdate()
     {
-        if (pv.IsMine) // 자신의 플레이어만 물리 업데이트
+        if (pv.IsMine)
         {
             Vector2 moveVec = isHorizonMove ? new Vector2(h, 0) : new Vector2(0, v);
             rd.velocity = moveVec * speed;
 
-            //s3 ray
-            Debug.DrawRay(rd.position, dirVec * 0.7f, new Color(0, 1, 0));
-            RaycastHit2D rayHit = Physics2D.Raycast(rd.position, dirVec, 0.35f,
-                LayerMask.GetMask("Object")); //Layer에서 object 인것을 조사할 수 잇도록 한다.
+            // Ray 시작 위치를 더 오른쪽으로 이동
+            Vector2 rayStartPos = rd.position + new Vector2(0.2f, -0.1f);
+
+            // 디버그 선 추가
+            Debug.DrawRay(rayStartPos, dirVec * 0.5f, Color.red);
+
+            // Ray를 발사
+            RaycastHit2D rayHit = Physics2D.Raycast(
+                rayStartPos, // 시작 위치
+                dirVec,      // 방향
+                1f,          // 길이 (0.35f -> 1f로 변경)
+                LayerMask.GetMask("Object") // Object 레이어만 탐색
+            );
+
             if (rayHit.collider != null)
             {
+                Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.name);
                 scanObject = rayHit.collider.gameObject;
             }
             else
@@ -127,6 +136,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
     }
+
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -151,5 +161,61 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         else if (hDown && h == -1) dirVec = Vector3.left;
         else if (hDown && h == 1) dirVec = Vector3.right;
     }
+    new void OnEnable()
+    {
+        // SceneManager의 sceneLoaded에 OnSceneLoaded 연결
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        if (pv.IsMine)
+        {
+            AttachCameraToPlayer(); // 씬이 전환되었을 때 카메라 타겟 다시 연결
+        }
+    }
 
+    new void OnDisable()
+    {
+        // 장면이 전환될 때 메서드 호출을 중지하기 위해 콜백 제거
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    // 특정 장면이 로드될 때 호출할 함수
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (pv.IsMine)
+        {
+            AttachCameraToPlayer(); // 씬이 전환되었을 때 카메라 타겟 다시 연결
+        }
+        if (scene.name == "MainScene")
+        {
+            SetPosition(0f, 0f, 0f);
+        }
+        else if(scene.name == "Scene3-1")
+        {
+            if (playerTag == "player1")
+            {
+                SetPosition(-0.5f, 2f, 0f);
+            }
+            else if (playerTag == "player2")
+            {
+                SetPosition(3f, -2.5f, 0f);
+            }
+        }
+    }
+    private void SetPosition(float x, float y, float z)
+    {
+        transform.position = new Vector3(x, y, z);
+    }
+    private void AttachCameraToPlayer()
+    {
+        // MainCamera의 S3Camera 스크립트에 이 플레이어의 Transform을 연결
+        S3Camera mainCamera = Camera.main.GetComponent<S3Camera>();
+        if (mainCamera != null)
+        {
+            mainCamera.SetTarget(transform);
+            Debug.Log("카메라가 플레이어에 연결되었습니다: " + transform.name);
+        }
+        else
+        {
+            Debug.LogWarning("S3Camera를 찾을 수 없습니다.");
+        }
+    }
 }
