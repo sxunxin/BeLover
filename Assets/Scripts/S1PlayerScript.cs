@@ -119,8 +119,8 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
                                 verticalInputPlayer1 = Mathf.Max(0f, v);
                                 break;
                             default:
-                                horizontalInputPlayer1 = 0f;
-                                verticalInputPlayer1 = 0f;
+                                horizontalInputPlayer2 = h;
+                                verticalInputPlayer2 = 0f;
                                 break;
                         }
                     }
@@ -149,8 +149,8 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
                                 verticalInputPlayer2 = Mathf.Min(0f, v);
                                 break;
                             default:
-                                horizontalInputPlayer2 = 0f;
-                                verticalInputPlayer2 = 0f;
+                                horizontalInputPlayer1 = 0f;
+                                verticalInputPlayer1 = v;
                                 break;
                         }
                     }
