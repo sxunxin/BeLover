@@ -15,8 +15,99 @@ public class S3SceneManager : MonoBehaviour
     public S3_1TalkManager talkManager;
     public int talkIndex;
 
+    public static S3SceneManager Instance { get; private set; }
+
+
     public List<int> selectedOrder = new List<int>(); // 선택된 묘비 순서
     private int[] correctOrder = { 1002, 1005, 1004, 1001, 1003 }; // 정답 순서
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    // 정답 매핑 테이블
+    private readonly Dictionary<string, string> correctPairs = new Dictionary<string, string>
+    {
+        { "Button1", "Road1" },
+        { "Button2", "Road2" },
+        { "Button3", "Road3" }
+    };
+
+    public static string p1ObjectName = "None";
+    public static string p2ObjectName = "None";
+
+    public void SetP1ObjectName(string objectName)
+    {
+        p1ObjectName = objectName;
+        CheckMatch();
+    }
+
+    public void SetP2ObjectName(string objectName)
+    {
+        p2ObjectName = objectName;
+        CheckMatch();
+    }
+
+    private void CheckMatch()
+    {
+        // Button과 Road 이름이 모두 설정된 경우
+        if (p1ObjectName != "None" && p2ObjectName != "None")
+        {
+            // 매핑 테이블에서 정답 확인
+            if (correctPairs.TryGetValue(p1ObjectName, out string correctRoad) && correctRoad == p2ObjectName)
+            {
+                Debug.Log($"정답! {p1ObjectName} ↔ {p2ObjectName} 매칭 성공!");
+                OnCorrectMatch();
+            }
+            else
+            {
+                Debug.Log($"오답! {p1ObjectName} ↔ {p2ObjectName} 매칭 실패!");
+                OnIncorrectMatch();
+            }
+
+            // 매칭 이름 초기화
+            p1ObjectName = "None";
+            p2ObjectName = "None";
+        }
+    }
+
+    private void OnCorrectMatch()
+    {
+        Debug.Log("정답에 대한 보상을 줍니다. 속도가 증가합니다.");
+        PlayerScript[] players = FindObjectsOfType<PlayerScript>();
+        foreach (var player in players)
+        {
+            if (player.CompareTag("player2")) // Player 2만 속도 변경
+            {
+                player.SetSpeed(1f);
+                Debug.Log("Player 2의 속도가 2로 설정되었습니다.");
+            }
+        }
+    }
+
+    private void OnIncorrectMatch()
+    {
+        Debug.Log("오답에 대한 페널티를 줍니다. 속도가 감소합니다.");
+        PlayerScript[] players = FindObjectsOfType<PlayerScript>();
+        foreach (var player in players)
+        {
+            if (player.CompareTag("player2")) // Player 2만 속도 변경
+            {
+                player.SetSpeed(0.5f);
+                Debug.Log("Player 2의 속도가 0.5로 설정되었습니다.");
+            }
+        }
+    }
+
 
     public void Action(GameObject scanObj)
     {

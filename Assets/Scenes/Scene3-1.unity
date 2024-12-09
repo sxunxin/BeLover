@@ -5414,7 +5414,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -28822,7 +28822,7 @@ GameObject:
   - component: {fileID: 831359072}
   - component: {fileID: 831359071}
   - component: {fileID: 831359070}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Road3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28943,7 +28943,7 @@ TilemapCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -33768,7 +33768,7 @@ GameObject:
   - component: {fileID: 1533510388}
   - component: {fileID: 1533510387}
   - component: {fileID: 1533510386}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Road2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33889,7 +33889,7 @@ TilemapCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -39576,7 +39576,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -48752,7 +48752,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -48797,7 +48797,7 @@ GameObject:
   - component: {fileID: 1999286016}
   - component: {fileID: 1999286015}
   - component: {fileID: 1999286014}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Road1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48918,7 +48918,7 @@ TilemapCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}

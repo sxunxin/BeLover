@@ -154,6 +154,23 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
     }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        string objectName = collision.gameObject.name;
+
+        // Player 1과 Button 상호작용
+        if (CompareTag("player1") && objectName.StartsWith("Button"))
+        {
+            Debug.Log($"Player 1이 {objectName}과 지속적으로 상호작용 중.");
+            S3SceneManager.Instance.SetP1ObjectName(objectName);
+        }
+        // Player 2와 Road 상호작용
+        else if (CompareTag("player2") && objectName.StartsWith("Road"))
+        {
+            Debug.Log($"Player 2가 {objectName}과 지속적으로 상호작용 중.");
+            S3SceneManager.Instance.SetP2ObjectName(objectName);
+        }
+    }
     private void SetDirection(bool hDown, bool vDown)
     {
         if (vDown && v == 1) dirVec = Vector3.up;
@@ -190,6 +207,17 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         }
         else if(scene.name == "Scene3-1")
         {
+            // Scene3-1에서 S3SceneManager 찾기
+            S3sm = FindObjectOfType<S3SceneManager>();
+            if (S3sm != null)
+            {
+                Debug.Log("S3SceneManager가 Scene3-1에서 연결되었습니다.");
+            }
+            else
+            {
+                Debug.LogWarning("Scene3-1에 S3SceneManager 프리팹이 없습니다.");
+            }
+
             if (playerTag == "player1")
             {
                 SetPosition(-0.5f, 2f, 0f);
@@ -198,6 +226,11 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             {
                 SetPosition(3f, -2.5f, 0f);
             }
+        }
+        else
+        {
+            // 다른 씬에서는 S3SceneManager 사용하지 않음
+            S3sm = null;
         }
     }
     private void SetPosition(float x, float y, float z)
@@ -216,6 +249,21 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         else
         {
             Debug.LogWarning("S3Camera를 찾을 수 없습니다.");
+        }
+    }
+    public void SetSpeed(float newSpeed)
+    {
+        // Debug.Log 추가로 호출 확인
+        Debug.Log($"SetSpeed 호출됨: {tag}, 속도: {newSpeed}");
+
+        if (CompareTag("player2")) // Player 2만 속도 변경
+        {
+            speed = newSpeed;
+            Debug.Log($"Player 2의 속도가 {newSpeed}로 설정되었습니다.");
+        }
+        else
+        {
+            Debug.Log($"SetSpeed 호출됨: Player 1이므로 속도 변경 없음.");
         }
     }
 }
