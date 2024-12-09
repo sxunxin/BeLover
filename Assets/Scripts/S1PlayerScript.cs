@@ -6,14 +6,12 @@ using UnityEngine.SceneManagement;
 
 public class S1PlayerScript : MonoBehaviourPunCallbacks
 {
-    // scene2에서의 거울조각 개수
-    public int mirrorCount = 0;
-
     public float speed;
 
     Animator anim;
     SpriteRenderer spriteRenderer;
     Rigidbody2D rigid;
+    private S2SceneManager S2sm;
 
     // Player 1과 Player 2의 입력을 따로 관리 (Scene2)
     private float horizontalInputPlayer1 = 0f;
@@ -33,6 +31,7 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        S2sm = FindObjectOfType<S2SceneManager>();
     }
 
     void Update()
@@ -97,7 +96,7 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
                     if (tag == "player1")
                     {
-                        switch (mirrorCount)
+                        switch (S2sm.mirrorCount)
                         {
                             case 0:
                                 horizontalInputPlayer1 = 0f;
@@ -127,7 +126,7 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
                     }
                     else if (tag == "player2")
                     {
-                        switch (mirrorCount)
+                        switch (S2sm.mirrorCount)
                         {
                             case 0:
                                 horizontalInputPlayer2 = h;
@@ -201,8 +200,8 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
         if (other.gameObject.tag == "MirrorPiece")
         {
-            mirrorCount++;
-            Debug.Log("MirrorPiece 개수 : " + mirrorCount);
+            S2sm.mirrorCount++;
+            Debug.Log("MirrorPiece 개수 : " + S2sm.mirrorCount);
 
             Destroy(other.gameObject);
         }

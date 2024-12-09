@@ -10,6 +10,8 @@ TagManager:
   - DeathZone
   - Goal
   - MirrorPiece
+  - Portal
+  - MainMission
   layers:
   - Default
   - TransparentFX

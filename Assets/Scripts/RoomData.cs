@@ -8,7 +8,7 @@ public class RoomData : MonoBehaviour
 {
     private RoomInfo _roomInfo;
     // 하위에 있는 TMP_Text를 저장할 변수
-    private TMP_Text roomInfoText;
+    private TextMeshProUGUI roomInfoText;
     // PhotonManager 접근 변수
     private PhotonManager photonManager;
     // 프로퍼티 정의
@@ -31,7 +31,7 @@ public class RoomData : MonoBehaviour
 
     void Awake()
     {
-        roomInfoText = GetComponentInChildren<TMP_Text>();
+        roomInfoText = GetComponentInChildren<TextMeshProUGUI>();
         photonManager = GameObject.Find("PhotonManager").GetComponent<PhotonManager>();
     }
 

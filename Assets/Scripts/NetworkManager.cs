@@ -9,9 +9,9 @@ using TMPro;
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
     public GameObject RoomPanel;
-    public Text MyNick;
-    public Text OtherNick;
-    public Text StartError;
+    public TextMeshProUGUI MyNick;
+    public TextMeshProUGUI OtherNick;
+    public TextMeshProUGUI StartError;
     public SpriteRenderer MaleSel;
     public SpriteRenderer FemaleSel;
 
@@ -56,14 +56,26 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        StartCoroutine(WaitForConnectionAndSetNickname());
+    }
+
+    private IEnumerator WaitForConnectionAndSetNickname()
+    {
+        // 연결이 될 때까지 대기
+        while (!PhotonNetwork.IsConnectedAndReady)
+        {
+            yield return null; // 프레임 대기
+        }
+
         string savedNickName = PlayerPrefs.GetString("USER_ID", "Unknown");
-        PhotonNetwork.LocalPlayer.NickName = savedNickName;
+        PhotonNetwork.LocalPlayer.NickName = savedNickName; // **Photon의 연결 상태가 완료되었을 때 NickName 설정**
         MyNick.text = savedNickName;
         MyNick.color = Color.green;
 
         RoomPanel.SetActive(true);
         UpdateOtherPlayerNick();
     }
+
 
 
     void Update()
@@ -97,14 +109,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         if (!isMyCharSelected || !isOtherCharSelected)
         {
-            StartError.text = "두 명의 플레이어가 모두 캐릭터를 선택해야 합니다.";
+            StartError.text = "두 명의 플레이어가 모두 캐릭터를 선택해야 합니다";
             Invoke("ClearText", 3f);
             return;
         }
 
         if (PhotonNetwork.CurrentRoom == null || PhotonNetwork.CurrentRoom.PlayerCount != PhotonNetwork.CurrentRoom.MaxPlayers)
         {
-            StartError.text = "2명의 플레이어가 준비가 돼야 합니다.";
+            StartError.text = "2명의 플레이어가 준비가 돼야 합니다";
             Invoke("ClearText", 3f);
             return;
         }
@@ -212,7 +224,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         if (isGameStart || isCharSelectionLocked)
         {
-            StartError.text = "캐릭터를 이미 선택했습니다.";
+            StartError.text = "캐릭터를 이미 선택했습니다";
 
             Invoke("ClearText", 3f);
             return;
@@ -222,7 +234,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         {
             if (isMaleSelected || isOtherMaleSelected)
             {
-                StartError.text = "???? ?????? ????????????.";
+                StartError.text = "이미 선택된 캐릭터입니다";
                 Invoke("ClearText", 3f);
                 return;
             }
@@ -240,7 +252,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         {
             if (isFemaleSelected || isOtherFemaleSelected)
             {
-                StartError.text = "???? ?????? ????????????.";
+                StartError.text = "이미 선택된 캐릭터입니다";
                 Invoke("ClearText", 3f);
                 return;
             }
@@ -282,7 +294,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         if (isMyCharSelected && isOtherCharSelected)
         {
-            StartError.text = "캐릭터 선택 완료! 게임을 시작하세요.";
+            StartError.text = "캐릭터 선택 완료! 게임을 시작하세요";
 
             SetCharacterColor(MaleSel, 1f);
             SetCharacterColor(FemaleSel, 1f);
@@ -305,7 +317,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            OtherNick.text = "Waiting for other player...";
+            OtherNick.text = "플레이어 기다리는중...";
         }
     }
 
