@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class S1PlayerScript : MonoBehaviourPunCallbacks
 {
+    GameManager gm;
     public float speed;
 
     Animator anim;
@@ -26,8 +27,12 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
     bool isFalling = false;
 
+    public GameObject blindPanel; // **블라인드 UI 패널 오브젝트 (검정색) 연결**
+    private bool isBlindActive = false; // **블라인드 활성화 상태를 확인하는 변수 (false가 초기값)**
+
     void Awake()
     {
+        gm = FindObjectOfType<GameManager>();
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -38,6 +43,25 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
     {
         if (SceneManager.GetActiveScene().name == "Scene1")
         {
+            // **자신의 CustomProperties 확인**
+            if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("Tag"))
+            {
+                string myTag = (string)PhotonNetwork.LocalPlayer.CustomProperties["Tag"];
+
+                // **내가 player1을 선택한 경우에만 블라인드 활성화**
+                if (myTag == "player1" && !isBlindActive)
+                {
+                    ActivateBlind(); // **블라인드 활성화**
+                    isBlindActive = true; // **중복 활성화 방지**
+                }
+                // **내가 player2를 선택한 경우 블라인드 비활성화**
+                else if (myTag == "player2" && isBlindActive)
+                {
+                    DeactivateBlind(); // **블라인드 비활성화**
+                    isBlindActive = false;
+                }
+            }
+
             foreach (Player player in PhotonNetwork.PlayerList)
             {
                 if (player.CustomProperties.ContainsKey("Horizontal") &&
@@ -76,6 +100,13 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
                 float localHorizontal = Input.GetAxisRaw("Horizontal");
                 float localVertical = Input.GetAxisRaw("Vertical");
 
+                // **동시 입력 방지 - 하나의 입력만 유지**
+                if (localHorizontal != 0f && localVertical != 0f)
+                {
+                    // **수직 입력이 우선 적용됨**
+                    localHorizontal = 0f;
+                }
+
                 Hashtable props = new Hashtable
                 {
                     { "Horizontal", localHorizontal },
@@ -96,6 +127,13 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
                     if (tag == "player1")
                     {
+                        // **동시 입력 방지**
+                        if (h != 0f && v != 0f)
+                        {
+                            // 수직 입력이 우선 적용됨
+                            h = 0f;
+                        }
+
                         switch (S2sm.mirrorCount)
                         {
                             case 0:
@@ -119,13 +157,20 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
                                 verticalInputPlayer1 = Mathf.Max(0f, v);
                                 break;
                             default:
-                                horizontalInputPlayer2 = h;
-                                verticalInputPlayer2 = 0f;
+                                horizontalInputPlayer1 = 0f;
+                                verticalInputPlayer1 = v;
                                 break;
                         }
                     }
                     else if (tag == "player2")
                     {
+                        // **동시 입력 방지**
+                        if (h != 0f && v != 0f)
+                        {
+                            // 수직 입력이 우선 적용됨
+                            h = 0f;
+                        }
+
                         switch (S2sm.mirrorCount)
                         {
                             case 0:
@@ -149,16 +194,41 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
                                 verticalInputPlayer2 = Mathf.Min(0f, v);
                                 break;
                             default:
-                                horizontalInputPlayer1 = 0f;
-                                verticalInputPlayer1 = v;
+                                horizontalInputPlayer2 = h;
+                                verticalInputPlayer2 = v;
                                 break;
                         }
                     }
                 }
             }
         }
+
+    }
+    private void ActivateBlind()
+    {
+        if (blindPanel != null && !isBlindActive)
+        {
+            blindPanel.SetActive(true); // **블라인드 패널 활성화**
+            Debug.Log("블라인드 활성화 (내가 player1임)");
+        }
+        else if (blindPanel == null)
+        {
+            Debug.LogWarning("blindPanel이 연결되지 않았습니다.");
+        }
     }
 
+    private void DeactivateBlind()
+    {
+        if (blindPanel != null && isBlindActive)
+        {
+            blindPanel.SetActive(false); // **블라인드 패널 비활성화**
+            Debug.Log("블라인드 비활성화 (내가 player2임)");
+        }
+        else if (blindPanel == null)
+        {
+            Debug.LogWarning("blindPanel이 연결되지 않았습니다.");
+        }
+    }
     void FixedUpdate()
     {
         if (isFalling) return;
@@ -194,6 +264,7 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
         {
             if (PhotonNetwork.IsMasterClient)
             {
+                gm.isMission1Clear = true;
                 PhotonNetwork.LoadLevel("MainScene");
             }
         }
@@ -205,24 +276,39 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
             Destroy(other.gameObject);
         }
+
+        if(other.gameObject.tag == "Mirror")
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                gm.isMission2Clear = true;
+                PhotonNetwork.LoadLevel("MainScene");
+            }
+        }
     }
 
     System.Collections.IEnumerator FallAndRespawn()
     {
         isFalling = true;
-        rigid.velocity = Vector2.zero;
+        rigid.velocity = Vector2.zero; 
 
         float fallDuration = 0.5f;
         float elapsedTime = 0f;
+        Vector3 initialPosition = transform.position;
 
         while (elapsedTime < fallDuration)
         {
             elapsedTime += Time.deltaTime;
+
+            transform.position = Vector3.Lerp(initialPosition, initialPosition + Vector3.down * 2, elapsedTime / fallDuration);
+            transform.Rotate(Vector3.forward * 360 * Time.deltaTime);
+
             yield return null;
         }
 
         transform.position = Vector2.zero;
         transform.rotation = Quaternion.identity;
+
         isFalling = false;
     }
 

@@ -7,6 +7,9 @@ public class GameManager : MonoBehaviour
 
     // 씬 입장 횟수를 기록하는 변수
     public int mainSceneEnterCount = 0;
+    public bool isMission1Clear = false;
+    public bool isMission2Clear = false;
+    public bool isMission3Clear = false;
 
     private void Awake()
     {

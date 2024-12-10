@@ -1393,6 +1393,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5828353959423475954, guid: 9dc56a80218dbc44c99a582c01076bc4, type: 3}
+      propertyPath: m_TagString
+      value: Mirror
+      objectReference: {fileID: 0}
     - target: {fileID: 5912914872359199202, guid: 9dc56a80218dbc44c99a582c01076bc4, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.1
