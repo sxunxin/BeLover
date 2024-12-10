@@ -194,7 +194,7 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
                                 verticalInputPlayer2 = Mathf.Min(0f, v);
                                 break;
                             default:
-                                horizontalInputPlayer2 = h;
+                                horizontalInputPlayer2 = 0;
                                 verticalInputPlayer2 = v;
                                 break;
                         }
@@ -262,9 +262,10 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
         if (other.gameObject.tag == "Goal")
         {
+            gm.isMission1Clear = true;
+            Debug.Log("Mission1 Clear");
             if (PhotonNetwork.IsMasterClient)
             {
-                gm.isMission1Clear = true;
                 PhotonNetwork.LoadLevel("MainScene");
             }
         }
@@ -279,9 +280,9 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
         if(other.gameObject.tag == "Mirror")
         {
+            gm.isMission2Clear = true;
             if (PhotonNetwork.IsMasterClient)
             {
-                gm.isMission2Clear = true;
                 PhotonNetwork.LoadLevel("MainScene");
             }
         }

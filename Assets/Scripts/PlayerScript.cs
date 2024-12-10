@@ -77,8 +77,11 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
                 SetDirection(hDown, vDown);
                 if (Input.GetButtonDown("Jump") && scanObject != null)
                 {
-                    Debug.Log(scanObject.name);
-                    S3sm.Action(scanObject);
+                    if(SceneManager.GetActiveScene().name == "Scene3-1")
+                    {
+                        Debug.Log(scanObject.name);
+                        S3sm.Action(scanObject);
+                    }
                 }
             }
 
@@ -111,30 +114,32 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             Vector2 moveVec = isHorizonMove ? new Vector2(h, 0) : new Vector2(0, v);
             rd.velocity = moveVec * speed;
-
-            // Ray 시작 위치를 더 오른쪽으로 이동
-            Vector2 rayStartPos = rd.position + new Vector2(0.2f, -0.1f);
-
-            // 디버그 선 추가
-            Debug.DrawRay(rayStartPos, dirVec * 0.5f, Color.red);
-
-            // Ray를 발사
-            RaycastHit2D rayHit = Physics2D.Raycast(
-                rayStartPos, // 시작 위치
-                dirVec,      // 방향
-                1f,          // 길이 (0.35f -> 1f로 변경)
-                LayerMask.GetMask("Object") // Object 레이어만 탐색
-            );
-
-            if (rayHit.collider != null)
+            if (Input.GetButtonDown("Jump"))
             {
-                Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.name);
-                Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.tag);
-                scanObject = rayHit.collider.gameObject;
-            }
-            else
-            {
-                scanObject = null;
+                // Ray 시작 위치를 더 오른쪽으로 이동
+                Vector2 rayStartPos = rd.position + new Vector2(0.2f, -0.1f);
+
+                // 디버그 선 추가
+                Debug.DrawRay(rayStartPos, dirVec * 0.5f, Color.red);
+
+                // Ray를 발사
+                RaycastHit2D rayHit = Physics2D.Raycast(
+                    rayStartPos, // 시작 위치
+                    dirVec,      // 방향
+                    1f,          // 길이 (0.35f -> 1f로 변경)
+                    LayerMask.GetMask("Object") // Object 레이어만 탐색
+                );
+
+                if (rayHit.collider != null)
+                {
+                    Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.name);
+                    Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.tag);
+                    scanObject = rayHit.collider.gameObject;
+                }
+                else
+                {
+                    scanObject = null;
+                }
             }
         }
     }
