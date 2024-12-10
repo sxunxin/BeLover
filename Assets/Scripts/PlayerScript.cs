@@ -29,6 +29,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     Vector3 dirVec;//바라보고 있는 방향
     GameObject scanObject;
     GameObject portalObject;
+    private GameObject currentRoad; // Player2의 현재 Road 상태
 
     void Awake()
     {
@@ -71,7 +72,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
                 // 플레이어를 화면 밖으로 이동시켜서 보이지 않게 함
                 transform.position = new Vector3(10000f, 10000f, 10000f);
             }
-            else if(SceneManager.GetActiveScene().name == "Scene3-1" || SceneManager.GetActiveScene().name == "MainScene")
+            else if (SceneManager.GetActiveScene().name == "Scene3-1" || SceneManager.GetActiveScene().name == "MainScene")
             {
                 SetDirection(hDown, vDown);
                 if (Input.GetButtonDown("Jump") && scanObject != null)
@@ -79,7 +80,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
                     Debug.Log(scanObject.name);
                     S3sm.Action(scanObject);
                 }
-            }    
+            }
 
             if (hDown)
                 isHorizonMove = true;
@@ -128,6 +129,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             if (rayHit.collider != null)
             {
                 Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.name);
+                Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.tag);
                 scanObject = rayHit.collider.gameObject;
             }
             else
@@ -143,7 +145,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         // Photon 상태 동기화용 (필요 시 구현)
     }
     private void OnTriggerEnter2D(Collider2D collision)
-    { 
+    {
         if (collision.CompareTag("Portal"))
         {
             // Portal과의 충돌 로직 추가
@@ -157,7 +159,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     private void OnTriggerStay2D(Collider2D collision)
     {
         string objectName = collision.gameObject.name;
-
         // Player 1과 Button 상호작용
         if (CompareTag("player1") && objectName.StartsWith("Button"))
         {
@@ -167,10 +168,25 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         // Player 2와 Road 상호작용
         else if (CompareTag("player2") && objectName.StartsWith("Road"))
         {
+            // Road 충돌 상태를 계속 업데이트
+            if (currentRoad != collision.gameObject)
+            {
+                currentRoad = collision.gameObject; // 새로운 Road로 업데이트
+                Debug.Log($"Player2가 새로운 Road({currentRoad.name})에 충돌했습니다.");
+                S3SceneManager.Instance.SetP1ObjectName(objectName);
+                S3SceneManager.Instance.SetP2ObjectName(objectName);
+            }
+
+            // 버튼과 상호작용하지 않은 상태에서 속도 감소
+            if (!S3sm.IsButtonInteracted())
+            {
+                SetSpeedRPC(0.5f);
+            }
             Debug.Log($"Player 2가 {objectName}과 지속적으로 상호작용 중.");
             S3SceneManager.Instance.SetP2ObjectName(objectName);
         }
     }
+
     private void SetDirection(bool hDown, bool vDown)
     {
         if (vDown && v == 1) dirVec = Vector3.up;
@@ -205,7 +221,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             SetPosition(0f, 0f, 0f);
         }
-        else if(scene.name == "Scene3-1")
+        else if (scene.name == "Scene3-1")
         {
             // Scene3-1에서 S3SceneManager 찾기
             S3sm = FindObjectOfType<S3SceneManager>();
@@ -225,6 +241,11 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             else if (playerTag == "player2")
             {
                 SetPosition(3f, -2.5f, 0f);
+            }
+
+            if (playerTag == "player2")
+            {
+                SetSpeedRPC(0.5f); // Player2 속도를 느리게 설정
             }
         }
         else
@@ -251,10 +272,10 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             Debug.LogWarning("S3Camera를 찾을 수 없습니다.");
         }
     }
-    public void SetSpeed(float newSpeed)
+    [PunRPC]
+    public void SetSpeedRPC(float newSpeed)
     {
-        // Debug.Log 추가로 호출 확인
-        Debug.Log($"SetSpeed 호출됨: {tag}, 속도: {newSpeed}");
+        Debug.Log($"SetSpeedRPC 호출됨: {tag}, 속도: {newSpeed}");
 
         if (CompareTag("player2")) // Player 2만 속도 변경
         {
@@ -263,7 +284,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
-            Debug.Log($"SetSpeed 호출됨: Player 1이므로 속도 변경 없음.");
+            Debug.Log($"SetSpeedRPC 호출됨: Player 1이므로 속도 변경 없음.");
         }
     }
 }

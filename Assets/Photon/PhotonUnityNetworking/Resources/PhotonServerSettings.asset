@@ -59,6 +59,11 @@ MonoBehaviour:
   - UpdatePlayerMovement
   - RPC_StartScene3
   - RPC_NotifyGameStarted
+  - OnCorrectMatch
+  - OnIncorrectMatch
+  - SyncObjectName
+  - SetSpeedRPC
+  - OnTriggerStay2D
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

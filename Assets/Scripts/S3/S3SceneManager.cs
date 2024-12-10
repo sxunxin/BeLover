@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Photon.Pun;
 
 public class S3SceneManager : MonoBehaviour
 {
@@ -44,9 +45,19 @@ public class S3SceneManager : MonoBehaviour
 
     public static string p1ObjectName = "None";
     public static string p2ObjectName = "None";
+    public bool isButtonInteracted = false; // 버튼 상호작용 여부
 
+    public bool IsButtonInteracted()
+    {
+        return isButtonInteracted;
+    }
     public void SetP1ObjectName(string objectName)
     {
+        if (!isButtonInteracted) // 버튼 상호작용이 아직 이루어지지 않은 경우
+        {
+            isButtonInteracted = true;
+            Debug.Log($"Player1이 버튼 {objectName}을(를) 상호작용했습니다.");
+        }
         p1ObjectName = objectName;
         CheckMatch();
     }
@@ -86,10 +97,10 @@ public class S3SceneManager : MonoBehaviour
         PlayerScript[] players = FindObjectsOfType<PlayerScript>();
         foreach (var player in players)
         {
-            if (player.CompareTag("player2")) // Player 2만 속도 변경
+            if (player.CompareTag("player2"))
             {
-                player.SetSpeed(1f);
-                Debug.Log("Player 2의 속도가 2로 설정되었습니다.");
+                player.photonView.RPC("SetSpeedRPC", RpcTarget.All, 1f); // 모든 클라이언트에 속도 변경
+                Debug.Log("Player 2의 속도가 1로 설정되었습니다.");
             }
         }
     }
@@ -100,9 +111,9 @@ public class S3SceneManager : MonoBehaviour
         PlayerScript[] players = FindObjectsOfType<PlayerScript>();
         foreach (var player in players)
         {
-            if (player.CompareTag("player2")) // Player 2만 속도 변경
+            if (player.CompareTag("player2"))
             {
-                player.SetSpeed(0.5f);
+                player.photonView.RPC("SetSpeedRPC", RpcTarget.All, 0.5f); // 모든 클라이언트에 속도 변경
                 Debug.Log("Player 2의 속도가 0.5로 설정되었습니다.");
             }
         }
