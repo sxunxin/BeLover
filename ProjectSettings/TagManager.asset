@@ -12,6 +12,7 @@ TagManager:
   - MirrorPiece
   - Portal
   - MainMission
+  - Mirror
   layers:
   - Default
   - TransparentFX
@@ -22,9 +23,6 @@ TagManager:
   - 
   - Portal
   - Object
-  - 
-  - 
-  - 
   - 
   - 
   - 

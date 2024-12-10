@@ -453,7 +453,7 @@ GameObject:
   - component: {fileID: 137146942}
   m_Layer: 0
   m_Name: tombstone - 8
-  m_TagString: MainMission
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8214,7 +8214,7 @@ GameObject:
   - component: {fileID: 270186978}
   m_Layer: 0
   m_Name: tombstone - 7
-  m_TagString: MainMission
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9388,7 +9388,7 @@ GameObject:
   - component: {fileID: 666897947}
   m_Layer: 0
   m_Name: tombstone - dirt - 1
-  m_TagString: MainMission
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9575,6 +9575,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   storyPanel: {fileID: 1855517584}
   StartBtn: {fileID: 563946752}
+  mainMission:
+  - {fileID: 137146940}
+  - {fileID: 270186976}
+  - {fileID: 2102019213}
 --- !u!4 &734174887
 Transform:
   m_ObjectHideFlags: 0
@@ -36070,7 +36074,7 @@ GameObject:
   - component: {fileID: 1516368344}
   m_Layer: 0
   m_Name: tombstone - dirt - 4
-  m_TagString: MainMission
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -41142,6 +41146,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainSceneEnterCount: 0
+  isMission1Clear: 0
+  isMission2Clear: 0
+  isMission3Clear: 0
 --- !u!4 &1730605977
 Transform:
   m_ObjectHideFlags: 0
@@ -41754,7 +41761,7 @@ GameObject:
   - component: {fileID: 2000295622}
   m_Layer: 0
   m_Name: tombstone - dirt - 6
-  m_TagString: MainMission
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -42609,7 +42616,7 @@ GameObject:
   - component: {fileID: 2102019215}
   m_Layer: 0
   m_Name: tombstone - 5
-  m_TagString: MainMission
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

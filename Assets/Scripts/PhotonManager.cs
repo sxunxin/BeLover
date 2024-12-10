@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class PhotonManager : MonoBehaviourPunCallbacks
 {
     private readonly string version = "1.0";
-    private string userId = "Victor";
+    private string userId;
 
     public TMP_InputField userInputField;
     public TMP_InputField roomInputField;
@@ -28,10 +28,9 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.GameVersion = version;
-        PhotonNetwork.NickName = userId;
         roomItemPrefab = Resources.Load<GameObject>("RoomItem");
 
-        if (PhotonNetwork.IsConnected == false)
+        if (!PhotonNetwork.IsConnected)
         {
             PhotonNetwork.ConnectUsingSettings();
         }
@@ -40,6 +39,11 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         Debug.Log("Connected to Master");
+
+        // **마스터 서버에 연결 후 닉네임 설정**
+        SetUserId();
+        PhotonNetwork.NickName = userId;
+
         PhotonNetwork.JoinLobby();
     }
 
@@ -78,9 +82,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        userId = PlayerPrefs.GetString("사용자 ID", $"USER_{Random.Range(1, 21):00}");
+        userId = PlayerPrefs.GetString("USER_ID", $"USER_{Random.Range(1, 21):00}");
         userInputField.text = userId;
-        PhotonNetwork.NickName = userId;
 
         DisableAllButtons(); // **모든 버튼 비활성화**
     }
@@ -89,15 +92,18 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         if (string.IsNullOrEmpty(userInputField.text))
         {
-            userId = $"사용자 {Random.Range(1, 21):00}";
+            userId = $"USER_{Random.Range(1, 21):00}";
         }
         else
         {
             userId = userInputField.text;
         }
 
-        PlayerPrefs.SetString("사용자", userId);
-        PhotonNetwork.NickName = userId;
+        PlayerPrefs.SetString("USER_ID", userId);
+        if (PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.NickName = userId; // **닉네임 설정**
+        }
     }
 
     string SetRoomName()
@@ -113,53 +119,38 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         SetUserId();
         DisableLoginButton();
-        EnableAllButtons(); // **모든 버튼 활성화**
+        EnableAllButtons();
         userInputField.interactable = false;
-        isLoggedIn = true; // **로그인 상태를 true로 변경**
+        isLoggedIn = true;
     }
 
     private void DisableLoginButton()
     {
         loginButton.interactable = false;
-        Image buttonImage = loginButton.GetComponent<Image>();
-        if (buttonImage != null)
-        {
-            buttonImage.color = Color.gray;
-        }
     }
 
     private void EnableAllButtons()
     {
         EnableButton(createRoomButton);
         EnableButton(joinRoomButton);
-        EnableRoomListButtons(); // **RoomList 버튼 활성화**
+        EnableRoomListButtons();
     }
 
     private void DisableAllButtons()
     {
         DisableButton(createRoomButton);
         DisableButton(joinRoomButton);
-        DisableRoomListButtons(); // **RoomList 버튼 비활성화**
+        DisableRoomListButtons();
     }
 
     private void EnableButton(Button button)
     {
         button.interactable = true;
-        Image buttonImage = button.GetComponent<Image>();
-        if (buttonImage != null)
-        {
-            buttonImage.color = Color.white;
-        }
     }
 
     private void DisableButton(Button button)
     {
         button.interactable = false;
-        Image buttonImage = button.GetComponent<Image>();
-        if (buttonImage != null)
-        {
-            buttonImage.color = Color.gray;
-        }
     }
 
     private void DisableRoomListButtons()
@@ -205,7 +196,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             return;
         }
 
-        SetUserId();
         RoomOptions ro = new RoomOptions();
         ro.MaxPlayers = 2;
         ro.IsOpen = true;
@@ -226,28 +216,23 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             }
             else
             {
-                if (rooms.ContainsKey(roomInfo.Name) == false)
+                if (!rooms.ContainsKey(roomInfo.Name))
                 {
                     GameObject roomPrefab = Instantiate(roomItemPrefab, scrollContent);
                     roomPrefab.GetComponent<RoomData>().RoomInfo = roomInfo;
                     Button button = roomPrefab.GetComponent<Button>();
                     if (button != null)
                     {
-                        button.interactable = isLoggedIn; // **로그인 상태에 따라 버튼 활성화**
+                        button.interactable = isLoggedIn;
                     }
                     rooms.Add(roomInfo.Name, roomPrefab);
-                }
-                else
-                {
-                    rooms.TryGetValue(roomInfo.Name, out tempRoom);
-                    tempRoom.GetComponent<RoomData>().RoomInfo = roomInfo;
                 }
             }
         }
 
         if (isLoggedIn)
         {
-            EnableRoomListButtons(); // **로그인 상태일 때 방 리스트 버튼 활성화**
+            EnableRoomListButtons();
         }
     }
 }
