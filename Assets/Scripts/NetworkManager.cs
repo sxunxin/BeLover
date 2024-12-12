@@ -128,7 +128,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     [PunRPC]
     void RPC_StartGame()
     {
-        Debug.Log("Game Start Triggered");
+        PhotonNetwork.LoadLevel("MainScene");
     }
 
     public void StartScene1()

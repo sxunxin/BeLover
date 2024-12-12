@@ -32,14 +32,22 @@ public class MainSceneManager : MonoBehaviour
             {
                 mainMission[0].tag = "MainMission";
             }
-            else if(gm.mainSceneEnterCount == 3 && gm.isMission1Clear == true && gm.isMission2Clear == true && gm.isMission3Clear == false)
+            else
+                mainMission[0].tag = "Untagged";
+
+            if (gm.mainSceneEnterCount == 3 && gm.isMission1Clear == true && gm.isMission2Clear == true && gm.isMission3Clear == false)
             {
                 mainMission[1].tag = "MainMission";
             }
-            else if(gm.mainSceneEnterCount == 4 && gm.isMission1Clear == true && gm.isMission2Clear == true && gm.isMission3Clear == true)
+            else
+                mainMission[1].tag = "Untagged";
+
+            if(gm.mainSceneEnterCount == 4 && gm.isMission1Clear == true && gm.isMission2Clear == true && gm.isMission3Clear == true)
             {
                 mainMission[2].tag = "MainMission";
             }
+            else
+                mainMission[2].tag = "Untagged";
         }
     }
     public void SpawnChar()
