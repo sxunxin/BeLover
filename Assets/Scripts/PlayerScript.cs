@@ -26,10 +26,10 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     public Text nicknameText;
 
     //s3 raycast
-    Vector3 dirVec;//¹Ù¶óº¸°í ÀÖ´Â ¹æÇâ
+    Vector3 dirVec;//ë°”ë¼ë³´ê³  ìˆëŠ” ë°©í–¥
     GameObject scanObject;
     GameObject portalObject;
-    private GameObject currentRoad; // Player2ÀÇ ÇöÀç Road »óÅÂ
+    private GameObject currentRoad; // Player2ì˜ í˜„ì¬ Road ìƒíƒœ
 
     void Awake()
     {
@@ -45,9 +45,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
     void Update()
     {
-        if (pv.IsMine) // ÀÚ½ÅÀÇ ÇÃ·¹ÀÌ¾î¸¸ µ¿ÀÛ
+        if (pv.IsMine) // ìì‹ ì˜ í”Œë ˆì´ì–´ë§Œ ë™ì‘
         {
-            // ÀÔ·Â°ª Ã³¸®
+            // ì…ë ¥ê°’ ì²˜ë¦¬
             h = Input.GetAxisRaw("Horizontal");
             v = Input.GetAxisRaw("Vertical");
 
@@ -56,7 +56,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             bool hUp = Input.GetButtonUp("Horizontal");
             bool vUp = Input.GetButtonUp("Vertical");
 
-            // ÅÂ±× ¼³Á¤
+            // íƒœê·¸ ì„¤ì •
             playerTag = gameObject.CompareTag("player1") ? "player1" : "player2";
             ExitGames.Client.Photon.Hashtable playerInput = new ExitGames.Client.Photon.Hashtable
             {
@@ -66,10 +66,10 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             };
             PhotonNetwork.LocalPlayer.SetCustomProperties(playerInput);
 
-            // Scene1ÀÏ ¶§
+            // Scene1ì¼ ë•Œ
             if (SceneManager.GetActiveScene().name == "Scene1" || SceneManager.GetActiveScene().name == "Scene2")
             {
-                // ÇÃ·¹ÀÌ¾î¸¦ È­¸é ¹ÛÀ¸·Î ÀÌµ¿½ÃÄÑ¼­ º¸ÀÌÁö ¾Ê°Ô ÇÔ
+                // í”Œë ˆì´ì–´ë¥¼ í™”ë©´ ë°–ìœ¼ë¡œ ì´ë™ì‹œì¼œì„œ ë³´ì´ì§€ ì•Šê²Œ í•¨
                 transform.position = new Vector3(10000f, 10000f, 10000f);
             }
             else if (SceneManager.GetActiveScene().name == "Scene3-1" || SceneManager.GetActiveScene().name == "MainScene")
@@ -77,12 +77,34 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
                 SetDirection(hDown, vDown);
                 if (Input.GetButtonDown("Jump") && scanObject != null)
                 {
-                    if(SceneManager.GetActiveScene().name == "Scene3-1")
+                    if (SceneManager.GetActiveScene().name == "Scene3-1")
                     {
                         Debug.Log(scanObject.name);
                         S3sm.Action(scanObject);
                     }
                 }
+            }
+            else if (SceneManager.GetActiveScene().name == "Scene4")
+            {
+                SetDirection(hDown, vDown);
+                if (CompareTag("player2"))
+                {
+                    GameObject blindObject = GameObject.FindGameObjectWithTag("Blind");
+                    if (blindObject != null)
+                    {
+                        blindObject.SetActive(false);
+                    }
+                }
+                if (Input.GetButtonDown("Jump") && scanObject != null)
+                {
+                    Debug.Log(scanObject.name);
+                    if (scanObject.name == "ResetStatue")
+                    {
+                        S4Manager s4manager = FindObjectOfType<S4Manager>();
+                        s4manager.ResetButtons();
+                    }
+                }
+
             }
 
             if (hDown)
@@ -92,7 +114,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             else if (vUp || hUp)
                 isHorizonMove = h != 0;
 
-            // ¾Ö´Ï¸ŞÀÌ¼Ç »óÅÂ Ã³¸®
+            // ì• ë‹ˆë©”ì´ì…˜ ìƒíƒœ ì²˜ë¦¬
             if (anim.GetInteger("hAxisRaw") != h)
             {
                 anim.SetBool("isChange", true);
@@ -116,18 +138,18 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             rd.velocity = moveVec * speed;
             if (Input.GetButtonDown("Jump"))
             {
-                // Ray ½ÃÀÛ À§Ä¡¸¦ ´õ ¿À¸¥ÂÊÀ¸·Î ÀÌµ¿
+                // Ray ì‹œì‘ ìœ„ì¹˜ë¥¼ ë” ì˜¤ë¥¸ìª½ìœ¼ë¡œ ì´ë™
                 Vector2 rayStartPos = rd.position + new Vector2(0.2f, -0.1f);
 
-                // µğ¹ö±× ¼± Ãß°¡
+                // ë””ë²„ê·¸ ì„  ì¶”ê°€
                 Debug.DrawRay(rayStartPos, dirVec * 0.5f, Color.red);
 
-                // Ray¸¦ ¹ß»ç
+                // Rayë¥¼ ë°œì‚¬
                 RaycastHit2D rayHit = Physics2D.Raycast(
-                    rayStartPos, // ½ÃÀÛ À§Ä¡
-                    dirVec,      // ¹æÇâ
-                    1f,          // ±æÀÌ (0.35f -> 1f·Î º¯°æ)
-                    LayerMask.GetMask("Object") // Object ·¹ÀÌ¾î¸¸ Å½»ö
+                    rayStartPos, // ì‹œì‘ ìœ„ì¹˜
+                    dirVec,      // ë°©í–¥
+                    1f,          // ê¸¸ì´ (0.35f -> 1fë¡œ ë³€ê²½)
+                    LayerMask.GetMask("Object") // Object ë ˆì´ì–´ë§Œ íƒìƒ‰
                 );
 
                 if (rayHit.collider != null)
@@ -147,13 +169,13 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        // Photon »óÅÂ µ¿±âÈ­¿ë (ÇÊ¿ä ½Ã ±¸Çö)
+        // Photon ìƒíƒœ ë™ê¸°í™”ìš© (í•„ìš” ì‹œ êµ¬í˜„)
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Portal"))
         {
-            // Portal°úÀÇ Ãæµ¹ ·ÎÁ÷ Ãß°¡
+            // Portalê³¼ì˜ ì¶©ëŒ ë¡œì§ ì¶”ê°€
             S3Portal portal = collision.GetComponent<S3Portal>();
             if (portal != null)
             {
@@ -164,30 +186,30 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     private void OnTriggerStay2D(Collider2D collision)
     {
         string objectName = collision.gameObject.name;
-        // Player 1°ú Button »óÈ£ÀÛ¿ë
+        // Player 1ê³¼ Button ìƒí˜¸ì‘ìš©
         if (CompareTag("player1") && objectName.StartsWith("Button"))
         {
-            Debug.Log($"Player 1ÀÌ {objectName}°ú Áö¼ÓÀûÀ¸·Î »óÈ£ÀÛ¿ë Áß.");
+            Debug.Log($"Player 1ì´ {objectName}ê³¼ ì§€ì†ì ìœ¼ë¡œ ìƒí˜¸ì‘ìš© ì¤‘.");
             S3SceneManager.Instance.SetP1ObjectName(objectName);
         }
-        // Player 2¿Í Road »óÈ£ÀÛ¿ë
+        // Player 2ì™€ Road ìƒí˜¸ì‘ìš©
         else if (CompareTag("player2") && objectName.StartsWith("Road"))
         {
-            // Road Ãæµ¹ »óÅÂ¸¦ °è¼Ó ¾÷µ¥ÀÌÆ®
+            // Road ì¶©ëŒ ìƒíƒœë¥¼ ê³„ì† ì—…ë°ì´íŠ¸
             if (currentRoad != collision.gameObject)
             {
-                currentRoad = collision.gameObject; // »õ·Î¿î Road·Î ¾÷µ¥ÀÌÆ®
-                Debug.Log($"Player2°¡ »õ·Î¿î Road({currentRoad.name})¿¡ Ãæµ¹Çß½À´Ï´Ù.");
+                currentRoad = collision.gameObject; // ìƒˆë¡œìš´ Roadë¡œ ì—…ë°ì´íŠ¸
+                Debug.Log($"Player2ê°€ ìƒˆë¡œìš´ Road({currentRoad.name})ì— ì¶©ëŒí–ˆìŠµë‹ˆë‹¤.");
                 S3SceneManager.Instance.SetP1ObjectName(objectName);
                 S3SceneManager.Instance.SetP2ObjectName(objectName);
             }
 
-            // ¹öÆ°°ú »óÈ£ÀÛ¿ëÇÏÁö ¾ÊÀº »óÅÂ¿¡¼­ ¼Óµµ °¨¼Ò
+            // ë²„íŠ¼ê³¼ ìƒí˜¸ì‘ìš©í•˜ì§€ ì•Šì€ ìƒíƒœì—ì„œ ì†ë„ ê°ì†Œ
             if (!S3sm.IsButtonInteracted())
             {
                 SetSpeedRPC(0.5f);
             }
-            Debug.Log($"Player 2°¡ {objectName}°ú Áö¼ÓÀûÀ¸·Î »óÈ£ÀÛ¿ë Áß.");
+            Debug.Log($"Player 2ê°€ {objectName}ê³¼ ì§€ì†ì ìœ¼ë¡œ ìƒí˜¸ì‘ìš© ì¤‘.");
             S3SceneManager.Instance.SetP2ObjectName(objectName);
         }
     }
@@ -201,26 +223,26 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     }
     new void OnEnable()
     {
-        // SceneManagerÀÇ sceneLoaded¿¡ OnSceneLoaded ¿¬°á
+        // SceneManagerì˜ sceneLoadedì— OnSceneLoaded ì—°ê²°
         SceneManager.sceneLoaded += OnSceneLoaded;
         if (pv.IsMine)
         {
-            AttachCameraToPlayer(); // ¾ÀÀÌ ÀüÈ¯µÇ¾úÀ» ¶§ Ä«¸Ş¶ó Å¸°Ù ´Ù½Ã ¿¬°á
+            AttachCameraToPlayer(); // ì”¬ì´ ì „í™˜ë˜ì—ˆì„ ë•Œ ì¹´ë©”ë¼ íƒ€ê²Ÿ ë‹¤ì‹œ ì—°ê²°
         }
     }
 
     new void OnDisable()
     {
-        // Àå¸éÀÌ ÀüÈ¯µÉ ¶§ ¸Ş¼­µå È£ÃâÀ» ÁßÁöÇÏ±â À§ÇØ Äİ¹é Á¦°Å
+        // ì¥ë©´ì´ ì „í™˜ë  ë•Œ ë©”ì„œë“œ í˜¸ì¶œì„ ì¤‘ì§€í•˜ê¸° ìœ„í•´ ì½œë°± ì œê±°
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    // Æ¯Á¤ Àå¸éÀÌ ·ÎµåµÉ ¶§ È£ÃâÇÒ ÇÔ¼ö
+    // íŠ¹ì • ì¥ë©´ì´ ë¡œë“œë  ë•Œ í˜¸ì¶œí•  í•¨ìˆ˜
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (pv.IsMine)
         {
-            AttachCameraToPlayer(); // ¾ÀÀÌ ÀüÈ¯µÇ¾úÀ» ¶§ Ä«¸Ş¶ó Å¸°Ù ´Ù½Ã ¿¬°á
+            AttachCameraToPlayer(); // ì”¬ì´ ì „í™˜ë˜ì—ˆì„ ë•Œ ì¹´ë©”ë¼ íƒ€ê²Ÿ ë‹¤ì‹œ ì—°ê²°
         }
         if (scene.name == "MainScene")
         {
@@ -228,15 +250,15 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         }
         else if (scene.name == "Scene3-1")
         {
-            // Scene3-1¿¡¼­ S3SceneManager Ã£±â
+            // Scene3-1ì—ì„œ S3SceneManager ì°¾ê¸°
             S3sm = FindObjectOfType<S3SceneManager>();
             if (S3sm != null)
             {
-                Debug.Log("S3SceneManager°¡ Scene3-1¿¡¼­ ¿¬°áµÇ¾ú½À´Ï´Ù.");
+                Debug.Log("S3SceneManagerê°€ Scene3-1ì—ì„œ ì—°ê²°ë˜ì—ˆìŠµë‹ˆë‹¤.");
             }
             else
             {
-                Debug.LogWarning("Scene3-1¿¡ S3SceneManager ÇÁ¸®ÆÕÀÌ ¾ø½À´Ï´Ù.");
+                Debug.LogWarning("Scene3-1ì— S3SceneManager í”„ë¦¬íŒ¹ì´ ì—†ìŠµë‹ˆë‹¤.");
             }
 
             if (playerTag == "player1")
@@ -250,12 +272,23 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
             if (playerTag == "player2")
             {
-                SetSpeedRPC(0.5f); // Player2 ¼Óµµ¸¦ ´À¸®°Ô ¼³Á¤
+                SetSpeedRPC(0.5f); // Player2 ì†ë„ë¥¼ ëŠë¦¬ê²Œ ì„¤ì •
+            }
+        }
+        else if (scene.name == "Scene4")
+        {
+            if (playerTag == "player1")
+            {
+                SetPosition(-0.4f, 3.7f, 0f);
+            }
+            else if (playerTag == "player2")
+            {
+                SetPosition(-0.35f, -28.8f, 0f);
             }
         }
         else
         {
-            // ´Ù¸¥ ¾À¿¡¼­´Â S3SceneManager »ç¿ëÇÏÁö ¾ÊÀ½
+            // ë‹¤ë¥¸ ì”¬ì—ì„œëŠ” S3SceneManager ì‚¬ìš©í•˜ì§€ ì•ŠìŒ
             S3sm = null;
         }
     }
@@ -265,32 +298,32 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     }
     private void AttachCameraToPlayer()
     {
-        // MainCameraÀÇ S3Camera ½ºÅ©¸³Æ®¿¡ ÀÌ ÇÃ·¹ÀÌ¾îÀÇ TransformÀ» ¿¬°á
+        // MainCameraì˜ S3Camera ìŠ¤í¬ë¦½íŠ¸ì— ì´ í”Œë ˆì´ì–´ì˜ Transformì„ ì—°ê²°
         S3Camera mainCamera = Camera.main.GetComponent<S3Camera>();
         if (mainCamera != null)
         {
             mainCamera.SetTarget(transform);
-            Debug.Log("Ä«¸Ş¶ó°¡ ÇÃ·¹ÀÌ¾î¿¡ ¿¬°áµÇ¾ú½À´Ï´Ù: " + transform.name);
+            Debug.Log("ì¹´ë©”ë¼ê°€ í”Œë ˆì´ì–´ì— ì—°ê²°ë˜ì—ˆìŠµë‹ˆë‹¤: " + transform.name);
         }
         else
         {
-            Debug.LogWarning("S3Camera¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+            Debug.LogWarning("S3Cameraë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
         }
     }
     [PunRPC]
     public void SetSpeedRPC(float newSpeed)
     {
-        Debug.Log($"SetSpeedRPC È£ÃâµÊ: {tag}, ¼Óµµ: {newSpeed}");
+        Debug.Log($"SetSpeedRPC í˜¸ì¶œë¨: {tag}, ì†ë„: {newSpeed}");
 
-        if (CompareTag("player2")) // Player 2¸¸ ¼Óµµ º¯°æ
+        if (CompareTag("player2")) // Player 2ë§Œ ì†ë„ ë³€ê²½
         {
             speed = newSpeed;
-            Debug.Log($"Player 2ÀÇ ¼Óµµ°¡ {newSpeed}·Î ¼³Á¤µÇ¾ú½À´Ï´Ù.");
+            Debug.Log($"Player 2ì˜ ì†ë„ê°€ {newSpeed}ë¡œ ì„¤ì •ë˜ì—ˆìŠµë‹ˆë‹¤.");
         }
         else
         {
-            Debug.Log($"SetSpeedRPC È£ÃâµÊ: Player 1ÀÌ¹Ç·Î ¼Óµµ º¯°æ ¾øÀ½.");
+            Debug.Log($"SetSpeedRPC í˜¸ì¶œë¨: Player 1ì´ë¯€ë¡œ ì†ë„ ë³€ê²½ ì—†ìŒ.");
         }
     }
-    
+
 }
