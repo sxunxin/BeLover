@@ -292,4 +292,5 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             Debug.Log($"SetSpeedRPC 호출됨: Player 1이므로 속도 변경 없음.");
         }
     }
+    
 }
