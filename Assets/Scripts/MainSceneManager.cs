@@ -7,6 +7,8 @@ using TMPro;
 public class MainSceneManager : MonoBehaviour
 {
     NetworkManager nm;
+    TalkManager tm;
+
     public GameObject storyPanel;
     public Button StartBtn;
     public Image CinemaImage1;
@@ -14,14 +16,17 @@ public class MainSceneManager : MonoBehaviour
 
     public GameObject StoryPanel;
     public TextMeshProUGUI StoryText;
+    public TypeEffect CinemaText;
 
     public GameObject[] mainMission;
 
     public bool isCinemaFinished = false;
+    public bool isStart = false;
 
     void Awake()
     {
         nm = FindObjectOfType<NetworkManager>();
+        tm = FindObjectOfType<TalkManager>();
 
         // 게임 재실행 시 항상 storyPanel을 활성화
         storyPanel.SetActive(true);
@@ -29,13 +34,19 @@ public class MainSceneManager : MonoBehaviour
 
         // 필요하면 PlayerPrefs 초기화
         PlayerPrefs.SetInt("StoryPanelHidden", 0);
-
+    }
+    private void Start()
+    {
         // 씬이 시작되면 시네마틱 애니메이션 시작
         StartCoroutine(CinemaSequence());
     }
-
     void Update()
     {
+        if (tm.isDialogueFinished && isStart == false)
+        {
+            StartBtn.gameObject.SetActive(true);
+        }
+
         if (GameManager.Instance.mainSceneEnterCount >= 2)
         {
             storyPanel.SetActive(false);
@@ -64,6 +75,7 @@ public class MainSceneManager : MonoBehaviour
 
     public void SpawnChar()
     {
+        isStart = true;
         // 버튼을 비활성화하여 더 이상 보이지 않게 만듭니다.
         StartBtn.gameObject.SetActive(false);
 
@@ -126,20 +138,30 @@ public class MainSceneManager : MonoBehaviour
 
     IEnumerator CinemaSequence()
     {
+        CinemaText.SetMsg("어두운 방 한 남자가 괴로워하고 있다");
+
         yield return new WaitForSeconds(3f); // 3초 대기 후 페이드 아웃 시작
 
         // CinemaImage1 페이드 아웃과 CinemaImage2 페이드 인을 동시에 실행
         StartCoroutine(FadeOutImage(CinemaImage1, 3f)); // 3초 동안 페이드 아웃
-        yield return StartCoroutine(FadeInImage(CinemaImage2, 7f)); // 7초 동안 페이드 인
 
+        yield return new WaitForSeconds(1f);
+
+        yield return StartCoroutine(FadeInImage(CinemaImage2, 5f)); // 7초 동안 페이드 인
+
+        CinemaText.SetMsg("한참을 괴로워하다가 잠에 들었다");
         // 페이드 인 완료 후 5초 동안 CinemaImage2의 크기를 3배로 확대
-        yield return StartCoroutine(ScaleImage(CinemaImage2, 3f, 5f)); // 5초 동안 3배 확대
+        yield return StartCoroutine(ScaleImage(CinemaImage2, 2.2f, 5f)); // 5초 동안 3배 확대
 
-        // 확대가 끝난 후 isCinemaFinished를 true로 설정
+        // 확대가 끝난 후 3초 동안 대기
+        yield return new WaitForSeconds(3f);
+
+        // 확대가 끝난 후 3초 동안 CinemaImage2를 검은색으로 변경
+        StartCoroutine(FadeToBlackImage(CinemaImage2, 3f)); // 이미지 RGB 변경
+        yield return StartCoroutine(FadeToBlackText(CinemaText, 3f)); // 텍스트 색상 변경
+
+        // 시네마틱 종료 표시
         isCinemaFinished = true;
-
-        // StartBtn을 활성화합니다 (한 번만 실행됨)
-        StartBtn.gameObject.SetActive(true);
     }
 
     IEnumerator FadeOutImage(Image image, float duration)
@@ -204,5 +226,66 @@ public class MainSceneManager : MonoBehaviour
         }
 
         image.rectTransform.localScale = target; // 최종 크기 고정
+    }
+    IEnumerator FadeToBlackImage(Image image, float duration)
+    {
+        float elapsedTime = 0f;
+        Color initialColor = image.color;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / duration;
+
+            // RGB를 (255,255,255)에서 (0,0,0)으로 변경
+            Color color = image.color;
+            color.r = Mathf.Lerp(initialColor.r, 0f, t);
+            color.g = Mathf.Lerp(initialColor.g, 0f, t);
+            color.b = Mathf.Lerp(initialColor.b, 0f, t);
+            image.color = color;
+
+            yield return null;
+        }
+
+        // 최종 색상을 검은색(0,0,0)으로 고정
+        Color finalColor = image.color;
+        finalColor.r = 0f;
+        finalColor.g = 0f;
+        finalColor.b = 0f;
+        image.color = finalColor;
+    }
+    IEnumerator FadeToBlackText(TypeEffect textEffect, float duration)
+    {
+        if (textEffect.MsgText == null)
+        {
+            Debug.LogError("TypeEffect.MsgText is null!");
+            yield break;
+        }
+
+        TextMeshProUGUI text = textEffect.MsgText; // TypeEffect에서 TextMeshProUGUI 가져오기
+        float elapsedTime = 0f;
+        Color initialColor = text.color;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / duration;
+
+            // RGB를 초기값에서 (0,0,0)으로 변경
+            Color color = text.color;
+            color.r = Mathf.Lerp(initialColor.r, 0f, t);
+            color.g = Mathf.Lerp(initialColor.g, 0f, t);
+            color.b = Mathf.Lerp(initialColor.b, 0f, t);
+            text.color = color;
+
+            yield return null;
+        }
+
+        // 최종 색상을 검은색(0,0,0)으로 고정
+        Color finalColor = text.color;
+        finalColor.r = 0f;
+        finalColor.g = 0f;
+        finalColor.b = 0f;
+        text.color = finalColor;
     }
 }
