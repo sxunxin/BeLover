@@ -85,6 +85,7 @@ public class S4Manager : MonoBehaviour
 
     private IEnumerator MoveLightBezier(Transform lightTransform, Vector3 startPosition, Vector3 targetPosition)
     {
+        Debug.Log("Light Moving!");
         float t = 0; // 곡선 진행도 (0~1)
 
         // 곡선 제어점 계산: 높이를 제한
