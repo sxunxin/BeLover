@@ -26,11 +26,12 @@ public class Btn : MonoBehaviour
             Debug.Log($"Player stepped on Button {buttonID}");
             S4Manager manager = FindObjectOfType<S4Manager>();
 
-            if (manager.OnButtonPressed(buttonID))
+            int ans = manager.OnButtonPressed(buttonID);
+            if (ans == 1)
             {
                 spriteRenderer.color = pressedColor;
             }
-            else
+            else if (ans == 0)
             {
                 spriteRenderer.color = incorrectColor;
             }
