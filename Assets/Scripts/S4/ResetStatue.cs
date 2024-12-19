@@ -14,14 +14,6 @@ public class ResetStatue : MonoBehaviour
         originalPosition = transform.localPosition;
     }
 
-    private void Update()
-    {
-        if(Input.GetButtonDown("Jump")) {
-            TriggerResetEffect();
-        }
-
-    }
-
     public void TriggerResetEffect()
     {
         // 흔들림 효과 시작

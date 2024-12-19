@@ -5,15 +5,15 @@ using UnityEngine;
 public class S3Camera : MonoBehaviour
 {
     [Header("Camera Settings")]
-    public Transform target; // ÃßÀûÇÒ ´ë»ó (Player)
-    public float smoothSpeed = 0.125f; // ÀÌµ¿ ¼Óµµ
-    public Vector3 offset; // Ä«¸Ş¶ó ¿ÀÇÁ¼Â
+    public Transform target; // ì¶”ì í•  ëŒ€ìƒ (Player)
+    public float smoothSpeed = 0.125f; // ì´ë™ ì†ë„
+    public Vector3 offset; // ì¹´ë©”ë¼ ì˜¤í”„ì…‹
 
     private Vector3 targetPosition;
 
     void Start()
     {
-        // ÀÚµ¿À¸·Î Player¸¦ Ã£°í Ä«¸Ş¶óÀÇ Å¸°ÙÀ¸·Î ¼³Á¤
+        // ìë™ìœ¼ë¡œ Playerë¥¼ ì°¾ê³  ì¹´ë©”ë¼ì˜ íƒ€ê²Ÿìœ¼ë¡œ ì„¤ì •
         if (target == null)
         {
             TryFindPlayer();
@@ -24,10 +24,10 @@ public class S3Camera : MonoBehaviour
     {
         if (target != null)
         {
-            // Å¸°Ù À§Ä¡¿¡ ¿ÀÇÁ¼Â Ãß°¡
+            // íƒ€ê²Ÿ ìœ„ì¹˜ì— ì˜¤í”„ì…‹ ì¶”ê°€
             targetPosition = target.position + offset;
 
-            // Lerp¸¦ »ç¿ëÇÏ¿© ºÎµå·´°Ô ÀÌµ¿
+            // Lerpë¥¼ ì‚¬ìš©í•˜ì—¬ ë¶€ë“œëŸ½ê²Œ ì´ë™
             Vector3 smoothedPosition = Vector3.Lerp(transform.position, targetPosition, smoothSpeed);
             transform.position = smoothedPosition;
         }
@@ -35,33 +35,33 @@ public class S3Camera : MonoBehaviour
 
     public void SnapToTarget()
     {
-        // Å¸°Ù À§Ä¡·Î Áï½Ã ÀÌµ¿
+        // íƒ€ê²Ÿ ìœ„ì¹˜ë¡œ ì¦‰ì‹œ ì´ë™
         if (target != null)
         {
             transform.position = target.position + offset;
         }
     }
 
-    // Player ¿ÀºêÁ§Æ®¸¦ Ã£´Â ÇÔ¼ö
+    // Player ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ëŠ” í•¨ìˆ˜
     public void TryFindPlayer()
     {
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null)
         {
             target = player.transform;
-            Debug.Log("ÇÃ·¹ÀÌ¾î¸¦ Ã£¾Ò½À´Ï´Ù: " + target.name);
+            Debug.Log("í”Œë ˆì´ì–´ë¥¼ ì°¾ì•˜ìŠµë‹ˆë‹¤: " + target.name);
         }
         else
         {
-            Debug.LogWarning("Player¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù. ³ªÁß¿¡ ´Ù½Ã ½ÃµµÇÕ´Ï´Ù.");
-            Invoke(nameof(TryFindPlayer), 1f); // 1ÃÊ ÈÄ ´Ù½Ã ½Ãµµ
+            Debug.LogWarning("Playerë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. ë‚˜ì¤‘ì— ë‹¤ì‹œ ì‹œë„í•©ë‹ˆë‹¤.");
+            Invoke(nameof(TryFindPlayer), 1f); // 1ì´ˆ í›„ ë‹¤ì‹œ ì‹œë„
         }
     }
 
-    // Player¸¦ ¼öµ¿À¸·Î ¼³Á¤ÇÒ ¶§ È£Ãâ
+    // Playerë¥¼ ìˆ˜ë™ìœ¼ë¡œ ì„¤ì •í•  ë•Œ í˜¸ì¶œ
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
-        Debug.Log("Å¸°ÙÀÌ ¼öµ¿À¸·Î ¼³Á¤µÇ¾ú½À´Ï´Ù: " + target.name);
+        Debug.Log("íƒ€ê²Ÿì´ ìˆ˜ë™ìœ¼ë¡œ ì„¤ì •ë˜ì—ˆìŠµë‹ˆë‹¤: " + target.name);
     }
 }

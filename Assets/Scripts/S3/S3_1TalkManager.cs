@@ -18,47 +18,47 @@ public class S3_1TalkManager : MonoBehaviour
         //statue
         talkdata.Add(3000, new string[]
         {
-            "Áø½ÇÀº ´Ü ÇÏ³ª"
+            "ì§„ì‹¤ì€ ë‹¨ í•˜ë‚˜"
         });
 
         talkdata.Add(1001, new string[]
         {
-            "ÇÍºû ÇØ°ñ 6¹øÂ°"
+            "í•ë¹› í•´ê³¨ 6ë²ˆì§¸"
         });
 
         talkdata.Add(1002, new string[]
         {
-            "Àíºû ÇØ°ñ 2¹øÂ°"
+            "ì¿ë¹› í•´ê³¨ 2ë²ˆì§¸"
         });
 
         talkdata.Add(1003, new string[]
         {
-            "´Ù¼¸¹øÂ° ¹¦Áö´Â ¿Ç´Ù"
+            "ë‹¤ì„¯ë²ˆì§¸ ë¬˜ì§€ëŠ” ì˜³ë‹¤"
         });
 
         talkdata.Add(1004, new string[]
         {
-            "¿ÇÀº ÀÚ´Â Ã¹¹øÂ° ¹¦¹Û¿¡ ¾ø´Ù"
+            "ì˜³ì€ ìëŠ” ì²«ë²ˆì§¸ ë¬˜ë°–ì— ì—†ë‹¤"
         });
         talkdata.Add(1005, new string[]
-        { 
-            "¸ğ·§ºû ÇØ°ñ 1¹øÂ°"
+        {
+            "ëª¨ë«ë¹› í•´ê³¨ 1ë²ˆì§¸"
         });
         talkdata.Add(1006, new string[]
         {
-            "¼¼¹øÂ° ¹¦´Â Áø½ÇÀ» ÀÌ¾ß±â ÇÑ´Ù"
+            "ì„¸ë²ˆì§¸ ë¬˜ëŠ” ì§„ì‹¤ì„ ì´ì•¼ê¸° í•œë‹¤"
         });
         talkdata.Add(2001, new string[]
         {
-            "¿À´ä."
+            "ì˜¤ë‹µ."
         });
         talkdata.Add(2002, new string[]
         {
-            "Á¤´ä."
+            "ì •ë‹µ."
         });
     }
 
-    //ÁöÁ¤µÈ ´ëÈ­ ¹®ÀåÀ» ¹İÈ¯ÇÏ´Â ÇÔ¼ö ÇÏ³ª »ı¼º
+    //ì§€ì •ëœ ëŒ€í™” ë¬¸ì¥ì„ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜ í•˜ë‚˜ ìƒì„±
     public string GetTalk(int id, int talkIndex) //talkindex
     {
         return talkdata[id][talkIndex];
