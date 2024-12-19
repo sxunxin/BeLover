@@ -106,54 +106,15 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
                 }
                 if (Input.GetButtonDown("Jump") && scanObject != null)
                 {
-                    // 화면 전환이 되는것이 아니라 판넬을 만들어 텍스트가 나오게 해야한다.
                     NetworkManager nm = FindAnyObjectByType<NetworkManager>();
                     Debug.Log(scanObject.name);
-                    if (scanObject.name == "MainMission1" && scanObject.tag == "MainMission")
+
+                    if (scanObject.tag == "MainMission")
                     {
-                        Msm.StoryPanel.SetActive(true);
-                        Msm.StoryText.text = "거울의 방";
-                        // nm.photonView.RPC("RPC_StartScene2", RpcTarget.All);
+                        HandleMissionSelection(scanObject.name, nm);
                     }
-                    else if (scanObject.name == "MainMission2" && scanObject.tag == "MainMission")
-                    {
-                        Msm.StoryPanel.SetActive(true);
-                        Msm.StoryText.text = "분리의 방";
-                        //nm.photonView.RPC("RPC_StartScene3", RpcTarget.All);
-                    }
-                    else if (scanObject.name == "MainMission3" && scanObject.tag == "MainMission")
-                    {
-                        Msm.StoryPanel.SetActive(true);
-                        Msm.StoryText.text = "어둠의 방";
-                        //nm.photonView.RPC("RPC_StartScene4", RpcTarget.All);
-                    }
-                    if(scanObject.name == "MainMission1" && GameManager.Instance.isMission2Clear == true)
-                    {
-                        Msm.StoryPanel.SetActive(true);
-                        Msm.StoryText.text = "이미 성불한 방이다";
-                    }
-                    if (scanObject.name == "MainMission2" && GameManager.Instance.isMission3Clear == true)
-                    {
-                        Msm.StoryPanel.SetActive(true);
-                        Msm.StoryText.text = "이미 성불한 방이다";
-                    }
-                    if(GameManager.Instance.isMission2Clear == false)
-                    {
-                        if(scanObject.name == "MainMission2" || scanObject.name == "MainMission3")
-                        {
-                            Msm.StoryPanel.SetActive(true);
-                            Msm.StoryText.text = "거울의 방부터 성불해라";
-                        }
-                    }
-                    if (GameManager.Instance.isMission3Clear == false)
-                    {
-                        if (scanObject.name == "MainMission3")
-                        {
-                            Msm.StoryPanel.SetActive(true);
-                            Msm.StoryText.text = "분리의 방부터 성불해라";
-                        }
-                    }
-                    
+
+                    HandleMissionClearCheck(scanObject.name);
                 }
             }
             else if (SceneManager.GetActiveScene().name == "Scene4")
@@ -202,7 +163,121 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
         }
     }
+    void HandleMissionSelection(string missionName, NetworkManager nm)
+    {
+        // UI 패널에 메시지 표시
+        if (missionName == "MainMission1")
+        {
+            Msm.StoryPanel.SetActive(true);
+            Msm.StoryText.text = "거울의 방";
+        }
+        else if (missionName == "MainMission2")
+        {
+            Msm.StoryPanel.SetActive(true);
+            Msm.StoryText.text = "분리의 방";
+        }
+        else if (missionName == "MainMission3")
+        {
+            Msm.StoryPanel.SetActive(true);
+            Msm.StoryText.text = "어둠의 방";
+        }
 
+        // 선택한 미션 정보를 Photon CustomProperties에 저장
+        ExitGames.Client.Photon.Hashtable playerSelection = new ExitGames.Client.Photon.Hashtable
+    {
+        { "SelectedMission", missionName }
+    };
+        PhotonNetwork.LocalPlayer.SetCustomProperties(playerSelection);
+
+        // 모든 플레이어의 선택 정보 확인 (코루틴으로 확인)
+        StartCoroutine(CheckBothPlayersMissionSelection(missionName, nm));
+    }
+
+    void HandleMissionClearCheck(string missionName)
+    {
+        if (missionName == "MainMission1" && GameManager.Instance.isMission2Clear == true)
+        {
+            Msm.StoryPanel.SetActive(true);
+            Msm.StoryText.text = "이미 성불한 방이다";
+        }
+
+        if (missionName == "MainMission2" && GameManager.Instance.isMission3Clear == true)
+        {
+            Msm.StoryPanel.SetActive(true);
+            Msm.StoryText.text = "이미 성불한 방이다";
+        }
+
+        if (GameManager.Instance.isMission2Clear == false)
+        {
+            if (missionName == "MainMission2" || missionName == "MainMission3")
+            {
+                Msm.StoryPanel.SetActive(true);
+                Msm.StoryText.text = "거울의 방부터 성불해라";
+            }
+        }
+
+        if (GameManager.Instance.isMission3Clear == false && missionName == "MainMission3")
+        {
+            Msm.StoryPanel.SetActive(true);
+            Msm.StoryText.text = "분리의 방부터 성불해라";
+        }
+    }
+
+    IEnumerator CheckBothPlayersMissionSelection(string missionName, NetworkManager nm)
+    {
+        float elapsedTime = 0f;
+        bool missionMatched = false;
+
+        while (elapsedTime < 5f) // 5초 동안 매 0.5초마다 확인
+        {
+            yield return new WaitForSeconds(0.5f);
+            elapsedTime += 0.5f;
+
+            // 모든 플레이어의 선택한 미션 정보를 가져옴
+            string player1Mission = "";
+            string player2Mission = "";
+
+            foreach (var player in PhotonNetwork.PlayerList)
+            {
+                if (player.CustomProperties.ContainsKey("SelectedMission"))
+                {
+                    string selectedMission = player.CustomProperties["SelectedMission"].ToString();
+                    if (player.IsLocal)
+                        player1Mission = selectedMission;
+                    else
+                        player2Mission = selectedMission;
+                }
+            }
+
+            // 두 플레이어의 선택이 같은지 확인
+            if (!string.IsNullOrEmpty(player1Mission) && player1Mission == player2Mission)
+            {
+                Debug.Log($"두 플레이어가 같은 미션을 선택했습니다: {missionName}");
+
+                if (missionName == "MainMission1")
+                {
+                    nm.photonView.RPC("RPC_StartScene2", RpcTarget.All);
+                }
+                else if (missionName == "MainMission2")
+                {
+                    nm.photonView.RPC("RPC_StartScene3", RpcTarget.All);
+                }
+                else if (missionName == "MainMission3")
+                {
+                    nm.photonView.RPC("RPC_StartScene4", RpcTarget.All);
+                }
+
+                missionMatched = true;
+                break; // 코루틴 종료
+            }
+        }
+
+        if (!missionMatched)
+        {
+            Debug.LogWarning("두 플레이어의 선택이 일치하지 않았습니다.");
+        }
+    }
+    
     void FixedUpdate()
     {
         if (pv.IsMine)
