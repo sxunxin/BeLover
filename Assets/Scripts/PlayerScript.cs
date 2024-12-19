@@ -8,9 +8,12 @@ using UnityEngine.SceneManagement;
 
 public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 {
+    public MainSceneManager Msm;
+
     [SerializeField]
     private float speed;
     public S3SceneManager S3sm; //s3
+
     float h;
     float v;
 
@@ -19,7 +22,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
     string playerTag;
 
-    GameManager gm;
     Rigidbody2D rd;
     Animator anim;
     public PhotonView pv;
@@ -33,9 +35,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
     void Awake()
     {
-        gm = FindObjectOfType<GameManager>();
         rd = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        Msm = FindObjectOfType<MainSceneManager>();
 
         DontDestroyOnLoad(this.gameObject);
 
@@ -47,6 +49,17 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (pv.IsMine) // 자신의 플레이어만 동작
         {
+            if (Msm != null && Msm.StoryPanel.activeSelf)
+            {
+                if (Input.GetButtonDown("Jump"))
+                {
+                    Msm.StoryPanel.SetActive(false);
+                }
+                //  플레이어의 이동을 정지시킴
+                rd.velocity = Vector2.zero; // 움직임 정지
+                anim.SetBool("isChange", false); // 애니메이션 정지
+                return; //  더 이상 코드 실행 중지
+            }
             // 입력값 처리
             h = Input.GetAxisRaw("Horizontal");
             v = Input.GetAxisRaw("Vertical");
@@ -81,6 +94,62 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
                     {
                         Debug.Log(scanObject.name);
                         S3sm.Action(scanObject);
+                        if (scanObject != null && scanObject.name == "Skull_True")
+                        {
+                            Debug.Log("Player 2가 Skull_True 오브젝트와 상호작용했습니다. 클리어 화면을 모든 클라이언트에 표시합니다.");
+                            S3sm.photonView.RPC("ShowClearUI_RPC", RpcTarget.All, 2); // 조건 2번
+                        }
+                    }
+
+                }
+                if (Input.GetButtonDown("Jump") && scanObject != null)
+                {
+                    // 화면 전환이 되는것이 아니라 판넬을 만들어 텍스트가 나오게 해야한다.
+                    NetworkManager nm = FindAnyObjectByType<NetworkManager>();
+                    Debug.Log(scanObject.name);
+                    if (scanObject.name == "MainMission1" && scanObject.tag == "MainMission")
+                    {
+                        Msm.StoryPanel.SetActive(true);
+                        Msm.StoryText.text = "거울의 방";
+                        // nm.photonView.RPC("RPC_StartScene2", RpcTarget.All);
+                    }
+                    else if (scanObject.name == "MainMission2" && scanObject.tag == "MainMission")
+                    {
+                        Msm.StoryPanel.SetActive(true);
+                        Msm.StoryText.text = "분리의 방";
+                        //nm.photonView.RPC("RPC_StartScene3", RpcTarget.All);
+                    }
+                    else if (scanObject.name == "MainMission3" && scanObject.tag == "MainMission")
+                    {
+                        Msm.StoryPanel.SetActive(true);
+                        Msm.StoryText.text = "어둠의 방";
+                        //nm.photonView.RPC("RPC_StartScene4", RpcTarget.All);
+                    }
+                    if(scanObject.name == "MainMission1" && GameManager.Instance.isMission2Clear == true)
+                    {
+                        Msm.StoryPanel.SetActive(true);
+                        Msm.StoryText.text = "이미 성불한 방이다";
+                    }
+                    if (scanObject.name == "MainMission2" && GameManager.Instance.isMission3Clear == true)
+                    {
+                        Msm.StoryPanel.SetActive(true);
+                        Msm.StoryText.text = "이미 성불한 방이다";
+                    }
+                    if(GameManager.Instance.isMission2Clear == false)
+                    {
+                        if(scanObject.name == "MainMission2" || scanObject.name == "MainMission3")
+                        {
+                            Msm.StoryPanel.SetActive(true);
+                            Msm.StoryText.text = "거울의 방부터 성불해라";
+                        }
+                    }
+                    if (GameManager.Instance.isMission3Clear == false)
+                    {
+                        if (scanObject.name == "MainMission3")
+                        {
+                            Msm.StoryPanel.SetActive(true);
+                            Msm.StoryText.text = "분리의 방부터 성불해라";
+                        }
                     }
                 }
             }
@@ -104,7 +173,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
                         s4manager.ResetButtons();
                     }
                 }
-
             }
 
             if (hDown)
@@ -136,35 +204,33 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             Vector2 moveVec = isHorizonMove ? new Vector2(h, 0) : new Vector2(0, v);
             rd.velocity = moveVec * speed;
-            if (Input.GetButtonDown("Jump"))
+            // Ray 시작 위치를 더 오른쪽으로 이동
+            Vector2 rayStartPos = rd.position + new Vector2(0.2f, -0.3f);
+
+            // 디버그 선 추가
+            Debug.DrawRay(rayStartPos, dirVec * 0.5f, Color.red);
+
+            // Ray를 발사
+            RaycastHit2D rayHit = Physics2D.Raycast(
+                rayStartPos, // 시작 위치
+                dirVec,      // 방향
+                1f,          // 길이 (0.35f -> 1f로 변경)
+                LayerMask.GetMask("Object") // Object 레이어만 탐색
+            );
+
+            if (rayHit.collider != null)
             {
-                // Ray 시작 위치를 더 오른쪽으로 이동
-                Vector2 rayStartPos = rd.position + new Vector2(0.2f, -0.1f);
-
-                // 디버그 선 추가
-                Debug.DrawRay(rayStartPos, dirVec * 0.5f, Color.red);
-
-                // Ray를 발사
-                RaycastHit2D rayHit = Physics2D.Raycast(
-                    rayStartPos, // 시작 위치
-                    dirVec,      // 방향
-                    1f,          // 길이 (0.35f -> 1f로 변경)
-                    LayerMask.GetMask("Object") // Object 레이어만 탐색
-                );
-
-                if (rayHit.collider != null)
-                {
-                    Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.name);
-                    Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.tag);
-                    scanObject = rayHit.collider.gameObject;
-                }
-                else
-                {
-                    scanObject = null;
-                }
+                Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.name);
+                Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.tag);
+                scanObject = rayHit.collider.gameObject;
+            }
+            else
+            {
+                scanObject = null;
             }
         }
     }
+
 
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -181,6 +247,17 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             {
                 portal.OnPlayerEnter(gameObject);
             }
+            // **M1_2Portal과 충돌했을 때만 클리어 화면을 표시**
+            if (collision.gameObject.name == "M1_2Portal" && CompareTag("player2"))
+            {
+                Debug.Log("Player 2가 M1_2Portal에 접촉했습니다. 클리어 화면을 모든 클라이언트에 표시합니다.");
+                S3sm.photonView.RPC("ShowClearUI_RPC", RpcTarget.All, 1); // 조건 1번
+            }
+        }
+
+        if (collision.CompareTag("Bridge"))
+        {
+            Debug.Log("지나갈 수 없어 보인다...");
         }
     }
     private void OnTriggerStay2D(Collider2D collision)
@@ -246,7 +323,16 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         }
         if (scene.name == "MainScene")
         {
-            SetPosition(0f, 0f, 0f);
+            Msm = FindObjectOfType<MainSceneManager>(); // **씬이 로드될 때 Msm 다시 할당**
+            if (Msm != null)
+            {
+                Debug.Log("MainSceneManager 연결 성공");
+            }
+            else
+            {
+                Debug.LogWarning("MainSceneManager를 찾을 수 없습니다.");
+            }
+            SetPosition(3f, -1f, 0f);
         }
         else if (scene.name == "Scene3-1")
         {
