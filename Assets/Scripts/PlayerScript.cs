@@ -38,7 +38,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         rd = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         S3sm = FindObjectOfType<S3SceneManager>();
-        Msm = FindObjectOfType<MainSceneManager>();
 
         DontDestroyOnLoad(this.gameObject);
 
@@ -170,16 +169,19 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             Msm.StoryPanel.SetActive(true);
             Msm.StoryText.text = "거울의 방";
+            Msm.ghostImage.sprite = Msm.GhostImage[0];
         }
         else if (missionName == "MainMission2")
         {
             Msm.StoryPanel.SetActive(true);
             Msm.StoryText.text = "분리의 방";
+            Msm.ghostImage.sprite = Msm.GhostImage[1];
         }
         else if (missionName == "MainMission3")
         {
             Msm.StoryPanel.SetActive(true);
             Msm.StoryText.text = "어둠의 방";
+            Msm.ghostImage.sprite = Msm.GhostImage[2];
         }
 
         // 선택한 미션 정보를 Photon CustomProperties에 저장
@@ -213,6 +215,16 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             {
                 Msm.StoryPanel.SetActive(true);
                 Msm.StoryText.text = "거울의 방부터 성불해라";
+                if(missionName == "MainMission2")
+                {
+                    Msm.ghostImage.sprite = Msm.GhostImage[1];
+                    Msm.ghostImage.color = new Color(0f, 0f, 0f);
+                }
+                else if(missionName == "MainMission3")
+                {
+                    Msm.ghostImage.sprite = Msm.GhostImage[2];
+                    Msm.ghostImage.color = new Color(0f, 0f, 0f);
+                }
             }
         }
 
@@ -220,6 +232,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             Msm.StoryPanel.SetActive(true);
             Msm.StoryText.text = "분리의 방부터 성불해라";
+            Msm.ghostImage.sprite = Msm.GhostImage[2];
+            Msm.ghostImage.color = new Color(0f, 0f, 0f);
         }
     }
 

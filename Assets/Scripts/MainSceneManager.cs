@@ -19,6 +19,8 @@ public class MainSceneManager : MonoBehaviour
     public TypeEffect CinemaText;
 
     public GameObject[] mainMission;
+    public Sprite[] GhostImage;
+    public Image ghostImage;
 
     public bool isCinemaFinished = false;
     public bool isStart = false;
