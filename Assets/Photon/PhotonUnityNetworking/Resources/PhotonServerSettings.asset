@@ -65,6 +65,8 @@ MonoBehaviour:
   - SetSpeedRPC
   - OnTriggerStay2D
   - RPC_StartScene4
+  - ActivatePairedPortal
+  - ShowClearUI_RPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

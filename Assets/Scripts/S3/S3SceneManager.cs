@@ -5,13 +5,15 @@ using TMPro;
 using Photon.Pun;
 
 
-public class S3SceneManager : MonoBehaviour
+public class S3SceneManager : MonoBehaviourPun
 {
     //플레이어가 스캔한 오브젝트 가져오기 & UI 
     public TextMeshProUGUI talkText;
     public GameObject scanObject;
 
     public GameObject talkPanel;
+    public GameObject clearPanel;
+    public TextMeshProUGUI clearUIText; // Clear UI의 텍스트 변경을 위해 추가
     public bool isAction; //활성화 상태 판단 변수
 
     public S3_1TalkManager talkManager;
@@ -130,14 +132,8 @@ public class S3SceneManager : MonoBehaviour
             isAction = true;
             scanObject = scanObj;
             S3ObjectData objData = scanObj.GetComponent<S3ObjectData>();
-            Talk(objData.id, objData.isTomb,objData.SkullTrue);
-            /*
-            if (objData != null)
-            {
-                Talk(objData.id, objData.isTomb,objData.SkullTrue); // id를 전달하여 대화 처리
-            }*/
+            Talk(objData.id, objData.isTomb, objData.SkullTrue);
         }
-
         talkPanel.SetActive(isAction);
     }
 
@@ -159,5 +155,46 @@ public class S3SceneManager : MonoBehaviour
             talkText.text = talkData;
         }
         
-    } 
+    }
+    // 클리어 UI를 화면에 표시하고 2초 후에 사라지게 하는 메서드
+    [PunRPC]
+    public void ShowClearUI_RPC(int type)
+    {
+        if (clearPanel != null)
+        {
+            clearPanel.SetActive(true);
+
+            // **조건에 따라 클리어 UI의 텍스트 변경**
+            switch (type)
+            {
+                case 1:
+                    clearUIText.text = "1st clear!";
+                    break;
+                case 2:
+                    clearUIText.text = "2nd clear!";
+                    break;
+                default:
+                    clearUIText.text = "3rd clear!";
+                    break;
+            }
+
+            Debug.Log($"Clear UI가 모든 클라이언트에 표시됩니다. 조건: {type}");
+            StartCoroutine(HideClearUIAfterDelay(2f));
+        }
+        else
+        {
+            Debug.LogWarning("Clear UI 오브젝트가 설정되지 않았습니다.");
+        }
+    }
+
+    // 2초 후에 클리어 UI를 숨기는 코루틴
+    private IEnumerator HideClearUIAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (clearPanel != null)
+        {
+            clearPanel.SetActive(false);
+            Debug.Log("Clear UI가 사라졌습니다.");
+        }
+    }
 }

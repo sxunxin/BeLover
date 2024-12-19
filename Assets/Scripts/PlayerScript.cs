@@ -36,6 +36,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         gm = FindObjectOfType<GameManager>();
         rd = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        S3sm = FindObjectOfType<S3SceneManager>();
 
         DontDestroyOnLoad(this.gameObject);
 
@@ -48,13 +49,13 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         if (pv.IsMine) // 자신의 플레이어만 동작
         {
             // 입력값 처리
-            h = Input.GetAxisRaw("Horizontal");
-            v = Input.GetAxisRaw("Vertical");
+            h =  Input.GetAxisRaw("Horizontal");
+            v =  Input.GetAxisRaw("Vertical");
 
             bool hDown = Input.GetButtonDown("Horizontal");
             bool vDown = Input.GetButtonDown("Vertical");
-            bool hUp = Input.GetButtonUp("Horizontal");
-            bool vUp = Input.GetButtonUp("Vertical");
+            bool hUp =  Input.GetButtonUp("Horizontal");
+            bool vUp =  Input.GetButtonUp("Vertical");
 
             // 태그 설정
             playerTag = gameObject.CompareTag("player1") ? "player1" : "player2";
@@ -81,7 +82,13 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
                     {
                         Debug.Log(scanObject.name);
                         S3sm.Action(scanObject);
+                        if (scanObject != null && scanObject.name == "Skull_True")
+                        {
+                            Debug.Log("Player 2가 Skull_True 오브젝트와 상호작용했습니다. 클리어 화면을 모든 클라이언트에 표시합니다.");
+                            S3sm.photonView.RPC("ShowClearUI_RPC", RpcTarget.All, 2); // 조건 2번
+                        }
                     }
+                    
                 }
             }
             else if (SceneManager.GetActiveScene().name == "Scene4")
@@ -127,6 +134,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             }
             else
                 anim.SetBool("isChange", false);
+
+
         }
     }
 
@@ -136,36 +145,32 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         {
             Vector2 moveVec = isHorizonMove ? new Vector2(h, 0) : new Vector2(0, v);
             rd.velocity = moveVec * speed;
-            if (Input.GetButtonDown("Jump"))
+            // Ray 시작 위치를 더 오른쪽으로 이동
+            Vector2 rayStartPos = rd.position + new Vector2(0.2f, -0.3f);
+
+            // 디버그 선 추가
+            Debug.DrawRay(rayStartPos, dirVec * 0.5f, Color.red);
+
+            // Ray를 발사
+            RaycastHit2D rayHit = Physics2D.Raycast(
+                rayStartPos, // 시작 위치
+                dirVec,      // 방향
+                1f,          // 길이 (0.35f -> 1f로 변경)
+                LayerMask.GetMask("Object") // Object 레이어만 탐색
+            );
+
+            if (rayHit.collider != null)
             {
-                // Ray 시작 위치를 더 오른쪽으로 이동
-                Vector2 rayStartPos = rd.position + new Vector2(0.2f, -0.1f);
-
-                // 디버그 선 추가
-                Debug.DrawRay(rayStartPos, dirVec * 0.5f, Color.red);
-
-                // Ray를 발사
-                RaycastHit2D rayHit = Physics2D.Raycast(
-                    rayStartPos, // 시작 위치
-                    dirVec,      // 방향
-                    1f,          // 길이 (0.35f -> 1f로 변경)
-                    LayerMask.GetMask("Object") // Object 레이어만 탐색
-                );
-
-                if (rayHit.collider != null)
-                {
-                    Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.name);
-                    Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.tag);
-                    scanObject = rayHit.collider.gameObject;
-                }
-                else
-                {
-                    scanObject = null;
-                }
+                Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.name);
+                Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.tag);
+                scanObject = rayHit.collider.gameObject;
+            }
+            else
+            {
+                scanObject = null;
             }
         }
     }
-
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -180,6 +185,12 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             if (portal != null)
             {
                 portal.OnPlayerEnter(gameObject);
+            }
+            // **M1_2Portal과 충돌했을 때만 클리어 화면을 표시**
+            if (collision.gameObject.name == "M1_2Portal" && CompareTag("player2"))
+            {
+                Debug.Log("Player 2가 M1_2Portal에 접촉했습니다. 클리어 화면을 모든 클라이언트에 표시합니다.");
+                S3sm.photonView.RPC("ShowClearUI_RPC", RpcTarget.All, 1); // 조건 1번
             }
         }
     }
