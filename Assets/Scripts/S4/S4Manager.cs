@@ -12,10 +12,11 @@ public class S4Manager : MonoBehaviour
     public GameObject mapLight;
     public float lightMoveSpeed = 5f;
     public Vector3[] lightPositions;
-    
+
     private ResetStatue resetStatue;
     private Btn[] Btns;
-    
+    private bool isRight = true;
+
 
     private void Start()
     {
@@ -26,8 +27,13 @@ public class S4Manager : MonoBehaviour
         mapLight.transform.position = lightPositions[1];
     }
 
-    public bool OnButtonPressed(int buttonID)
+    public int OnButtonPressed(int buttonID)
     {
+        if (!isRight)
+        {
+            return 2;
+        }
+
         if (buttonID == currentButtonIndex) // 올바른 순서로 밟았을 때
         {
             Debug.Log($"Button {buttonID} Correct!");
@@ -43,22 +49,24 @@ public class S4Manager : MonoBehaviour
                 house2.SetActive(true);
                 blind.SetActive(false);
             }
-            return true;
+            return 1;
         }
         else if (buttonID > currentButtonIndex)
         {
+            isRight = false;
             Debug.Log($"Button {buttonID} Incorrect!");
             currentButtonIndex = 0; // 버튼 순서
             MoveLightToNextPosition();
-            return false;
+            return 0;
         }
-        return true;
+        return 2;
     }
 
     public void ResetButtons()
     {
         Debug.Log("Resetting Buttons!");
         currentButtonIndex = 1;
+        isRight = true;
         MoveLightToNextPosition();
         foreach (Btn button in Btns)
         {
