@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class S1PlayerScript : MonoBehaviourPunCallbacks
 {
-    GameManager gm;
     public float speed;
 
     Animator anim;
@@ -32,7 +31,6 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
     void Awake()
     {
-        gm = FindObjectOfType<GameManager>();
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -262,7 +260,7 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
         if (other.gameObject.tag == "Goal")
         {
-            gm.isMission1Clear = true;
+            GameManager.Instance.isMission1Clear = true;
             Debug.Log("Mission1 Clear");
             if (PhotonNetwork.IsMasterClient)
             {
@@ -280,7 +278,7 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
         if(other.gameObject.tag == "Mirror")
         {
-            gm.isMission2Clear = true;
+            GameManager.Instance.isMission2Clear = true;
             if (PhotonNetwork.IsMasterClient)
             {
                 PhotonNetwork.LoadLevel("MainScene");

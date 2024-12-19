@@ -671,13 +671,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   StartSceneBGM: {fileID: 8300000, guid: 19d4d16b094e4124190113ed973d6238, type: 3}
-  mainSceneBGM: {fileID: 0}
+  mainSceneBGM: {fileID: 8300000, guid: 19d4d16b094e4124190113ed973d6238, type: 3}
   scene1BGM: {fileID: 0}
   scene2BGM: {fileID: 8300000, guid: 44082c09722d7f8499c1887ae58d8c7c, type: 3}
-  scene3_1BGM: {fileID: 0}
-  scene3BGM: {fileID: 0}
+  scene3_1BGM: {fileID: 8300000, guid: 17bd59a508c2a2f4abf3cba24ad099c2, type: 3}
+  scene3BGM: {fileID: 8300000, guid: 17bd59a508c2a2f4abf3cba24ad099c2, type: 3}
   scene4BGM: {fileID: 0}
-  scene5BGM: {fileID: 0}
+  scene5BGM: {fileID: 8300000, guid: e04581ca4fc591d4fbff4bcdfc07ef95, type: 3}
 --- !u!4 &1759711036
 Transform:
   m_ObjectHideFlags: 0

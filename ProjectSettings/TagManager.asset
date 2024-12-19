@@ -15,6 +15,7 @@ TagManager:
   - Mirror
   - Blind
   - ResetStatue
+  - Bridge
   layers:
   - Default
   - TransparentFX

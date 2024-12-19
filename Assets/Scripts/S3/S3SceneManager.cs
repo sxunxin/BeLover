@@ -7,14 +7,14 @@ using Photon.Pun;
 
 public class S3SceneManager : MonoBehaviourPun
 {
-    //ÇÃ·¹ÀÌ¾î°¡ ½ºÄµÇÑ ¿ÀºêÁ§Æ® °¡Á®¿À±â & UI 
+    //ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½Äµï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ & UI 
     public TextMeshProUGUI talkText;
     public GameObject scanObject;
 
     public GameObject talkPanel;
     public GameObject clearPanel;
-    public TextMeshProUGUI clearUIText; // Clear UIÀÇ ÅØ½ºÆ® º¯°æÀ» À§ÇØ Ãß°¡
-    public bool isAction; //È°¼ºÈ­ »óÅÂ ÆÇ´Ü º¯¼ö
+    public TextMeshProUGUI clearUIText; // Clear UIï¿½ï¿½ ï¿½Ø½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
+    public bool isAction; //È°ï¿½ï¿½È­ ï¿½ï¿½ï¿½ï¿½ ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     public S3_1TalkManager talkManager;
     public int talkIndex;
@@ -35,7 +35,7 @@ public class S3SceneManager : MonoBehaviourPun
         }
     }
 
-    // Á¤´ä ¸ÅÇÎ Å×ÀÌºí
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìºï¿½
     private readonly Dictionary<string, string> correctPairs = new Dictionary<string, string>
     {
         { "Button1", "Road1" },
@@ -45,7 +45,7 @@ public class S3SceneManager : MonoBehaviourPun
 
     public static string p1ObjectName = "None";
     public static string p2ObjectName = "None";
-    public bool isButtonInteracted = false; // ¹öÆ° »óÈ£ÀÛ¿ë ¿©ºÎ
+    public bool isButtonInteracted = false; // ï¿½ï¿½Æ° ï¿½ï¿½È£ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     public bool IsButtonInteracted()
     {
@@ -53,10 +53,10 @@ public class S3SceneManager : MonoBehaviourPun
     }
     public void SetP1ObjectName(string objectName)
     {
-        if (!isButtonInteracted) // ¹öÆ° »óÈ£ÀÛ¿ëÀÌ ¾ÆÁ÷ ÀÌ·ç¾îÁöÁö ¾ÊÀº °æ¿ì
+        if (!isButtonInteracted) // ï¿½ï¿½Æ° ï¿½ï¿½È£ï¿½Û¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ì·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         {
             isButtonInteracted = true;
-            Debug.Log($"Player1ÀÌ ¹öÆ° {objectName}À»(¸¦) »óÈ£ÀÛ¿ëÇß½À´Ï´Ù.");
+            Debug.Log($"Player1ï¿½ï¿½ ï¿½ï¿½Æ° {objectName}ï¿½ï¿½(ï¿½ï¿½) ï¿½ï¿½È£ï¿½Û¿ï¿½ï¿½ß½ï¿½ï¿½Ï´ï¿½.");
         }
         p1ObjectName = objectName;
         CheckMatch();
@@ -70,22 +70,22 @@ public class S3SceneManager : MonoBehaviourPun
 
     private void CheckMatch()
     {
-        // Button°ú Road ÀÌ¸§ÀÌ ¸ðµÎ ¼³Á¤µÈ °æ¿ì
+        // Buttonï¿½ï¿½ Road ï¿½Ì¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         if (p1ObjectName != "None" && p2ObjectName != "None")
         {
-            // ¸ÅÇÎ Å×ÀÌºí¿¡¼­ Á¤´ä È®ÀÎ
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìºï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
             if (correctPairs.TryGetValue(p1ObjectName, out string correctRoad) && correctRoad == p2ObjectName)
             {
-                Debug.Log($"Á¤´ä! {p1ObjectName} ¡ê {p2ObjectName} ¸ÅÄª ¼º°ø!");
+                Debug.Log($"ï¿½ï¿½ï¿½ï¿½! {p1ObjectName} ï¿½ï¿½ {p2ObjectName} ï¿½ï¿½Äª ï¿½ï¿½ï¿½ï¿½!");
                 OnCorrectMatch();
             }
             else
             {
-                Debug.Log($"¿À´ä! {p1ObjectName} ¡ê {p2ObjectName} ¸ÅÄª ½ÇÆÐ!");
+                Debug.Log($"ï¿½ï¿½ï¿½ï¿½! {p1ObjectName} ï¿½ï¿½ {p2ObjectName} ï¿½ï¿½Äª ï¿½ï¿½ï¿½ï¿½!");
                 OnIncorrectMatch();
             }
 
-            // ¸ÅÄª ÀÌ¸§ ÃÊ±âÈ­
+            // ï¿½ï¿½Äª ï¿½Ì¸ï¿½ ï¿½Ê±ï¿½È­
             p1ObjectName = "None";
             p2ObjectName = "None";
         }
@@ -93,28 +93,28 @@ public class S3SceneManager : MonoBehaviourPun
 
     private void OnCorrectMatch()
     {
-        Debug.Log("Á¤´ä¿¡ ´ëÇÑ º¸»óÀ» ÁÝ´Ï´Ù. ¼Óµµ°¡ Áõ°¡ÇÕ´Ï´Ù.");
+        Debug.Log("ï¿½ï¿½ï¿½ä¿¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ý´Ï´ï¿½. ï¿½Óµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.");
         PlayerScript[] players = FindObjectsOfType<PlayerScript>();
         foreach (var player in players)
         {
             if (player.CompareTag("player2"))
             {
-                player.photonView.RPC("SetSpeedRPC", RpcTarget.All, 1f); // ¸ðµç Å¬¶óÀÌ¾ðÆ®¿¡ ¼Óµµ º¯°æ
-                Debug.Log("Player 2ÀÇ ¼Óµµ°¡ 1·Î ¼³Á¤µÇ¾ú½À´Ï´Ù.");
+                player.photonView.RPC("SetSpeedRPC", RpcTarget.All, 1f); // ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½
+                Debug.Log("Player 2ï¿½ï¿½ ï¿½Óµï¿½ï¿½ï¿½ 1ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
             }
         }
     }
 
     private void OnIncorrectMatch()
     {
-        Debug.Log("¿À´ä¿¡ ´ëÇÑ Æä³ÎÆ¼¸¦ ÁÝ´Ï´Ù. ¼Óµµ°¡ °¨¼ÒÇÕ´Ï´Ù.");
+        Debug.Log("ï¿½ï¿½ï¿½ä¿¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Æ¼ï¿½ï¿½ ï¿½Ý´Ï´ï¿½. ï¿½Óµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.");
         PlayerScript[] players = FindObjectsOfType<PlayerScript>();
         foreach (var player in players)
         {
             if (player.CompareTag("player2"))
             {
-                player.photonView.RPC("SetSpeedRPC", RpcTarget.All, 0.5f); // ¸ðµç Å¬¶óÀÌ¾ðÆ®¿¡ ¼Óµµ º¯°æ
-                Debug.Log("Player 2ÀÇ ¼Óµµ°¡ 0.5·Î ¼³Á¤µÇ¾ú½À´Ï´Ù.");
+                player.photonView.RPC("SetSpeedRPC", RpcTarget.All, 0.5f); // ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½
+                Debug.Log("Player 2ï¿½ï¿½ ï¿½Óµï¿½ï¿½ï¿½ 0.5ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
             }
         }
     }
@@ -138,8 +138,8 @@ public class S3SceneManager : MonoBehaviourPun
     }
 
     //s3 m2 
-    //ÄûÁî Ãâ·Â ÇÏ¸é µÉ°Å °°Àºµ¥
-    public void Talk(int id, bool isTomb,bool skullTrue)
+    //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ï¸ï¿½ ï¿½É°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    public void Talk(int id, bool isTomb, bool skullTrue)
     {
         string talkData = talkManager.GetTalk(id, talkIndex);
         if (isTomb)
@@ -154,9 +154,8 @@ public class S3SceneManager : MonoBehaviourPun
         {
             talkText.text = talkData;
         }
-        
     }
-    // Å¬¸®¾î UI¸¦ È­¸é¿¡ Ç¥½ÃÇÏ°í 2ÃÊ ÈÄ¿¡ »ç¶óÁö°Ô ÇÏ´Â ¸Þ¼­µå
+    // Å¬ï¿½ï¿½ï¿½ï¿½ UIï¿½ï¿½ È­ï¿½é¿¡ Ç¥ï¿½ï¿½ï¿½Ï°ï¿½ 2ï¿½ï¿½ ï¿½Ä¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ï´ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½
     [PunRPC]
     public void ShowClearUI_RPC(int type)
     {
@@ -164,7 +163,7 @@ public class S3SceneManager : MonoBehaviourPun
         {
             clearPanel.SetActive(true);
 
-            // **Á¶°Ç¿¡ µû¶ó Å¬¸®¾î UIÀÇ ÅØ½ºÆ® º¯°æ**
+            // **ï¿½ï¿½ï¿½Ç¿ï¿½ ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ UIï¿½ï¿½ ï¿½Ø½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½**
             switch (type)
             {
                 case 1:
@@ -178,23 +177,23 @@ public class S3SceneManager : MonoBehaviourPun
                     break;
             }
 
-            Debug.Log($"Clear UI°¡ ¸ðµç Å¬¶óÀÌ¾ðÆ®¿¡ Ç¥½ÃµË´Ï´Ù. Á¶°Ç: {type}");
+            Debug.Log($"Clear UIï¿½ï¿½ ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ Ç¥ï¿½ÃµË´Ï´ï¿½. ï¿½ï¿½ï¿½ï¿½: {type}");
             StartCoroutine(HideClearUIAfterDelay(2f));
         }
         else
         {
-            Debug.LogWarning("Clear UI ¿ÀºêÁ§Æ®°¡ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.LogWarning("Clear UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾Ò½ï¿½ï¿½Ï´ï¿½.");
         }
     }
 
-    // 2ÃÊ ÈÄ¿¡ Å¬¸®¾î UI¸¦ ¼û±â´Â ÄÚ·çÆ¾
+    // 2ï¿½ï¿½ ï¿½Ä¿ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ UIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ú·ï¿½Æ¾
     private IEnumerator HideClearUIAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
         if (clearPanel != null)
         {
             clearPanel.SetActive(false);
-            Debug.Log("Clear UI°¡ »ç¶óÁ³½À´Ï´Ù.");
+            Debug.Log("Clear UIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
         }
     }
 }

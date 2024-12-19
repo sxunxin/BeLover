@@ -2,15 +2,18 @@ using System.Collections;
 using UnityEngine;
 using Photon.Pun;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainSceneManager : MonoBehaviour
 {
-    GameManager gm;
     NetworkManager nm;
     public GameObject storyPanel;
     public Button StartBtn;
     public Image CinemaImage1;
     public Image CinemaImage2;
+
+    public GameObject StoryPanel;
+    public TextMeshProUGUI StoryText;
 
     public GameObject[] mainMission;
 
@@ -18,7 +21,6 @@ public class MainSceneManager : MonoBehaviour
 
     void Awake()
     {
-        gm = FindObjectOfType<GameManager>();
         nm = FindObjectOfType<NetworkManager>();
 
         // 게임 재실행 시 항상 storyPanel을 활성화
@@ -34,24 +36,24 @@ public class MainSceneManager : MonoBehaviour
 
     void Update()
     {
-        if (gm.mainSceneEnterCount >= 2)
+        if (GameManager.Instance.mainSceneEnterCount >= 2)
         {
             storyPanel.SetActive(false);
-            if (gm.mainSceneEnterCount == 2 && gm.isMission1Clear == true && gm.isMission2Clear == false && gm.isMission3Clear == false)
+            if (GameManager.Instance.mainSceneEnterCount == 2 && GameManager.Instance.isMission1Clear == true && GameManager.Instance.isMission2Clear == false && GameManager.Instance.isMission3Clear == false)
             {
                 mainMission[0].tag = "MainMission";
             }
             else
                 mainMission[0].tag = "Untagged";
 
-            if (gm.mainSceneEnterCount == 3 && gm.isMission1Clear == true && gm.isMission2Clear == true && gm.isMission3Clear == false)
+            if (GameManager.Instance.mainSceneEnterCount == 3 && GameManager.Instance.isMission1Clear == true && GameManager.Instance.isMission2Clear == true && GameManager.Instance.isMission3Clear == false)
             {
                 mainMission[1].tag = "MainMission";
             }
             else
                 mainMission[1].tag = "Untagged";
 
-            if (gm.mainSceneEnterCount == 4 && gm.isMission1Clear == true && gm.isMission2Clear == true && gm.isMission3Clear == true)
+            if (GameManager.Instance.mainSceneEnterCount == 4 && GameManager.Instance.isMission1Clear == true && GameManager.Instance.isMission2Clear == true && GameManager.Instance.isMission3Clear == true)
             {
                 mainMission[2].tag = "MainMission";
             }

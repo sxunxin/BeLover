@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun; // Photon ³×ÀÓ½ºÆäÀÌ½º Ãß°¡
+using Photon.Pun; // Photon ë„¤ì„ìŠ¤í˜ì´ìŠ¤ ì¶”ê°€
 
 public class S3Portal : MonoBehaviourPun
 {
     public GameObject targetSpawnPoint;
-    public GameObject pairedPortal; // ¿¬°áµÈ Æ÷Å»À» ÂüÁ¶ÇÕ´Ï´Ù.
+    public GameObject pairedPortal; // ì—°ê²°ëœ í¬íƒˆì„ ì°¸ì¡°í•©ë‹ˆë‹¤.
 
     public void OnPlayerEnter(GameObject player)
     {
@@ -17,17 +17,17 @@ public class S3Portal : MonoBehaviourPun
             {
                 rb.position = targetSpawnPoint.transform.position;
                 Debug.Log($"Player moved to {targetSpawnPoint.transform.position}");
-                // M1_2 Æ÷Å»ÀÌ ÀÛµ¿ÇÏ¸é M1_1 Æ÷Å»À» È°¼ºÈ­ÇÕ´Ï´Ù.
+                // M1_2 í¬íƒˆì´ ì‘ë™í•˜ë©´ M1_1 í¬íƒˆì„ í™œì„±í™”í•©ë‹ˆë‹¤.
                 if (gameObject.name == "M1_2Portal" && pairedPortal != null)
                 {
                     photonView.RPC("ActivatePairedPortal", RpcTarget.All, pairedPortal.name);
-                    Debug.Log("M1_1 Æ÷Å»ÀÌ È°¼ºÈ­µÇ¾ú½À´Ï´Ù.");
+                    Debug.Log("M1_1 í¬íƒˆì´ í™œì„±í™”ë˜ì—ˆìŠµë‹ˆë‹¤.");
                 }
-                // M2_2 Æ÷Å»ÀÌ ÀÛµ¿ÇÏ¸é M2_1 Æ÷Å»À» È°¼ºÈ­ÇÕ´Ï´Ù.
+                // M2_2 í¬íƒˆì´ ì‘ë™í•˜ë©´ M2_1 í¬íƒˆì„ í™œì„±í™”í•©ë‹ˆë‹¤.
                 else if (gameObject.name == "M2_2Portal" && pairedPortal != null)
                 {
                     photonView.RPC("ActivatePairedPortal", RpcTarget.All, pairedPortal.name);
-                    Debug.Log("M2_1 Æ÷Å»ÀÌ È°¼ºÈ­µÇ¾ú½À´Ï´Ù.");
+                    Debug.Log("M2_1 í¬íƒˆì´ í™œì„±í™”ë˜ì—ˆìŠµë‹ˆë‹¤.");
                 }
             }
         }
@@ -45,28 +45,28 @@ public class S3Portal : MonoBehaviourPun
                 Rigidbody2D rb = collision.GetComponent<Rigidbody2D>();
                 if (rb != null)
                 {
-                    // ÇÃ·¹ÀÌ¾î ÀÌµ¿
+                    // í”Œë ˆì´ì–´ ì´ë™
                     rb.position = targetSpawnPoint.transform.position;
                     Debug.Log($"Player moved to {targetSpawnPoint.transform.position}");
-                    // M1_2 Æ÷Å»ÀÌ ÀÛµ¿ÇÏ¸é M1_1 Æ÷Å»À» È°¼ºÈ­ÇÕ´Ï´Ù.
+                    // M1_2 í¬íƒˆì´ ì‘ë™í•˜ë©´ M1_1 í¬íƒˆì„ í™œì„±í™”í•©ë‹ˆë‹¤.
                     if (gameObject.name == "M1_2Portal" && pairedPortal != null)
                     {
                         photonView.RPC("ActivatePairedPortal", RpcTarget.All, pairedPortal.name); 
-                        Debug.Log("M1_1 Æ÷Å»ÀÌ È°¼ºÈ­µÇ¾ú½À´Ï´Ù.");
+                        Debug.Log("M1_1 í¬íƒˆì´ í™œì„±í™”ë˜ì—ˆìŠµë‹ˆë‹¤.");
                     }
-                    // M2_2 Æ÷Å»ÀÌ ÀÛµ¿ÇÏ¸é M2_1 Æ÷Å»À» È°¼ºÈ­ÇÕ´Ï´Ù.
+                    // M2_2 í¬íƒˆì´ ì‘ë™í•˜ë©´ M2_1 í¬íƒˆì„ í™œì„±í™”í•©ë‹ˆë‹¤.
                     else if (gameObject.name == "M2_2Portal" && pairedPortal != null)
                     {
                         photonView.RPC("ActivatePairedPortal", RpcTarget.All, pairedPortal.name);
-                        Debug.Log("M2_1 Æ÷Å»ÀÌ È°¼ºÈ­µÇ¾ú½À´Ï´Ù.");
+                        Debug.Log("M2_1 í¬íƒˆì´ í™œì„±í™”ë˜ì—ˆìŠµë‹ˆë‹¤.");
                     }
                 }
 
-                // Ä«¸Ş¶ó ÀÌµ¿
+                // ì¹´ë©”ë¼ ì´ë™
                 S3Camera cameraFollow = Camera.main.GetComponent<S3Camera>();
                 if (cameraFollow != null)
                 {
-                    cameraFollow.SnapToTarget(); // Áï½Ã ÀÌµ¿
+                    cameraFollow.SnapToTarget(); // ì¦‰ì‹œ ì´ë™
                 }
             }
             else
@@ -75,7 +75,7 @@ public class S3Portal : MonoBehaviourPun
             }
         }
     }
-    //¸ğµç Å¬¶óÀÌ¾ğÆ®°¡ ½ÇÇàÇÒ Æ÷Å» È°¼ºÈ­ ¸Ş¼­µå
+    //ëª¨ë“  í´ë¼ì´ì–¸íŠ¸ê°€ ì‹¤í–‰í•  í¬íƒˆ í™œì„±í™” ë©”ì„œë“œ
     [PunRPC]
     public void ActivatePairedPortal(string portalName)
     {
@@ -83,11 +83,11 @@ public class S3Portal : MonoBehaviourPun
         if (portalToActivate != null)
         {
             portalToActivate.SetActive(true);
-            Debug.Log($"{portalName} Æ÷Å»ÀÌ È°¼ºÈ­µÇ¾ú½À´Ï´Ù.");
+            Debug.Log($"{portalName} í¬íƒˆì´ í™œì„±í™”ë˜ì—ˆìŠµë‹ˆë‹¤.");
         }
         else
         {
-            Debug.LogWarning($"{portalName} Æ÷Å»À» Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+            Debug.LogWarning($"{portalName} í¬íƒˆì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
         }
     }
 }
