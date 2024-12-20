@@ -30,20 +30,29 @@ public class MainSceneManager : MonoBehaviour
         nm = FindObjectOfType<NetworkManager>();
         tm = FindObjectOfType<TalkManager>();
 
-        // 게임 재실행 시 항상 storyPanel을 활성화
+        // ???? ?????? ?? ???? storyPanel?? ??????
         storyPanel.SetActive(true);
         StartBtn.gameObject.SetActive(false);
 
-        // 필요하면 PlayerPrefs 초기화
+        // ???????? PlayerPrefs ??????
         PlayerPrefs.SetInt("StoryPanelHidden", 0);
     }
     private void Start()
     {
-        // 씬이 시작되면 시네마틱 애니메이션 시작
+        // ???? ???????? ???????? ?????????? ????
         StartCoroutine(CinemaSequence());
     }
     void Update()
     {
+
+        // ================= ??? ?? ?? (?? ??) =================
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            SpawnChar();
+        }
+        // ==========================================================
+
+
         if (tm.isDialogueFinished && isStart == false)
         {
             StartBtn.gameObject.SetActive(true);
@@ -73,30 +82,32 @@ public class MainSceneManager : MonoBehaviour
             else
                 mainMission[2].tag = "Untagged";
         }
+
+      
     }
 
     public void SpawnChar()
     {
         isStart = true;
-        // 버튼을 비활성화하여 더 이상 보이지 않게 만듭니다.
+        // ?????? ???????????? ?? ???? ?????? ???? ????????.
         StartBtn.gameObject.SetActive(false);
 
-        // storyPanel 숨김 상태 저장
+        // storyPanel ???? ???? ????
         PlayerPrefs.SetInt("StoryPanelHidden", 1);
 
-        // Spawn 전에 ViewID 관리
+        // Spawn ???? ViewID ????
         nm.Spawn();
 
-        // 버튼을 누른 플레이어 정보 업데이트
+        // ?????? ???? ???????? ???? ????????
         UpdatePlayerReadyStatus();
 
-        // 두 플레이어가 준비 상태인지 확인
+        // ?? ?????????? ???? ???????? ????
         StartCoroutine(CheckBothPlayersReady());
     }
 
     void UpdatePlayerReadyStatus()
     {
-        // 현재 플레이어가 준비 상태임을 설정
+        // ???? ?????????? ???? ???????? ????
         var props = new ExitGames.Client.Photon.Hashtable
         {
             { "IsReady", true }
@@ -108,7 +119,7 @@ public class MainSceneManager : MonoBehaviour
     {
         while (true)
         {
-            // 모든 플레이어의 CustomProperties 확인
+            // ???? ?????????? CustomProperties ????
             bool allReady = true;
             foreach (var player in PhotonNetwork.PlayerList)
             {
@@ -122,47 +133,47 @@ public class MainSceneManager : MonoBehaviour
                 }
             }
 
-            // 두 플레이어가 모두 준비 상태면 Scene1으로 이동
+            // ?? ?????????? ???? ???? ?????? Scene1???? ????
             if (allReady)
             {
-                yield return new WaitForSeconds(3f); // 3초 대기
-                nm.StartScene1(); // Scene1으로 이동
-                yield break; // Coroutine 종료
+                yield return new WaitForSeconds(3f); // 3?? ????
+                nm.StartScene1(); // Scene1???? ????
+                yield break; // Coroutine ????
             }
 
-            yield return null; // 다음 프레임까지 대기
+            yield return null; // ???? ?????????? ????
         }
     }
 
     // =========================
-    //   시네마틱 애니메이션 부분
+    //   ???????? ?????????? ????
     // =========================
 
     IEnumerator CinemaSequence()
     {
-        CinemaText.SetMsg("어두운 방 한 남자가 괴로워하고 있다");
+        CinemaText.SetMsg("?????? ?? ?? ?????? ?????????? ????");
 
-        yield return new WaitForSeconds(3f); // 3초 대기 후 페이드 아웃 시작
+        yield return new WaitForSeconds(3f); // 3?? ???? ?? ?????? ???? ????
 
-        // CinemaImage1 페이드 아웃과 CinemaImage2 페이드 인을 동시에 실행
-        StartCoroutine(FadeOutImage(CinemaImage1, 3f)); // 3초 동안 페이드 아웃
+        // CinemaImage1 ?????? ?????? CinemaImage2 ?????? ???? ?????? ????
+        StartCoroutine(FadeOutImage(CinemaImage1, 3f)); // 3?? ???? ?????? ????
 
         yield return new WaitForSeconds(1f);
 
-        yield return StartCoroutine(FadeInImage(CinemaImage2, 5f)); // 7초 동안 페이드 인
+        yield return StartCoroutine(FadeInImage(CinemaImage2, 5f)); // 7?? ???? ?????? ??
 
-        CinemaText.SetMsg("한참을 괴로워하다가 잠에 들었다");
-        // 페이드 인 완료 후 5초 동안 CinemaImage2의 크기를 3배로 확대
-        yield return StartCoroutine(ScaleImage(CinemaImage2, 2.2f, 5f)); // 5초 동안 3배 확대
+        CinemaText.SetMsg("?????? ???????????? ???? ??????");
+        // ?????? ?? ???? ?? 5?? ???? CinemaImage2?? ?????? 3???? ????
+        yield return StartCoroutine(ScaleImage(CinemaImage2, 2.2f, 5f)); // 5?? ???? 3?? ????
 
-        // 확대가 끝난 후 3초 동안 대기
+        // ?????? ???? ?? 3?? ???? ????
         yield return new WaitForSeconds(3f);
 
-        // 확대가 끝난 후 3초 동안 CinemaImage2를 검은색으로 변경
-        StartCoroutine(FadeToBlackImage(CinemaImage2, 3f)); // 이미지 RGB 변경
-        yield return StartCoroutine(FadeToBlackText(CinemaText, 3f)); // 텍스트 색상 변경
+        // ?????? ???? ?? 3?? ???? CinemaImage2?? ?????????? ????
+        StartCoroutine(FadeToBlackImage(CinemaImage2, 3f)); // ?????? RGB ????
+        yield return StartCoroutine(FadeToBlackText(CinemaText, 3f)); // ?????? ???? ????
 
-        // 시네마틱 종료 표시
+        // ???????? ???? ????
         isCinemaFinished = true;
     }
 
@@ -174,12 +185,12 @@ public class MainSceneManager : MonoBehaviour
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
-            color.a = Mathf.Lerp(1f, 0f, elapsedTime / duration); // 알파 값 1에서 0으로
+            color.a = Mathf.Lerp(1f, 0f, elapsedTime / duration); // ???? ?? 1???? 0????
             image.color = color;
             yield return null;
         }
 
-        color.a = 0f; // 확실히 0으로 고정
+        color.a = 0f; // ?????? 0???? ????
         image.color = color;
     }
 
@@ -192,11 +203,11 @@ public class MainSceneManager : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / duration;
 
-            // 알파 값 0에서 1로
+            // ???? ?? 0???? 1??
             Color color = image.color;
             color.a = Mathf.Lerp(0f, 1f, t);
 
-            // RGB 값을 점점 (255, 255, 255)로 변경
+            // RGB ???? ???? (255, 255, 255)?? ????
             color.r = Mathf.Lerp(image.color.r, 1f, t);
             color.g = Mathf.Lerp(image.color.g, 1f, t);
             color.b = Mathf.Lerp(image.color.b, 1f, t);
@@ -205,7 +216,7 @@ public class MainSceneManager : MonoBehaviour
             yield return null;
         }
 
-        // 최종 색상을 (255, 255, 255)로 고정
+        // ???? ?????? (255, 255, 255)?? ????
         Color finalColor = image.color;
         finalColor.a = 1f;
         finalColor.r = 1f;
@@ -218,16 +229,16 @@ public class MainSceneManager : MonoBehaviour
     {
         float elapsedTime = 0f;
         Vector3 initialScale = image.rectTransform.localScale;
-        Vector3 target = new Vector3(targetScale, targetScale, targetScale); // 목표 크기 (3배)
+        Vector3 target = new Vector3(targetScale, targetScale, targetScale); // ???? ???? (3??)
 
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
-            image.rectTransform.localScale = Vector3.Lerp(initialScale, target, elapsedTime / duration); // 크기 변경
+            image.rectTransform.localScale = Vector3.Lerp(initialScale, target, elapsedTime / duration); // ???? ????
             yield return null;
         }
 
-        image.rectTransform.localScale = target; // 최종 크기 고정
+        image.rectTransform.localScale = target; // ???? ???? ????
     }
     IEnumerator FadeToBlackImage(Image image, float duration)
     {
@@ -239,7 +250,7 @@ public class MainSceneManager : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / duration;
 
-            // RGB를 (255,255,255)에서 (0,0,0)으로 변경
+            // RGB?? (255,255,255)???? (0,0,0)???? ????
             Color color = image.color;
             color.r = Mathf.Lerp(initialColor.r, 0f, t);
             color.g = Mathf.Lerp(initialColor.g, 0f, t);
@@ -249,7 +260,7 @@ public class MainSceneManager : MonoBehaviour
             yield return null;
         }
 
-        // 최종 색상을 검은색(0,0,0)으로 고정
+        // ???? ?????? ??????(0,0,0)???? ????
         Color finalColor = image.color;
         finalColor.r = 0f;
         finalColor.g = 0f;
@@ -264,7 +275,7 @@ public class MainSceneManager : MonoBehaviour
             yield break;
         }
 
-        TextMeshProUGUI text = textEffect.MsgText; // TypeEffect에서 TextMeshProUGUI 가져오기
+        TextMeshProUGUI text = textEffect.MsgText; // TypeEffect???? TextMeshProUGUI ????????
         float elapsedTime = 0f;
         Color initialColor = text.color;
 
@@ -273,7 +284,7 @@ public class MainSceneManager : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / duration;
 
-            // RGB를 초기값에서 (0,0,0)으로 변경
+            // RGB?? ?????????? (0,0,0)???? ????
             Color color = text.color;
             color.r = Mathf.Lerp(initialColor.r, 0f, t);
             color.g = Mathf.Lerp(initialColor.g, 0f, t);
@@ -283,7 +294,7 @@ public class MainSceneManager : MonoBehaviour
             yield return null;
         }
 
-        // 최종 색상을 검은색(0,0,0)으로 고정
+        // ???? ?????? ??????(0,0,0)???? ????
         Color finalColor = text.color;
         finalColor.r = 0f;
         finalColor.g = 0f;
