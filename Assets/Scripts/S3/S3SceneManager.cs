@@ -35,11 +35,12 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
         }
     }
 
+
     public void CompareButtonAndRoad()
     {
         string player1Button = "None";
         string player2Road = "None";
-
+        
         // 모든 플레이어의 Custom Properties를 가져옴
         foreach (var player in PhotonNetwork.PlayerList)
         {
@@ -52,6 +53,7 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
             {
                 player2Road = player.CustomProperties["Player2Road"].ToString();
             }
+
         }
 
         Debug.Log($"서버에서 받은 값: Player1Button={player1Button}, Player2Road={player2Road}");
