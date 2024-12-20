@@ -5,7 +5,7 @@ using TMPro;
 using Photon.Pun;
 
 
-public class S3SceneManager : MonoBehaviourPun
+public class S3SceneManager : MonoBehaviourPunCallbacks
 {
     //플레이어가 스캔한 오브젝트 가져오기 & UI 
     public TextMeshProUGUI talkText;
@@ -34,91 +34,64 @@ public class S3SceneManager : MonoBehaviourPun
             Destroy(gameObject);
         }
     }
-    // 정답 매핑 테이블
-    private readonly Dictionary<string, string> correctPairs = new Dictionary<string, string>
-    {
-        { "Button1", "Road1" },
-        { "Button2", "Road2" },
-        { "Button3", "Road3" }
-    };
 
-    public static string p1ObjectName = "None";
-    public static string p2ObjectName = "None";
-    public bool isButtonInteracted = false; // 버튼 상호작용 여부
 
-    public bool IsButtonInteracted()
+    public void CompareButtonAndRoad()
     {
-        return isButtonInteracted;
-    }
-    public void SetP1ObjectName(string objectName)
-    {
-        if (!isButtonInteracted) // 버튼 상호작용이 아직 이루어지지 않은 경우
-
+        string player1Button = "None";
+        string player2Road = "None";
+        
+        // 모든 플레이어의 Custom Properties를 가져옴
+        foreach (var player in PhotonNetwork.PlayerList)
         {
-            isButtonInteracted = true;
-            Debug.Log($"Player1이 버튼 {objectName}을(를) 상호작용했습니다.");
+            if (player.CustomProperties.ContainsKey("Player1Button"))
+            {
+                player1Button = player.CustomProperties["Player1Button"].ToString();
+            }
+
+            if (player.CustomProperties.ContainsKey("Player2Road"))
+            {
+                player2Road = player.CustomProperties["Player2Road"].ToString();
+            }
 
         }
-        p1ObjectName = objectName;
-        CheckMatch();
-    }
 
-    public void SetP2ObjectName(string objectName)
-    {
-        p2ObjectName = objectName;
-        CheckMatch();
-    }
+        Debug.Log($"서버에서 받은 값: Player1Button={player1Button}, Player2Road={player2Road}");
 
-    private void CheckMatch()
-    {
-        // Button과 Road 이름이 모두 설정된 경우
-        if (p1ObjectName != "None" && p2ObjectName != "None")
+        // 숫자 추출
+        string buttonNumber = player1Button.Replace("Button", "");
+        string roadNumber = player2Road.Replace("Road", "");
+
+        GameObject player2 = GameObject.FindWithTag("player2");
+
+        if (player2 != null)
         {
-            // 매핑 테이블에서 정답 확인
-            if (correctPairs.TryGetValue(p1ObjectName, out string correctRoad) && correctRoad == p2ObjectName)
+            PhotonView player2PhotonView = player2.GetComponent<PhotonView>();
+
+            if (player2PhotonView != null)
             {
-                Debug.Log($"정답! {p1ObjectName} ↔ {p2ObjectName} 매칭 성공!");
-                OnCorrectMatch();
+                if (buttonNumber == roadNumber)
+                {
+                    Debug.Log("정답입니다! Player 2의 속도를 증가시킵니다.");
+                    player2PhotonView.RPC("SetSpeedRPC", RpcTarget.All, 1f); // PlayerScript의 photonView 사용
+                }
+                else
+                {
+                    Debug.Log("오답입니다! Player 2의 속도를 감소시킵니다.");
+                    player2PhotonView.RPC("SetSpeedRPC", RpcTarget.All, 0.5f); // PlayerScript의 photonView 사용
+                }
             }
             else
             {
-                Debug.Log($"오답! {p1ObjectName} ↔ {p2ObjectName} 매칭 실패!");
-                OnIncorrectMatch();
+                Debug.LogError("Player2의 PhotonView를 찾을 수 없습니다.");
             }
-
-            // 매칭 이름 초기화
-            p1ObjectName = "None";
-            p2ObjectName = "None";
         }
-    }
-
-    private void OnCorrectMatch()
-    {
-        Debug.Log("정답에 대한 보상을 줍니다. 속도가 증가합니다.");
-        PlayerScript[] players = FindObjectsOfType<PlayerScript>();
-        foreach (var player in players)
+        else
         {
-            if (player.CompareTag("player2"))
-            {
-                player.photonView.RPC("SetSpeedRPC", RpcTarget.All, 1f); // 모든 클라이언트에 속도 변경
-                Debug.Log("Player 2의 속도가 1로 설정되었습니다.");
-            }
+            Debug.LogError("Player2 오브젝트를 찾을 수 없습니다.");
         }
     }
 
-    private void OnIncorrectMatch()
-    {
-        Debug.Log("   信         Ƽ    ݴϴ .  ӵ         մϴ .");
-        PlayerScript[] players = FindObjectsOfType<PlayerScript>();
-        foreach (var player in players)
-        {
-            if (player.CompareTag("player2"))
-            {
-                player.photonView.RPC("SetSpeedRPC", RpcTarget.All, 0.5f); //     Ŭ   ̾ Ʈ    ӵ      
-                Debug.Log("Player 2    ӵ    0.5        Ǿ    ϴ .");
-            }
-        }
-    }
 
     //M2 gimmick
 

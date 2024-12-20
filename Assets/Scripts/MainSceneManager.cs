@@ -30,20 +30,25 @@ public class MainSceneManager : MonoBehaviour
         nm = FindObjectOfType<NetworkManager>();
         tm = FindObjectOfType<TalkManager>();
 
-        // °ÔÀÓ Àç½ÇÇà ½Ã Ç×»ó storyPanelÀ» È°¼ºÈ­
+        // ê²Œì„ ì¬ì‹¤í–‰ ì‹œ í•­ìƒ storyPanelì„ í™œì„±í™”
         storyPanel.SetActive(true);
         StartBtn.gameObject.SetActive(false);
 
-        // ÇÊ¿äÇÏ¸é PlayerPrefs ÃÊ±âÈ­
+        // í•„ìš”í•˜ë©´ PlayerPrefs ì´ˆê¸°í™”
         PlayerPrefs.SetInt("StoryPanelHidden", 0);
     }
     private void Start()
     {
-        // ¾ÀÀÌ ½ÃÀÛµÇ¸é ½Ã³×¸¶Æ½ ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ
+        // ì”¬ì´ ì‹œì‘ë˜ë©´ ì‹œë„¤ë§ˆí‹± ì• ë‹ˆë©”ì´ì…˜ ì‹œì‘
         StartCoroutine(CinemaSequence());
     }
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            SpawnChar();
+        }
+
         if (tm.isDialogueFinished && isStart == false)
         {
             StartBtn.gameObject.SetActive(true);
@@ -78,25 +83,25 @@ public class MainSceneManager : MonoBehaviour
     public void SpawnChar()
     {
         isStart = true;
-        // ¹öÆ°À» ºñÈ°¼ºÈ­ÇÏ¿© ´õ ÀÌ»ó º¸ÀÌÁö ¾Ê°Ô ¸¸µì´Ï´Ù.
+        // ë²„íŠ¼ì„ ë¹„í™œì„±í™”í•˜ì—¬ ë” ì´ìƒ ë³´ì´ì§€ ì•Šê²Œ ë§Œë“­ë‹ˆë‹¤.
         StartBtn.gameObject.SetActive(false);
 
-        // storyPanel ¼û±è »óÅÂ ÀúÀå
+        // storyPanel ìˆ¨ê¹€ ìƒíƒœ ì €ì¥
         PlayerPrefs.SetInt("StoryPanelHidden", 1);
 
-        // Spawn Àü¿¡ ViewID °ü¸®
+        // Spawn ì „ì— ViewID ê´€ë¦¬
         nm.Spawn();
 
-        // ¹öÆ°À» ´©¸¥ ÇÃ·¹ÀÌ¾î Á¤º¸ ¾÷µ¥ÀÌÆ®
+        // ë²„íŠ¼ì„ ëˆ„ë¥¸ í”Œë ˆì´ì–´ ì •ë³´ ì—…ë°ì´íŠ¸
         UpdatePlayerReadyStatus();
 
-        // µÎ ÇÃ·¹ÀÌ¾î°¡ ÁØºñ »óÅÂÀÎÁö È®ÀÎ
+        // ë‘ í”Œë ˆì´ì–´ê°€ ì¤€ë¹„ ìƒíƒœì¸ì§€ í™•ì¸
         StartCoroutine(CheckBothPlayersReady());
     }
 
     void UpdatePlayerReadyStatus()
     {
-        // ÇöÀç ÇÃ·¹ÀÌ¾î°¡ ÁØºñ »óÅÂÀÓÀ» ¼³Á¤
+        // í˜„ì¬ í”Œë ˆì´ì–´ê°€ ì¤€ë¹„ ìƒíƒœì„ì„ ì„¤ì •
         var props = new ExitGames.Client.Photon.Hashtable
         {
             { "IsReady", true }
@@ -108,7 +113,7 @@ public class MainSceneManager : MonoBehaviour
     {
         while (true)
         {
-            // ¸ğµç ÇÃ·¹ÀÌ¾îÀÇ CustomProperties È®ÀÎ
+            // ëª¨ë“  í”Œë ˆì´ì–´ì˜ CustomProperties í™•ì¸
             bool allReady = true;
             foreach (var player in PhotonNetwork.PlayerList)
             {
@@ -122,47 +127,47 @@ public class MainSceneManager : MonoBehaviour
                 }
             }
 
-            // µÎ ÇÃ·¹ÀÌ¾î°¡ ¸ğµÎ ÁØºñ »óÅÂ¸é Scene1À¸·Î ÀÌµ¿
+            // ë‘ í”Œë ˆì´ì–´ê°€ ëª¨ë‘ ì¤€ë¹„ ìƒíƒœë©´ Scene1ìœ¼ë¡œ ì´ë™
             if (allReady)
             {
-                yield return new WaitForSeconds(3f); // 3ÃÊ ´ë±â
-                nm.StartScene1(); // Scene1À¸·Î ÀÌµ¿
-                yield break; // Coroutine Á¾·á
+                yield return new WaitForSeconds(3f); // 3ì´ˆ ëŒ€ê¸°
+                nm.StartScene1(); // Scene1ìœ¼ë¡œ ì´ë™
+                yield break; // Coroutine ì¢…ë£Œ
             }
 
-            yield return null; // ´ÙÀ½ ÇÁ·¹ÀÓ±îÁö ´ë±â
+            yield return null; // ë‹¤ìŒ í”„ë ˆì„ê¹Œì§€ ëŒ€ê¸°
         }
     }
 
     // =========================
-    //   ½Ã³×¸¶Æ½ ¾Ö´Ï¸ŞÀÌ¼Ç ºÎºĞ
+    //   ì‹œë„¤ë§ˆí‹± ì• ë‹ˆë©”ì´ì…˜ ë¶€ë¶„
     // =========================
 
     IEnumerator CinemaSequence()
     {
-        CinemaText.SetMsg("¾îµÎ¿î ¹æ ÇÑ ³²ÀÚ°¡ ±«·Î¿öÇÏ°í ÀÖ´Ù");
+        CinemaText.SetMsg("ì–´ë‘ìš´ ë°© í•œ ë‚¨ìê°€ ê´´ë¡œì›Œí•˜ê³  ìˆë‹¤");
 
-        yield return new WaitForSeconds(3f); // 3ÃÊ ´ë±â ÈÄ ÆäÀÌµå ¾Æ¿ô ½ÃÀÛ
+        yield return new WaitForSeconds(3f); // 3ì´ˆ ëŒ€ê¸° í›„ í˜ì´ë“œ ì•„ì›ƒ ì‹œì‘
 
-        // CinemaImage1 ÆäÀÌµå ¾Æ¿ô°ú CinemaImage2 ÆäÀÌµå ÀÎÀ» µ¿½Ã¿¡ ½ÇÇà
-        StartCoroutine(FadeOutImage(CinemaImage1, 3f)); // 3ÃÊ µ¿¾È ÆäÀÌµå ¾Æ¿ô
+        // CinemaImage1 í˜ì´ë“œ ì•„ì›ƒê³¼ CinemaImage2 í˜ì´ë“œ ì¸ì„ ë™ì‹œì— ì‹¤í–‰
+        StartCoroutine(FadeOutImage(CinemaImage1, 3f)); // 3ì´ˆ ë™ì•ˆ í˜ì´ë“œ ì•„ì›ƒ
 
         yield return new WaitForSeconds(1f);
 
-        yield return StartCoroutine(FadeInImage(CinemaImage2, 5f)); // 7ÃÊ µ¿¾È ÆäÀÌµå ÀÎ
+        yield return StartCoroutine(FadeInImage(CinemaImage2, 5f)); // 7ì´ˆ ë™ì•ˆ í˜ì´ë“œ ì¸
 
-        CinemaText.SetMsg("ÇÑÂüÀ» ±«·Î¿öÇÏ´Ù°¡ Àá¿¡ µé¾ú´Ù");
-        // ÆäÀÌµå ÀÎ ¿Ï·á ÈÄ 5ÃÊ µ¿¾È CinemaImage2ÀÇ Å©±â¸¦ 3¹è·Î È®´ë
-        yield return StartCoroutine(ScaleImage(CinemaImage2, 2.2f, 5f)); // 5ÃÊ µ¿¾È 3¹è È®´ë
+        CinemaText.SetMsg("í•œì°¸ì„ ê´´ë¡œì›Œí•˜ë‹¤ê°€ ì ì— ë“¤ì—ˆë‹¤");
+        // í˜ì´ë“œ ì¸ ì™„ë£Œ í›„ 5ì´ˆ ë™ì•ˆ CinemaImage2ì˜ í¬ê¸°ë¥¼ 3ë°°ë¡œ í™•ëŒ€
+        yield return StartCoroutine(ScaleImage(CinemaImage2, 2.2f, 5f)); // 5ì´ˆ ë™ì•ˆ 3ë°° í™•ëŒ€
 
-        // È®´ë°¡ ³¡³­ ÈÄ 3ÃÊ µ¿¾È ´ë±â
+        // í™•ëŒ€ê°€ ëë‚œ í›„ 3ì´ˆ ë™ì•ˆ ëŒ€ê¸°
         yield return new WaitForSeconds(3f);
 
-        // È®´ë°¡ ³¡³­ ÈÄ 3ÃÊ µ¿¾È CinemaImage2¸¦ °ËÀº»öÀ¸·Î º¯°æ
-        StartCoroutine(FadeToBlackImage(CinemaImage2, 3f)); // ÀÌ¹ÌÁö RGB º¯°æ
-        yield return StartCoroutine(FadeToBlackText(CinemaText, 3f)); // ÅØ½ºÆ® »ö»ó º¯°æ
+        // í™•ëŒ€ê°€ ëë‚œ í›„ 3ì´ˆ ë™ì•ˆ CinemaImage2ë¥¼ ê²€ì€ìƒ‰ìœ¼ë¡œ ë³€ê²½
+        StartCoroutine(FadeToBlackImage(CinemaImage2, 3f)); // ì´ë¯¸ì§€ RGB ë³€ê²½
+        yield return StartCoroutine(FadeToBlackText(CinemaText, 3f)); // í…ìŠ¤íŠ¸ ìƒ‰ìƒ ë³€ê²½
 
-        // ½Ã³×¸¶Æ½ Á¾·á Ç¥½Ã
+        // ì‹œë„¤ë§ˆí‹± ì¢…ë£Œ í‘œì‹œ
         isCinemaFinished = true;
     }
 
@@ -174,12 +179,12 @@ public class MainSceneManager : MonoBehaviour
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
-            color.a = Mathf.Lerp(1f, 0f, elapsedTime / duration); // ¾ËÆÄ °ª 1¿¡¼­ 0À¸·Î
+            color.a = Mathf.Lerp(1f, 0f, elapsedTime / duration); // ì•ŒíŒŒ ê°’ 1ì—ì„œ 0ìœ¼ë¡œ
             image.color = color;
             yield return null;
         }
 
-        color.a = 0f; // È®½ÇÈ÷ 0À¸·Î °íÁ¤
+        color.a = 0f; // í™•ì‹¤íˆ 0ìœ¼ë¡œ ê³ ì •
         image.color = color;
     }
 
@@ -192,11 +197,11 @@ public class MainSceneManager : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / duration;
 
-            // ¾ËÆÄ °ª 0¿¡¼­ 1·Î
+            // ì•ŒíŒŒ ê°’ 0ì—ì„œ 1ë¡œ
             Color color = image.color;
             color.a = Mathf.Lerp(0f, 1f, t);
 
-            // RGB °ªÀ» Á¡Á¡ (255, 255, 255)·Î º¯°æ
+            // RGB ê°’ì„ ì ì  (255, 255, 255)ë¡œ ë³€ê²½
             color.r = Mathf.Lerp(image.color.r, 1f, t);
             color.g = Mathf.Lerp(image.color.g, 1f, t);
             color.b = Mathf.Lerp(image.color.b, 1f, t);
@@ -205,7 +210,7 @@ public class MainSceneManager : MonoBehaviour
             yield return null;
         }
 
-        // ÃÖÁ¾ »ö»óÀ» (255, 255, 255)·Î °íÁ¤
+        // ìµœì¢… ìƒ‰ìƒì„ (255, 255, 255)ë¡œ ê³ ì •
         Color finalColor = image.color;
         finalColor.a = 1f;
         finalColor.r = 1f;
@@ -218,16 +223,16 @@ public class MainSceneManager : MonoBehaviour
     {
         float elapsedTime = 0f;
         Vector3 initialScale = image.rectTransform.localScale;
-        Vector3 target = new Vector3(targetScale, targetScale, targetScale); // ¸ñÇ¥ Å©±â (3¹è)
+        Vector3 target = new Vector3(targetScale, targetScale, targetScale); // ëª©í‘œ í¬ê¸° (3ë°°)
 
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
-            image.rectTransform.localScale = Vector3.Lerp(initialScale, target, elapsedTime / duration); // Å©±â º¯°æ
+            image.rectTransform.localScale = Vector3.Lerp(initialScale, target, elapsedTime / duration); // í¬ê¸° ë³€ê²½
             yield return null;
         }
 
-        image.rectTransform.localScale = target; // ÃÖÁ¾ Å©±â °íÁ¤
+        image.rectTransform.localScale = target; // ìµœì¢… í¬ê¸° ê³ ì •
     }
     IEnumerator FadeToBlackImage(Image image, float duration)
     {
@@ -239,7 +244,7 @@ public class MainSceneManager : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / duration;
 
-            // RGB¸¦ (255,255,255)¿¡¼­ (0,0,0)À¸·Î º¯°æ
+            // RGBë¥¼ (255,255,255)ì—ì„œ (0,0,0)ìœ¼ë¡œ ë³€ê²½
             Color color = image.color;
             color.r = Mathf.Lerp(initialColor.r, 0f, t);
             color.g = Mathf.Lerp(initialColor.g, 0f, t);
@@ -249,7 +254,7 @@ public class MainSceneManager : MonoBehaviour
             yield return null;
         }
 
-        // ÃÖÁ¾ »ö»óÀ» °ËÀº»ö(0,0,0)À¸·Î °íÁ¤
+        // ìµœì¢… ìƒ‰ìƒì„ ê²€ì€ìƒ‰(0,0,0)ìœ¼ë¡œ ê³ ì •
         Color finalColor = image.color;
         finalColor.r = 0f;
         finalColor.g = 0f;
@@ -264,7 +269,7 @@ public class MainSceneManager : MonoBehaviour
             yield break;
         }
 
-        TextMeshProUGUI text = textEffect.MsgText; // TypeEffect¿¡¼­ TextMeshProUGUI °¡Á®¿À±â
+        TextMeshProUGUI text = textEffect.MsgText; // TypeEffectì—ì„œ TextMeshProUGUI ê°€ì ¸ì˜¤ê¸°
         float elapsedTime = 0f;
         Color initialColor = text.color;
 
@@ -273,7 +278,7 @@ public class MainSceneManager : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / duration;
 
-            // RGB¸¦ ÃÊ±â°ª¿¡¼­ (0,0,0)À¸·Î º¯°æ
+            // RGBë¥¼ ì´ˆê¸°ê°’ì—ì„œ (0,0,0)ìœ¼ë¡œ ë³€ê²½
             Color color = text.color;
             color.r = Mathf.Lerp(initialColor.r, 0f, t);
             color.g = Mathf.Lerp(initialColor.g, 0f, t);
@@ -283,7 +288,7 @@ public class MainSceneManager : MonoBehaviour
             yield return null;
         }
 
-        // ÃÖÁ¾ »ö»óÀ» °ËÀº»ö(0,0,0)À¸·Î °íÁ¤
+        // ìµœì¢… ìƒ‰ìƒì„ ê²€ì€ìƒ‰(0,0,0)ìœ¼ë¡œ ê³ ì •
         Color finalColor = text.color;
         finalColor.r = 0f;
         finalColor.g = 0f;

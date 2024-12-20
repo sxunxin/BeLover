@@ -347,6 +347,21 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
         }
 
+        string objectName = collision.gameObject.name;
+        if (CompareTag("player2") && objectName.StartsWith("Road"))
+        {
+            Debug.Log($"Player 22 {objectName}과 상호작용 시작.");
+
+            ExitGames.Client.Photon.Hashtable player2Properties = new ExitGames.Client.Photon.Hashtable
+            {
+                { "Player2Road", objectName }
+            };
+            PhotonNetwork.LocalPlayer.SetCustomProperties(player2Properties);
+
+            S3SceneManager.Instance.CompareButtonAndRoad();
+        }
+
+
         if (collision.CompareTag("Bridge"))
         {
             Debug.Log("지나갈 수 없어 보인다...");
@@ -359,28 +374,28 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         if (CompareTag("player1") && objectName.StartsWith("Button"))
         {
             Debug.Log($"Player 1이 {objectName}과 지속적으로 상호작용 중.");
-            S3SceneManager.Instance.SetP1ObjectName(objectName);
+
+            ExitGames.Client.Photon.Hashtable player1Properties = new ExitGames.Client.Photon.Hashtable
+            {
+                { "Player1Button", objectName }
+            };
+            PhotonNetwork.LocalPlayer.SetCustomProperties(player1Properties);
         }
         // Player 2와 Road 상호작용
-        else if (CompareTag("player2") && objectName.StartsWith("Road"))
+        if (CompareTag("player2") && objectName.StartsWith("Road"))
         {
-            // Road 충돌 상태를 계속 업데이트
-            if (currentRoad != collision.gameObject)
-            {
-                currentRoad = collision.gameObject; // 새로운 Road로 업데이트
-                Debug.Log($"Player2가 새로운 Road({currentRoad.name})에 충돌했습니다.");
-                S3SceneManager.Instance.SetP1ObjectName(objectName);
-                S3SceneManager.Instance.SetP2ObjectName(objectName);
-            }
+            Debug.Log($"Player 22 {objectName}과 지속적으로 상호작용 중.");
 
-            // 버튼과 상호작용하지 않은 상태에서 속도 감소
-            if (!S3sm.IsButtonInteracted())
+            ExitGames.Client.Photon.Hashtable player2Properties = new ExitGames.Client.Photon.Hashtable
             {
-                SetSpeedRPC(0.5f);
-            }
-            Debug.Log($"Player 2가 {objectName}과 지속적으로 상호작용 중.");
-            S3SceneManager.Instance.SetP2ObjectName(objectName);
+                { "Player2Road", objectName }
+            };
+            PhotonNetwork.LocalPlayer.SetCustomProperties(player2Properties);
+
+            S3SceneManager.Instance.CompareButtonAndRoad();
         }
+
+
     }
 
     private void SetDirection(bool hDown, bool vDown)
