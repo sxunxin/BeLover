@@ -70,7 +70,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 {   
                     Msm.StoryPanel.SetActive(false);
                 }
-                //  플레이어의 이동을 정지시킴
+                anim.SetBool("isChange", false); // 애니메이션 정지
                 rd.velocity = Vector2.zero; // 움직임 정지
                 return; //  더 이상 코드 실행 중지
             }
@@ -81,13 +81,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 anim.SetBool("isChange", false); // 애니메이션 정지
                 return; //  더 이상 코드 실행 중지
             }
-            if (Msm != null && Msm.StoryPanel1.activeSelf)
-            {
-                //  플레이어의 이동을 정지시킴
-                rd.velocity = Vector2.zero; // 움직임 정지
-                anim.SetBool("isChange", false); // 애니메이션 정지
-                return; //  더 이상 코드 실행 중지
-            }
+            
             // 입력값 처리
             h =  Input.GetAxisRaw("Horizontal");
             v =  Input.GetAxisRaw("Vertical");
@@ -252,14 +246,12 @@ public class PlayerScript : MonoBehaviourPunCallbacks
             RaycastHit2D rayHit = Physics2D.Raycast(
                 rayStartPos, // 시작 위치
                 dirVec,      // 방향
-                1f,          // 길이 (0.35f -> 1f로 변경)
+                0.5f,          // 길이 (0.35f -> 1f로 변경)
                 LayerMask.GetMask("Object") // Object 레이어만 탐색
             );
 
             if (rayHit.collider != null)
             {
-                Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.name);
-                Debug.Log("Ray Hit Object: " + rayHit.collider.gameObject.tag);
                 scanObject = rayHit.collider.gameObject;
             }
             else
@@ -314,12 +306,14 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         if (missionName == "MainMission1" && GameManager.Instance.isMission2Clear == true)
         {
             Msm.StoryPanel.SetActive(true);
+            Msm.ghostImage.sprite = Msm.GhostImage[0];
             Msm.StoryText.text = "이미 성불한 방이다";
         }
 
         if (missionName == "MainMission2" && GameManager.Instance.isMission3Clear == true)
         {
             Msm.StoryPanel.SetActive(true);
+            Msm.ghostImage.sprite = Msm.GhostImage[1];
             Msm.StoryText.text = "이미 성불한 방이다";
         }
 

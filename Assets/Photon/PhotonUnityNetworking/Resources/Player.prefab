@@ -173,6 +173,8 @@ MonoBehaviour:
   minSortingOrder: 10
   maxSortingOrder: 1000000
   offsetMultiplier: 5
+  rd: {fileID: 0}
+  anim: {fileID: 0}
   pv: {fileID: -6096268475123890931}
   nicknameText: {fileID: 5014128133371754621}
   candlecount: 0
