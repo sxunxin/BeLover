@@ -16,6 +16,7 @@ TagManager:
   - Blind
   - ResetStatue
   - Bridge
+  - Candle
   layers:
   - Default
   - TransparentFX

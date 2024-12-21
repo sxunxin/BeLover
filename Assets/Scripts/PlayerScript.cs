@@ -32,6 +32,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     GameObject scanObject;
     GameObject portalObject;
     private GameObject currentRoad; // Player2의 현재 Road 상태
+    
+    //s3 gimmick
+    public int candlecount;
 
     void Awake()
     {
@@ -98,6 +101,31 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
                         {
                             Debug.Log("Player 2가 Skull_True 오브젝트와 상호작용했습니다. 클리어 화면을 모든 클라이언트에 표시합니다.");
                             S3sm.photonView.RPC("ShowClearUI_RPC", RpcTarget.All, 2); // 조건 2번
+                        }
+                        if (scanObject != null && scanObject.CompareTag("Candle"))
+                        {
+                            S3ObjectData objData = scanObject.GetComponent<S3ObjectData>();
+                            if (objData != null && objData.isActivated)
+                            {
+                                Debug.Log($"이미 활성화된 {scanObject.name}과는 더 이상 상호작용할 수 없습니다.");
+                                return;
+                            }
+
+                            if (objData != null && objData.linkedCandleFire != null)
+                            {
+                                objData.linkedCandleFire.SetActive(true);
+                                Debug.Log($"{scanObject.name}의 CandleFire 활성화 완료");
+                            }
+                            else
+                            {
+                                Debug.LogWarning($"CandleFire가 {scanObject.name}와 연결되지 않았습니다.");
+                                return;
+                            }
+
+                            objData.isActivated = true;
+                            candlecount++;
+                            Debug.Log($"캔들 카운트 증가: {candlecount}");
+                            S3sm.CheckStageClear(candlecount);
                         }
 
                     }

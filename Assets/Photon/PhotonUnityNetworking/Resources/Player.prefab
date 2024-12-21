@@ -171,6 +171,7 @@ MonoBehaviour:
   S3sm: {fileID: 0}
   pv: {fileID: -6096268475123890931}
   nicknameText: {fileID: 5014128133371754621}
+  candlecount: 0
 --- !u!95 &8251382587938969043
 Animator:
   serializedVersion: 5
