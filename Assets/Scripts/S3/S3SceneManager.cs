@@ -21,7 +21,12 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
 
     public static S3SceneManager Instance { get; private set; }
 
+    public int TotalItemCount;
 
+    void Start()
+    {
+        TotalItemCount = GameObject.FindGameObjectsWithTag("candle").Length;
+    }
     private void Awake()
     {
         if (Instance == null)
@@ -168,6 +173,18 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
         {
             clearPanel.SetActive(false);
             Debug.Log("Clear UI가 사라졌습니다.");
+        }
+    }
+    //s3 m3 
+    public void CheckStageClear(int currentCandleCount)
+    {
+        Debug.Log($"현재 캔들 카운트: {currentCandleCount} / 총 아이템 수: {TotalItemCount}");
+
+        // 만약 모든 캔들에 불이 켜졌다면
+        if (currentCandleCount >= TotalItemCount)
+        {
+            Debug.Log("모든 캔들에 불이 켜졌습니다. 스테이지 클리어!");
+            ShowClearUI_RPC(3); // 클리어 UI 표시
         }
     }
 }
