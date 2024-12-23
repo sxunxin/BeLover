@@ -222,19 +222,19 @@ AnimatorController:
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
+    m_Controller: {fileID: 0}
   - m_Name: vAxisRaw
     m_Type: 3
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
+    m_Controller: {fileID: 0}
   - m_Name: isChange
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
+    m_Controller: {fileID: 0}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -443,7 +443,7 @@ AnimatorStateMachine:
     m_Position: {x: -330, y: 0, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 7284336575139459272}
-    m_Position: {x: 30, y: 0, z: 0}
+    m_Position: {x: 100, y: -30, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -1400898573480326281}
     m_Position: {x: 30, y: 80, z: 0}
