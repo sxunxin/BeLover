@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Realtime;
+using Photon.Pun;
+using ExitGames.Client.Photon;
 using UnityEngine;
 using UnityEngine.UI; // **UI 이미지 처리를 위해 추가**
 using TMPro;
 
-public class S2SceneManager : MonoBehaviour
+public class S2SceneManager : MonoBehaviourPun
 {
     public Camera mainCamera; // 연결된 카메라 (Camera.main 대신 사용)
     public TextMeshProUGUI warningText; // **TMP 경고 메시지 텍스트 연결**
@@ -14,6 +17,26 @@ public class S2SceneManager : MonoBehaviour
     public int mirrorCount = 0; // 미러 카운트
     private int previousMirrorCount = 0; // 이전 미러 카운트를 저장
     private bool isShaking = false; // 흔들림 중인지 여부 확인
+
+    public GameObject storyPanel;
+    public GameObject firstPanel;
+    public GameObject secondPanel;
+
+    public TypeEffect firstText;
+    public TypeEffect secondText;
+    public TypeEffect thirdText;
+
+    public GameObject endPanel;
+    public GameObject p1Panel;
+    public GameObject p2Panel;
+    public GameObject bossPanel;
+
+    public TypeEffect p1Talk;
+    public TypeEffect p2Talk;
+    public TypeEffect bossTalk;
+
+    public Image ghostImage;
+    public Image Buddhahood;
 
     void Start()
     {
@@ -59,6 +82,7 @@ public class S2SceneManager : MonoBehaviour
             displayImage.sprite = imageList[0];
             displayImage.rectTransform.sizeDelta = new Vector2(160, 180); // **이미지 크기 고정**
         }
+        StartCoroutine(firstCinema());
     }
 
     void Update()
@@ -73,7 +97,7 @@ public class S2SceneManager : MonoBehaviour
                 StartCoroutine(CameraShake(3f));
             }
 
-            StartCoroutine(ShowWarningMessage("플레이어의 방향키가 랜덤으로 재설정됩니다"));
+            StartCoroutine(ShowWarningMessage(warningText, "플레이어의 방향키가 랜덤으로 재설정됩니다", Color.red));
             ChangeImage(mirrorCount);
 
             if (mirrorCount == 5)
@@ -121,7 +145,7 @@ public class S2SceneManager : MonoBehaviour
         isShaking = false;
     }
 
-    IEnumerator ShowWarningMessage(string message)
+    IEnumerator ShowWarningMessage(TextMeshProUGUI text, string message, Color color)
     {
         if (warningText == null)
         {
@@ -129,8 +153,8 @@ public class S2SceneManager : MonoBehaviour
             yield break;
         }
 
-        warningText.text = message;
-        warningText.color = Color.red;
+        text.text = message;
+        text.color = color;
 
         for (int i = 0; i < 3; i++)
         {
@@ -197,5 +221,119 @@ public class S2SceneManager : MonoBehaviour
 
         Debug.Log("[S2SceneManager] Prefab 비활성화 및 카메라 복원 완료");
     }
+    IEnumerator firstCinema()
+    {
+        firstPanel.SetActive(true);
+        yield return new WaitForSeconds(3f);
+        firstText.SetMsg("외모스트레스로 인해 거울을 보지 못하고,\n\n스트레스를 받아 한이 맺힌 유령");
 
+        yield return new WaitForSeconds(12f);
+
+        firstPanel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+        secondPanel.SetActive(true);
+
+        secondText.SetMsg("으아아아아아 거울이 너무 싫어 다 박살내버릴거야!!!");
+        yield return new WaitForSeconds(7f);
+
+        thirdText.SetMsg("부서진 거울 조각을 찾아 거울을 완성해보자.\n\n단 두 플레이어가 조종할 수 있는 2개의 방향키가 다르고,\n\n조각을 먹을 때마다 방향키가 랜덤으로 바뀐다.");
+
+        yield return new WaitForSeconds(20f);
+        storyPanel.SetActive(false);
+    }
+    IEnumerator secondCinema()
+    {
+        yield return new WaitForSeconds(3f);
+        p1Panel.SetActive(true);
+        p1Talk.SetMsg("휴... 우리가 거울 조각을 모아왔어.");
+        yield return new WaitForSeconds(5f);
+        p1Panel.SetActive(false);
+
+        bossPanel.SetActive(true);
+        bossTalk.SetMsg("으악! 저리 치워!");
+        yield return new WaitForSeconds(5f);
+        bossPanel.SetActive(false);
+
+        p2Panel.SetActive(true);
+        p2Talk.SetMsg("아니야, 거울을 봐. 네가 아까와는 다르게 보여.");
+        yield return new WaitForSeconds(5f);
+        p2Panel.SetActive(false);
+
+        bossPanel.SetActive(true);
+        bossTalk.SetMsg("그래...? 똑같은거 같은데...");
+        yield return new WaitForSeconds(5f);
+        bossPanel.SetActive(false);
+
+        p2Panel.SetActive(true);
+        p2Talk.SetMsg("너의 빛나는 눈동자를 봐.");
+        yield return new WaitForSeconds(5f);
+        p2Panel.SetActive(false);
+
+        p1Panel.SetActive(true);
+        p1Talk.SetMsg("그래! 거울보다 더 반짝거리는 걸? 정말 예쁘다.");
+        yield return new WaitForSeconds(5f);
+        p1Panel.SetActive(false);
+
+        bossPanel.SetActive(true);
+        bossTalk.SetMsg("정말 그렇게 생각해...?");
+        yield return new WaitForSeconds(5f);
+        bossPanel.SetActive(false);
+
+        p2Panel.SetActive(true);
+        p2Talk.SetMsg("그럼. 너는 어떤 것 같아?");
+        yield return new WaitForSeconds(5f);
+        p2Panel.SetActive(false);
+
+        bossPanel.SetActive(true);
+        bossTalk.SetMsg("나도… 그런 것 같아.");
+        yield return new WaitForSeconds(5f);
+        bossPanel.SetActive(false);
+
+        yield return new WaitForSeconds(3f);
+        ghostImage.gameObject.SetActive(true); // ghostImage 활성화
+        yield return new WaitForSeconds(3f); // 3초 대기 후 크기와 투명도 변경 시작
+
+        RectTransform rectTransform = ghostImage.GetComponent<RectTransform>(); // RectTransform 가져오기
+        CanvasGroup canvasGroup = ghostImage.GetComponent<CanvasGroup>(); // Alpha 값을 제어하기 위해 CanvasGroup 사용
+        if (canvasGroup == null)
+        {
+            canvasGroup = ghostImage.gameObject.AddComponent<CanvasGroup>(); // 없으면 추가
+        }
+
+        rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x, 0); // 초기 Y 위치 설정
+        canvasGroup.alpha = 1f; // 초기 Alpha 값 설정
+
+        while (rectTransform.anchoredPosition.y < 1200)
+        {
+            rectTransform.anchoredPosition += new Vector2(0, 200) * Time.deltaTime; // Y 위치 증가
+            rectTransform.localScale = Vector3.Lerp(rectTransform.localScale, new Vector3(0.2f, 0.2f, 0.2f), Time.deltaTime); // 크기 점점 줄이기
+            canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0f, Time.deltaTime); // 투명도 점점 감소
+            yield return null; // 다음 프레임까지 대기
+        }
+
+        if(rectTransform.anchoredPosition.y > 1200)
+        {
+            Buddhahood.gameObject.SetActive(true);
+            yield return new WaitForSeconds(5f);
+
+            if (PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.LoadLevel("MainScene");
+            }
+        }
+    }
+
+    [PunRPC]
+    public void ShowEndPanel_RPC()
+    {
+        if (endPanel != null)
+        {
+            endPanel.SetActive(true);
+            StartCoroutine(secondCinema());
+        }
+        else
+        {
+            Debug.LogError("endPanel이 연결되지 않았습니다.");
+        }
+    }
 }

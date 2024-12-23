@@ -73,6 +73,8 @@ MonoBehaviour:
   - ActivateFinalPortal
   - ActivateM2_2Portal
   - SyncAnimationIdle
+  - UpdateCountdownText
+  - ShowEndPanel_RPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

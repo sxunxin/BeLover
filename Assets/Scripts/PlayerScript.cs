@@ -428,7 +428,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks
 
         while (countdown > 0)
         {
-            Msm.countDown.text = mapName +"에 입장합니다\n\n"+ countdown.ToString(); // 텍스트 갱신
+            // RPC를 통해 모든 클라이언트에 카운트다운 동기화
+            pv.RPC("UpdateCountdownText", RpcTarget.All, mapName, countdown);
+
             yield return new WaitForSeconds(1f);
             countdown--;
         }
@@ -448,6 +450,14 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         }
     }
 
+    [PunRPC]
+    void UpdateCountdownText(string mapName, int countdown)
+    {
+        if (Msm != null && Msm.countDown != null)
+        {
+            Msm.countDown.text = $"{mapName}에 입장합니다\n\n{countdown}";
+        }
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Goal")

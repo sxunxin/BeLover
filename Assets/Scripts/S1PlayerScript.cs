@@ -39,6 +39,11 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
     void Update()
     {
+        if (S2sm != null && S2sm.storyPanel.activeSelf)
+        {
+            rigid.velocity = Vector2.zero; // 움직임 정지
+            return; //  더 이상 코드 실행 중지
+        }
         if (SceneManager.GetActiveScene().name == "Scene1")
         {
 
@@ -290,10 +295,10 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
         if (other.gameObject.tag == "Mirror")
         {
             GameManager.Instance.isMission1Clear = true;
-
+            Destroy(other.gameObject);
             if (PhotonNetwork.IsMasterClient)
             {
-                PhotonNetwork.LoadLevel("MainScene");
+                S2sm.photonView.RPC("ShowEndPanel_RPC", RpcTarget.All); // 모든 클라이언트에서 패널 활성화
             }
         }
 
