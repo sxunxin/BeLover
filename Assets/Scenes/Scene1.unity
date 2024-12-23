@@ -379,7 +379,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 22
   m_Sprite: {fileID: 21300000, guid: 65118763e5c474e51a83dbba394012c2, type: 3}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_FlipX: 0
@@ -473,7 +473,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9114543500538722775, guid: 1c33c41d34826f4429c07dc0b6eb8722, type: 3}
       propertyPath: m_SortingOrder
-      value: 3
+      value: 23
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -605,6 +605,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2126767031262568546, guid: 3433b362e116f4248974c4444e50ffa9, type: 3}
+      propertyPath: m_SortingOrder
+      value: 23
+      objectReference: {fileID: 0}
     - target: {fileID: 3308329271049156495, guid: 3433b362e116f4248974c4444e50ffa9, type: 3}
       propertyPath: m_Name
       value: Grid
@@ -612,6 +616,14 @@ PrefabInstance:
     - target: {fileID: 3308329271049156495, guid: 3433b362e116f4248974c4444e50ffa9, type: 3}
       propertyPath: m_TagString
       value: Untagged
+      objectReference: {fileID: 0}
+    - target: {fileID: 8557090828779961232, guid: 3433b362e116f4248974c4444e50ffa9, type: 3}
+      propertyPath: m_SortingOrder
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 8841118423338052176, guid: 3433b362e116f4248974c4444e50ffa9, type: 3}
+      propertyPath: m_SortingOrder
+      value: 21
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

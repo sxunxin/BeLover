@@ -72,6 +72,7 @@ MonoBehaviour:
   - SyncAnimation
   - ActivateFinalPortal
   - ActivateM2_2Portal
+  - SyncAnimationIdle
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

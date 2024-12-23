@@ -75,12 +75,13 @@ public class PlayerScript : MonoBehaviourPunCallbacks
             }
             if (Msm != null && Msm.StoryPanel1.activeSelf)
             {
-                //  플레이어의 이동을 정지시킴
+                if (CompareTag("player2")) anim.Play("Female_Down_Idle");
+                else anim.Play("Male_Down_Idle");
+                pv.RPC("SyncAnimationIdle", RpcTarget.Others);
                 rd.velocity = Vector2.zero; // 움직임 정지
-                anim.SetBool("isChange", false); // 애니메이션 정지
                 return; //  더 이상 코드 실행 중지
             }
-            
+
             // 입력값 처리
             h =  Input.GetAxisRaw("Horizontal");
             v =  Input.GetAxisRaw("Vertical");
@@ -272,6 +273,13 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     {
         anim.SetInteger("hAxisRaw", hInput);
         anim.SetInteger("vAxisRaw", vInput);
+    }
+
+    [PunRPC]
+    void SyncAnimationIdle()
+    {
+        if (CompareTag("player2")) anim.Play("Female_Down_Idle");
+        else anim.Play("Male_Down_Idle");
     }
 
     void HandleMissionSelection(string missionName, NetworkManager nm)
@@ -550,6 +558,12 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         }
         if (scene.name == "MainScene")
         {
+            horizontalInput = 0f;
+            verticalInput = 0f;
+            Vector2 moveVec = new Vector2(horizontalInput, verticalInput);
+            rd.velocity = Vector2.zero;
+           
+
             Msm = FindObjectOfType<MainSceneManager>(); // **씬이 로드될 때 Msm 다시 할당**
             if (Msm != null)
             {
