@@ -402,6 +402,14 @@ public class PlayerScript : MonoBehaviourPunCallbacks
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (collision.gameObject.tag == "Goal")
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.LoadLevel("MainScene");
+            }
+        }
+
         if (collision.CompareTag("Portal"))
         {
             // Portal과의 충돌 로직 추가
