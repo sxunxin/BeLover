@@ -7,9 +7,22 @@ public class S3Portal : MonoBehaviourPun
 {
     public GameObject targetSpawnPoint;
     public GameObject pairedPortal; // 연결된 포탈을 참조합니다.
+    public GameObject finalPortal;
 
     public void OnPlayerEnter(GameObject player)
     {
+        if (gameObject.name == "FinalPortal")
+        {
+            Debug.Log("FinalPortal에 플레이어가 진입했습니다.");
+            GameManager.Instance.isMission2Clear = true;
+
+            if (PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.LoadLevel("MainScene");
+            }
+
+            return; // FinalPortal은 더 이상 로직이 필요 없음
+        }
         if (targetSpawnPoint != null)
         {
             Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
@@ -40,38 +53,46 @@ public class S3Portal : MonoBehaviourPun
     {
         if (collision.CompareTag("Player"))
         {
-            if (targetSpawnPoint != null)
+            if (finalPortal != null)
             {
-                Rigidbody2D rb = collision.GetComponent<Rigidbody2D>();
-                if (rb != null)
-                {
-                    // 플레이어 이동
-                    rb.position = targetSpawnPoint.transform.position;
-                    Debug.Log($"Player moved to {targetSpawnPoint.transform.position}");
-                    // M1_2 포탈이 작동하면 M1_1 포탈을 활성화합니다.
-                    if (gameObject.name == "M1_2Portal" && pairedPortal != null)
-                    {
-                        photonView.RPC("ActivatePairedPortal", RpcTarget.All, pairedPortal.name); 
-                        Debug.Log("M1_1 포탈이 활성화되었습니다.");
-                    }
-                    // M2_2 포탈이 작동하면 M2_1 포탈을 활성화합니다.
-                    else if (gameObject.name == "M2_2Portal" && pairedPortal != null)
-                    {
-                        photonView.RPC("ActivatePairedPortal", RpcTarget.All, pairedPortal.name);
-                        Debug.Log("M2_1 포탈이 활성화되었습니다.");
-                    }
-                }
-
-                // 카메라 이동
-                S3Camera cameraFollow = Camera.main.GetComponent<S3Camera>();
-                if (cameraFollow != null)
-                {
-                    cameraFollow.SnapToTarget(); // 즉시 이동
-                }
+                Debug.Log("FinalPortal에 플레이어가 진입했습니다.");
+                OnPlayerEnter(collision.gameObject);
             }
             else
             {
-                Debug.LogWarning("Target spawn point is not assigned!");
+                if (targetSpawnPoint != null)
+                {
+                    Rigidbody2D rb = collision.GetComponent<Rigidbody2D>();
+                    if (rb != null)
+                    {
+                        // 플레이어 이동
+                        rb.position = targetSpawnPoint.transform.position;
+                        Debug.Log($"Player moved to {targetSpawnPoint.transform.position}");
+                        // M1_2 포탈이 작동하면 M1_1 포탈을 활성화합니다.
+                        if (gameObject.name == "M1_2Portal" && pairedPortal != null)
+                        {
+                            photonView.RPC("ActivatePairedPortal", RpcTarget.All, pairedPortal.name);
+                            Debug.Log("M1_1 포탈이 활성화되었습니다.");
+                        }
+                        // M2_2 포탈이 작동하면 M2_1 포탈을 활성화합니다.
+                        else if (gameObject.name == "M2_2Portal" && pairedPortal != null)
+                        {
+                            photonView.RPC("ActivatePairedPortal", RpcTarget.All, pairedPortal.name);
+                            Debug.Log("M2_1 포탈이 활성화되었습니다.");
+                        }
+                    }
+
+                    // 카메라 이동
+                    S3Camera cameraFollow = Camera.main.GetComponent<S3Camera>();
+                    if (cameraFollow != null)
+                    {
+                        cameraFollow.SnapToTarget(); // 즉시 이동
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("Target spawn point is not assigned!");
+                }
             }
         }
     }

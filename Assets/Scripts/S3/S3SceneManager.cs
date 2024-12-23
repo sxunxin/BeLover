@@ -23,6 +23,9 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
 
     public int TotalItemCount;
 
+    public GameObject M2_2Portal; // Unity 에디터에서 할당
+    public GameObject HousePortalOn;
+    public GameObject FinalPortal;
     void Start()
     {
         TotalItemCount = GameObject.FindGameObjectsWithTag("candle").Length;
@@ -36,7 +39,7 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            Destroy(gameObject);
+            Destroy(gameObject); // 중복 객체 삭제
         }
     }
 
@@ -117,6 +120,19 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
     }
 
     //s3 m2 
+    [PunRPC]
+    public void ActivateM2_2Portal()
+    {
+        if (M2_2Portal != null)
+        {
+            M2_2Portal.SetActive(true);
+            Debug.Log("M2_2Portal이 활성화되었습니다.");
+        }
+        else
+        {
+            Debug.LogWarning("M2_2Portal이 할당되지 않았습니다.");
+        }
+    }
     //퀴즈 출력 하면 될거 같은데
     public void Talk(int id, bool isTomb, bool skullTrue)
     {
@@ -153,6 +169,8 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
                     break;
                 default:
                     clearUIText.text = "3rd clear!";
+                    // FinalPortal 및 House_PortalOn 활성화
+                    photonView.RPC("ActivateFinalPortal", RpcTarget.All);
                     break;
             }
 
@@ -184,7 +202,22 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
         if (currentCandleCount >= TotalItemCount)
         {
             Debug.Log("모든 캔들에 불이 켜졌습니다. 스테이지 클리어!");
-            ShowClearUI_RPC(3); // 클리어 UI 표시
+            photonView.RPC("ShowClearUI_RPC", RpcTarget.All, 3);
         }
     }
+    [PunRPC]
+    public void ActivateFinalPortal()
+    {
+        if (HousePortalOn != null && FinalPortal != null)
+        {
+            HousePortalOn.SetActive(true);
+            FinalPortal.SetActive(true);
+            Debug.Log("House_PortalOn과 FinalPortal이 활성화되었습니다.");
+        }
+        else
+        {
+            Debug.LogWarning("House_PortalOn 또는 FinalPortal 오브젝트를 찾을 수 없습니다.");
+        }
+    }
+
 }

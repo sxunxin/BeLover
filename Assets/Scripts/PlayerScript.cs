@@ -42,6 +42,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     GameObject scanObject;
     GameObject portalObject;
     private GameObject currentRoad; // Player2의 현재 Road 상태
+
     
     //s3 gimmick
     public int candlecount;
@@ -136,7 +137,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                         if (scanObject != null && scanObject.name == "Skull_True")
                         {
                             Debug.Log("Player 2가 Skull_True 오브젝트와 상호작용했습니다. 클리어 화면을 모든 클라이언트에 표시합니다.");
-                            S3sm.photonView.RPC("ShowClearUI_RPC", RpcTarget.All, 2); // 조건 2번
+                            S3sm.photonView.RPC("ShowClearUI_RPC", RpcTarget.All, 2); // 조건 2번                                                        
+                            // M2_2Portal 활성
+                            S3sm.photonView.RPC("ActivateM2_2Portal", RpcTarget.All); // 모든 클라이언트에서 활성화
                         }
                         if (scanObject != null && scanObject.CompareTag("Candle"))
                         {
