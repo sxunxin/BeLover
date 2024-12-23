@@ -45,7 +45,6 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
             // ======================= 마지막에 지울 것 ! =======================
             if (Input.GetKeyDown(KeyCode.Alpha0))
             {
-                GameManager.Instance.isMission1Clear = true;
                 Debug.Log("Mission1 Clear");
                 if (PhotonNetwork.IsMasterClient)
                 {
@@ -273,7 +272,6 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
         if (other.gameObject.tag == "Goal")
         {
-            GameManager.Instance.isMission1Clear = true;
             Debug.Log("Mission1 Clear");
             if (PhotonNetwork.IsMasterClient)
             {
@@ -291,7 +289,7 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
 
         if(other.gameObject.tag == "Mirror")
         {
-            GameManager.Instance.isMission2Clear = true;
+            GameManager.Instance.isMission1Clear = true;
             if (PhotonNetwork.IsMasterClient)
             {
                 PhotonNetwork.LoadLevel("MainScene");

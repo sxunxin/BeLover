@@ -11,10 +11,6 @@ public class GameManager : MonoBehaviour
     public bool isMission2Clear = false;
     public bool isMission3Clear = false;
 
-    public int isMission1Count = 0;
-    public int isMission2Count = 0;
-    public int isMission3Count = 0;
-
     private void Awake()
     {
         // ½Ì±ÛÅæ ÆĞÅÏ ±¸Çö

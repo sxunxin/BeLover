@@ -8,7 +8,7 @@ public class S4Manager : MonoBehaviourPunCallbacks
     private int currentButtonIndex = 1; // 플레이어가 밟아야 할 버튼의 순서
     public GameObject door;
     public GameObject house1;
-    public GameObject house2;
+    public GameObject goal;
     public GameObject blind;
     public GameObject mapLight;
     public float lightMoveSpeed = 5f;
@@ -145,7 +145,7 @@ public class S4Manager : MonoBehaviourPunCallbacks
 
         door.SetActive(false);
         house1.SetActive(true);
-        house2.SetActive(true);
+        goal.SetActive(true);
     }
 
     public void EnlargeBlind()
