@@ -71,21 +71,21 @@ public class MainSceneManager : MonoBehaviour
         if (GameManager.Instance.mainSceneEnterCount >= 2)
         {
             storyPanel.SetActive(false);
-            if (GameManager.Instance.mainSceneEnterCount == 2 && GameManager.Instance.isMission1Clear == true && GameManager.Instance.isMission2Clear == false && GameManager.Instance.isMission3Clear == false)
+            if (GameManager.Instance.mainSceneEnterCount == 2 && GameManager.Instance.isMission1Clear == false && GameManager.Instance.isMission2Clear == false && GameManager.Instance.isMission3Clear == false)
             {
                 mainMission[0].tag = "MainMission";
             }
             else
                 mainMission[0].tag = "Untagged";
 
-            if (GameManager.Instance.mainSceneEnterCount == 3 && GameManager.Instance.isMission1Clear == true && GameManager.Instance.isMission2Clear == true && GameManager.Instance.isMission3Clear == false)
+            if (GameManager.Instance.mainSceneEnterCount == 3 && GameManager.Instance.isMission1Clear == true && GameManager.Instance.isMission2Clear == false && GameManager.Instance.isMission3Clear == false)
             {
                 mainMission[1].tag = "MainMission";
             }
             else
                 mainMission[1].tag = "Untagged";
 
-            if (GameManager.Instance.mainSceneEnterCount == 4 && GameManager.Instance.isMission1Clear == true && GameManager.Instance.isMission2Clear == true && GameManager.Instance.isMission3Clear == true)
+            if (GameManager.Instance.mainSceneEnterCount == 4 && GameManager.Instance.isMission1Clear == true && GameManager.Instance.isMission2Clear == true && GameManager.Instance.isMission3Clear == false)
             {
                 mainMission[2].tag = "MainMission";
             }

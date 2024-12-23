@@ -303,14 +303,14 @@ public class PlayerScript : MonoBehaviourPunCallbacks
 
     void HandleMissionClearCheck(string missionName)
     {
-        if (missionName == "MainMission1" && GameManager.Instance.isMission2Clear == true)
+        if (missionName == "MainMission1" && GameManager.Instance.isMission1Clear == true)
         {
             Msm.StoryPanel.SetActive(true);
             Msm.ghostImage.sprite = Msm.GhostImage[0];
             Msm.StoryText.text = "이미 성불한 방이다";
         }
 
-        if (missionName == "MainMission2" && GameManager.Instance.isMission3Clear == true)
+        if (missionName == "MainMission2" && GameManager.Instance.isMission2Clear == true)
         {
             Msm.StoryPanel.SetActive(true);
             Msm.ghostImage.sprite = Msm.GhostImage[1];
