@@ -287,14 +287,16 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
             Destroy(other.gameObject);
         }
 
-        if(other.gameObject.tag == "Mirror")
+        if (other.gameObject.tag == "Mirror")
         {
             GameManager.Instance.isMission1Clear = true;
+
             if (PhotonNetwork.IsMasterClient)
             {
                 PhotonNetwork.LoadLevel("MainScene");
             }
         }
+
     }
 
     System.Collections.IEnumerator FallAndRespawn()

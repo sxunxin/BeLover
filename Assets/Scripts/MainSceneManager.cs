@@ -38,6 +38,8 @@ public class MainSceneManager : MonoBehaviour
     public bool isCinemaFinished = false;
     public bool isStart = false;
 
+    public TextMeshProUGUI countDown;
+
     void Awake()
     {
         nm = FindObjectOfType<NetworkManager>();

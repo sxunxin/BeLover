@@ -42,11 +42,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     GameObject scanObject;
     GameObject portalObject;
     private GameObject currentRoad; // Player2의 현재 Road 상태
-
     
     //s3 gimmick
     public int candlecount;
-
 
     void Awake()
     {
@@ -137,9 +135,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                         if (scanObject != null && scanObject.name == "Skull_True")
                         {
                             Debug.Log("Player 2가 Skull_True 오브젝트와 상호작용했습니다. 클리어 화면을 모든 클라이언트에 표시합니다.");
-                            S3sm.photonView.RPC("ShowClearUI_RPC", RpcTarget.All, 2); // 조건 2번                                                        
-                            // M2_2Portal 활성
-                            S3sm.photonView.RPC("ActivateM2_2Portal", RpcTarget.All); // 모든 클라이언트에서 활성화
+                            S3sm.photonView.RPC("ShowClearUI_RPC", RpcTarget.All, 2); // 조건 2번
                         }
                         if (scanObject != null && scanObject.CompareTag("Candle"))
                         {
@@ -179,8 +175,10 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                     {
                         HandleMissionSelection(scanObject.name, nm);
                     }
-
-                    HandleMissionClearCheck(scanObject.name);
+                    else
+                    {
+                        HandleMissionClearCheck(scanObject.name);
+                    }
                 }
             }
             else if (SceneManager.GetActiveScene().name == "Scene4")
@@ -249,16 +247,18 @@ public class PlayerScript : MonoBehaviourPunCallbacks
             RaycastHit2D rayHit = Physics2D.Raycast(
                 rayStartPos, // 시작 위치
                 dirVec,      // 방향
-                0.5f,          // 길이 (0.35f -> 1f로 변경)
+                0.5f,        // 길이
                 LayerMask.GetMask("Object") // Object 레이어만 탐색
             );
 
             if (rayHit.collider != null)
             {
+                // 새로운 오브젝트를 스캔
                 scanObject = rayHit.collider.gameObject;
             }
             else
             {
+                // Raycast가 아무것도 감지하지 못한 경우
                 scanObject = null;
             }
         }
@@ -279,18 +279,21 @@ public class PlayerScript : MonoBehaviourPunCallbacks
             Msm.StoryPanel.SetActive(true);
             Msm.StoryText.text = "거울의 방";
             Msm.ghostImage.sprite = Msm.GhostImage[0];
+            Msm.ghostImage.color = new Color(1f, 1f, 1f);
         }
         else if (missionName == "MainMission2")
         {
             Msm.StoryPanel.SetActive(true);
             Msm.StoryText.text = "분리의 방";
             Msm.ghostImage.sprite = Msm.GhostImage[1];
+            Msm.ghostImage.color = new Color(1f, 1f, 1f);
         }
         else if (missionName == "MainMission3")
         {
             Msm.StoryPanel.SetActive(true);
             Msm.StoryText.text = "어둠의 방";
             Msm.ghostImage.sprite = Msm.GhostImage[2];
+            Msm.ghostImage.color = new Color(1f, 1f, 1f);
         }
 
         // 선택한 미션 정보를 Photon CustomProperties에 저장
@@ -309,6 +312,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         if (missionName == "MainMission1" && GameManager.Instance.isMission1Clear == true)
         {
             Msm.StoryPanel.SetActive(true);
+            Msm.ghostImage.color = new Color(1f, 1f, 1f);
             Msm.ghostImage.sprite = Msm.GhostImage[0];
             Msm.StoryText.text = "이미 성불한 방이다";
         }
@@ -316,6 +320,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         if (missionName == "MainMission2" && GameManager.Instance.isMission2Clear == true)
         {
             Msm.StoryPanel.SetActive(true);
+            Msm.ghostImage.color = new Color(1f, 1f, 1f);
             Msm.ghostImage.sprite = Msm.GhostImage[1];
             Msm.StoryText.text = "이미 성불한 방이다";
         }
@@ -353,10 +358,10 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         float elapsedTime = 0f;
         bool missionMatched = false;
 
-        while (elapsedTime < 5f) // 5초 동안 매 0.5초마다 확인
+        while (elapsedTime < 3f) // 3초 동안 매 0.5초마다 확인
         {
-            yield return new WaitForSeconds(0.5f);
-            elapsedTime += 0.5f;
+            yield return new WaitForSeconds(1.5f);
+            elapsedTime += 1.5f;
 
             // 모든 플레이어의 선택한 미션 정보를 가져옴
             string player1Mission = "";
@@ -379,19 +384,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks
             {
                 Debug.Log($"두 플레이어가 같은 미션을 선택했습니다: {missionName}");
 
-                if (missionName == "MainMission1")
-                {
-                    nm.photonView.RPC("RPC_StartScene2", RpcTarget.All);
-                }
-                else if (missionName == "MainMission2")
-                {
-                    nm.photonView.RPC("RPC_StartScene3", RpcTarget.All);
-                }
-                else if (missionName == "MainMission3")
-                {
-                    nm.photonView.RPC("RPC_StartScene4", RpcTarget.All);
-                }
-
+                // 카운트다운 시작
+                StartCoroutine(StartCountdownAndChangeScene(missionName, nm));
                 missionMatched = true;
                 break; // 코루틴 종료
             }
@@ -400,6 +394,46 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         if (!missionMatched)
         {
             Debug.LogWarning("두 플레이어의 선택이 일치하지 않았습니다.");
+        }
+    }
+
+    IEnumerator StartCountdownAndChangeScene(string missionName, NetworkManager nm)
+    {
+        string mapName = "알 수 없는 방";
+
+        if (missionName == "MainMission1")
+        {
+            mapName = "거울의 방";
+        }
+        else if (missionName == "MainMission2")
+        {
+            mapName = "분리의 방";
+        }
+        else if (missionName == "MainMission3")
+        {
+            mapName = "어둠의 방";
+        }
+        int countdown = 3; // 카운트다운 시작 숫자
+
+        while (countdown > 0)
+        {
+            Msm.countDown.text = mapName +"에 입장합니다\n\n"+ countdown.ToString(); // 텍스트 갱신
+            yield return new WaitForSeconds(1f);
+            countdown--;
+        }
+
+        // 씬 변경
+        if (missionName == "MainMission1")
+        {
+            nm.photonView.RPC("RPC_StartScene2", RpcTarget.All);
+        }
+        else if (missionName == "MainMission2")
+        {
+            nm.photonView.RPC("RPC_StartScene3", RpcTarget.All);
+        }
+        else if (missionName == "MainMission3")
+        {
+            nm.photonView.RPC("RPC_StartScene4", RpcTarget.All);
         }
     }
 
