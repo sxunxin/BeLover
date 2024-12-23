@@ -54014,6 +54014,9 @@ MonoBehaviour:
   talkManager: {fileID: 434388303}
   talkIndex: 0
   TotalItemCount: 5
+  m2Portals:
+  - {fileID: 1013471636}
+  - {fileID: 670625233}
   M2_2Portal: {fileID: 670625233}
   HousePortalOn: {fileID: 1072684649}
   FinalPortal: {fileID: 196712715}

@@ -9,6 +9,7 @@ using TMPro;
 
 public class S2SceneManager : MonoBehaviourPun
 {
+    TalkManager tm;
     public Camera mainCamera; // 연결된 카메라 (Camera.main 대신 사용)
     public TextMeshProUGUI warningText; // **TMP 경고 메시지 텍스트 연결**
     public Image displayImage; // **표시할 이미지 연결**
@@ -38,6 +39,10 @@ public class S2SceneManager : MonoBehaviourPun
     public Image ghostImage;
     public Image Buddhahood;
 
+    private void Awake()
+    {
+        tm = FindObjectOfType<TalkManager>();
+    }
     void Start()
     {
         if (mainCamera == null)
@@ -225,7 +230,7 @@ public class S2SceneManager : MonoBehaviourPun
     {
         firstPanel.SetActive(true);
         yield return new WaitForSeconds(3f);
-        firstText.SetMsg("외모스트레스로 인해 거울을 보지 못하고,\n\n스트레스를 받아 한이 맺힌 유령");
+        firstText.SetMsg(tm.s2Text[0]);
 
         yield return new WaitForSeconds(12f);
 
@@ -233,10 +238,10 @@ public class S2SceneManager : MonoBehaviourPun
         yield return new WaitForSeconds(2f);
         secondPanel.SetActive(true);
 
-        secondText.SetMsg("으아아아아아 거울이 너무 싫어 다 박살내버릴거야!!!");
+        secondText.SetMsg(tm.s2Text[1]);
         yield return new WaitForSeconds(7f);
 
-        thirdText.SetMsg("부서진 거울 조각을 찾아 거울을 완성해보자.\n\n단 두 플레이어가 조종할 수 있는 2개의 방향키가 다르고,\n\n조각을 먹을 때마다 방향키가 랜덤으로 바뀐다.");
+        thirdText.SetMsg(tm.s2Text[2]);
 
         yield return new WaitForSeconds(20f);
         storyPanel.SetActive(false);
@@ -245,47 +250,47 @@ public class S2SceneManager : MonoBehaviourPun
     {
         yield return new WaitForSeconds(3f);
         p1Panel.SetActive(true);
-        p1Talk.SetMsg("휴... 우리가 거울 조각을 모아왔어.");
+        p1Talk.SetMsg(tm.s2Text[3]);
         yield return new WaitForSeconds(5f);
         p1Panel.SetActive(false);
 
         bossPanel.SetActive(true);
-        bossTalk.SetMsg("으악! 저리 치워!");
+        bossTalk.SetMsg(tm.s2Text[4]);
         yield return new WaitForSeconds(5f);
         bossPanel.SetActive(false);
 
         p2Panel.SetActive(true);
-        p2Talk.SetMsg("아니야, 거울을 봐. 네가 아까와는 다르게 보여.");
+        p2Talk.SetMsg(tm.s2Text[5]);
         yield return new WaitForSeconds(5f);
         p2Panel.SetActive(false);
 
         bossPanel.SetActive(true);
-        bossTalk.SetMsg("그래...? 똑같은거 같은데...");
+        bossTalk.SetMsg(tm.s2Text[6]);
         yield return new WaitForSeconds(5f);
         bossPanel.SetActive(false);
 
         p2Panel.SetActive(true);
-        p2Talk.SetMsg("너의 빛나는 눈동자를 봐.");
+        p2Talk.SetMsg(tm.s2Text[7]);
         yield return new WaitForSeconds(5f);
         p2Panel.SetActive(false);
 
         p1Panel.SetActive(true);
-        p1Talk.SetMsg("그래! 거울보다 더 반짝거리는 걸? 정말 예쁘다.");
+        p1Talk.SetMsg(tm.s2Text[8]);
         yield return new WaitForSeconds(5f);
         p1Panel.SetActive(false);
 
         bossPanel.SetActive(true);
-        bossTalk.SetMsg("정말 그렇게 생각해...?");
+        bossTalk.SetMsg(tm.s2Text[9]);
         yield return new WaitForSeconds(5f);
         bossPanel.SetActive(false);
 
         p2Panel.SetActive(true);
-        p2Talk.SetMsg("그럼. 너는 어떤 것 같아?");
+        p2Talk.SetMsg(tm.s2Text[10]);
         yield return new WaitForSeconds(5f);
         p2Panel.SetActive(false);
 
         bossPanel.SetActive(true);
-        bossTalk.SetMsg("나도… 그런 것 같아.");
+        bossTalk.SetMsg(tm.s2Text[11]);
         yield return new WaitForSeconds(5f);
         bossPanel.SetActive(false);
 

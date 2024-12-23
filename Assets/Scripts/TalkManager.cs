@@ -34,9 +34,26 @@ public class TalkManager : MonoBehaviour
 
     private bool isP1Talking = true; // P1부터 시작
 
+    //s2의 대화스크립트
+    public string[] s2Text = {
+        "외모스트레스로 인해 거울을 보지 못하고,\n\n스트레스를 받아 한이 맺힌 유령",
+        "으아아아아아 거울이 너무 싫어 다 박살내버릴거야!!!",
+        "부서진 거울 조각을 찾아 거울을 완성해보자.\n\n단 두 플레이어가 조종할 수 있는 2개의 방향키가 다르고,\n\n조각을 먹을 때마다 방향키가 랜덤으로 바뀐다.",
+        "휴... 우리가 거울 조각을 모아왔어.",
+        "으악! 저리 치워!",
+        "아니야, 거울을 봐. 네가 아까와는 다르게 보여.",
+        "그래...? 똑같은거 같은데...",
+        "너의 빛나는 눈동자를 봐.",
+        "그래! 거울보다 더 반짝거리는 걸? 정말 예쁘다.",
+        "정말 그렇게 생각해...?",
+        "그럼. 너는 어떤 것 같아?",
+        "나도...그런 것 같아...",
+    };
+
     private void Awake()
     {
         Msm = FindObjectOfType<MainSceneManager>();
+        DontDestroyOnLoad(this.gameObject);
     }
 
     private void Start()

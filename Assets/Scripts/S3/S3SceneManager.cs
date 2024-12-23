@@ -23,6 +23,7 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
 
     public int TotalItemCount;
 
+    public GameObject[] m2Portals;
     public GameObject M2_2Portal; // Unity 에디터에서 할당
     public GameObject HousePortalOn;
     public GameObject FinalPortal;
@@ -166,6 +167,8 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
                     break;
                 case 2:
                     clearUIText.text = "2nd clear!";
+                    m2Portals[0].SetActive(true);
+                    m2Portals[1].SetActive(true);
                     break;
                 default:
                     clearUIText.text = "3rd clear!";
