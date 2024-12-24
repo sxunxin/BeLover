@@ -16714,7 +16714,7 @@ GameObject:
   - component: {fileID: 1157606083}
   - component: {fileID: 1157606082}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Buddhahood
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -65,7 +65,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         {
             if (Msm != null && Msm.StoryPanel.activeSelf)
             {
-                if (Input.GetButtonDown("Jump"))
+                if (Input.GetButtonDown("Jump") && scanObject.tag != "MainMission")
                 {   
                     Msm.StoryPanel.SetActive(false);
                 }
@@ -306,9 +306,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks
 
         // 선택한 미션 정보를 Photon CustomProperties에 저장
         ExitGames.Client.Photon.Hashtable playerSelection = new ExitGames.Client.Photon.Hashtable
-    {
-        { "SelectedMission", missionName }
-    };
+        {
+            { "SelectedMission", missionName }
+        };
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerSelection);
 
         // 모든 플레이어의 선택 정보 확인 (코루틴으로 확인)

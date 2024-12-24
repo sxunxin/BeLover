@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Realtime;
+using Photon.Pun;
 
 public class TalkManager : MonoBehaviour
 {
@@ -34,8 +36,7 @@ public class TalkManager : MonoBehaviour
 
     private bool isP1Talking = true; // P1부터 시작
 
-    //s2의 대화스크립트
-    public string[] s2Text = {
+    public string[] S2Text = {
         "외모스트레스로 인해 거울을 보지 못하고,\n\n스트레스를 받아 한이 맺힌 유령",
         "으아아아아아 거울이 너무 싫어 다 박살내버릴거야!!!",
         "부서진 거울 조각을 찾아 거울을 완성해보자.\n\n단 두 플레이어가 조종할 수 있는 2개의 방향키가 다르고,\n\n조각을 먹을 때마다 방향키가 랜덤으로 바뀐다.",
@@ -44,12 +45,12 @@ public class TalkManager : MonoBehaviour
         "아니야, 거울을 봐. 네가 아까와는 다르게 보여.",
         "그래...? 똑같은거 같은데...",
         "너의 빛나는 눈동자를 봐.",
-        "그래! 거울보다 더 반짝거리는 걸? 정말 예쁘다.",
+        "그래! 거울보다 더 반짝거리는걸? 정말 예쁘다.",
         "정말 그렇게 생각해...?",
         "그럼. 너는 어떤 것 같아?",
         "나도...그런 것 같아...",
+        "한을 풀어줘서 고마워, 나중에 꼭 필요할 물건을 줄게.\n\n너희가 먹었던 거울 조각 5개를 거울 5개로 갚아줄게."
     };
-
     private void Awake()
     {
         Msm = FindObjectOfType<MainSceneManager>();
@@ -59,7 +60,7 @@ public class TalkManager : MonoBehaviour
     private void Start()
     {
         // 대사를 바로 시작하려면 Start()에서 호출하도록 수정
-        if (Msm.isCinemaFinished)
+        if (Msm != null && Msm.isCinemaFinished)
         {
             dialoguePanel.SetActive(true);
             StartCoroutine(ShowDialogue());
@@ -70,7 +71,7 @@ public class TalkManager : MonoBehaviour
     private void Update()
     {
         // dialoguePanel은 계속 켜놓고, 시네마틱이 끝났을 때만 대사를 시작
-        if (Msm.isCinemaFinished && !dialoguePanel.activeSelf)
+        if (Msm != null && Msm.isCinemaFinished && !dialoguePanel.activeSelf)
         {
             dialoguePanel.SetActive(true);
             StartCoroutine(ShowDialogue());
@@ -103,5 +104,37 @@ public class TalkManager : MonoBehaviour
         isDialogueFinished = true;
         // 대사가 모두 끝나면 dialoguePanel을 비활성화
         dialoguePanel.SetActive(false);
+    }
+
+    public IEnumerator ImagePadeOut(Image image, Image image1)
+    {
+        RectTransform rectTransform = image.GetComponent<RectTransform>(); // RectTransform 가져오기
+        CanvasGroup canvasGroup = image.GetComponent<CanvasGroup>(); // Alpha 값을 제어하기 위해 CanvasGroup 사용
+        if (canvasGroup == null)
+        {
+            canvasGroup = image.gameObject.AddComponent<CanvasGroup>(); // 없으면 추가
+        }
+
+        rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x, 0); // 초기 Y 위치 설정
+        canvasGroup.alpha = 1f; // 초기 Alpha 값 설정
+
+        while (rectTransform.anchoredPosition.y < 1200)
+        {
+            rectTransform.anchoredPosition += new Vector2(0, 200) * Time.deltaTime; // Y 위치 증가
+            rectTransform.localScale = Vector3.Lerp(rectTransform.localScale, new Vector3(0.2f, 0.2f, 0.2f), Time.deltaTime); // 크기 점점 줄이기
+            canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0f, Time.deltaTime); // 투명도 점점 감소
+            yield return null; // 다음 프레임까지 대기
+        }
+
+        if (rectTransform.anchoredPosition.y > 1200)
+        {
+            image1.gameObject.SetActive(true);
+            yield return new WaitForSeconds(5f);
+
+            if (PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.LoadLevel("MainScene");
+            }
+        }
     }
 }

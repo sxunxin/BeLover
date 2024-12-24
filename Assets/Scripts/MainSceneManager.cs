@@ -17,8 +17,6 @@ public class MainSceneManager : MonoBehaviour
 
     public GameObject StoryPanel;
     public GameObject StoryPanel1;
-    public GameObject StoryPanel2;
-    public GameObject StoryPanel3;
 
     public GameObject S1P1Panel; // Panel1의 대화UI
     public GameObject S1P2Panel;
@@ -332,11 +330,13 @@ public class MainSceneManager : MonoBehaviour
             }
             else if (GameManager.Instance.mainSceneEnterCount == 3)
             {
-                StoryPanel2.SetActive(true);
+                StoryPanel1.SetActive(true);
+                StartCoroutine(ShowS2Dialogue());
             }
             else if (GameManager.Instance.mainSceneEnterCount == 4)
             {
-                StoryPanel3.SetActive(true);
+                StoryPanel1.SetActive(true);
+                StartCoroutine(ShowS3Dialogue());
             }
         }
     }
@@ -358,7 +358,7 @@ public class MainSceneManager : MonoBehaviour
         S1BossPanel.SetActive(true);
         bossAudioSource.Play();
 
-        BossTalk.SetMsg("너희는 지금 이승에 한이 맺혀 지박령이 된 유령들의 묘지에 침입했다.\n\n그 벌로 각각의 묘지에 해당하는 귀신들을 성불해야한다.");
+        BossTalk.SetMsg("너희는 이승에 한이 맺혀 지박령이 된 유령들의 묘지에 침입했다.\n\n그 벌로 각각의 묘지에 해당하는 귀신들을 성불해야한다.");
         yield return new WaitForSeconds(15f);
 
         BossTalk.SetMsg("거울의 방 - 분리의 방 - 어둠의 방 순서대로 해야하며\n\n각각의 귀신들을 성불하여 얻게 되는 아이템들이 있다.");
@@ -370,6 +370,40 @@ public class MainSceneManager : MonoBehaviour
 
         S1BossPanel.SetActive(false);
         bossAudioSource.Stop();
+        StoryPanel1.SetActive(false);
+    }
+    IEnumerator ShowS2Dialogue()
+    {
+        yield return new WaitForSeconds(3f);
+        S1P1Panel.SetActive(true);
+        P1Talk.SetMsg("휴...드디어 끝났다...");
+        yield return new WaitForSeconds(5f);
+
+        S1P1Panel.SetActive(false);
+        S1P2Panel.SetActive(true);
+        P2Talk.SetMsg("이제 다음은 분리의 방이네요.");
+        yield return new WaitForSeconds(5f);
+
+        S1P2Panel.SetActive(false);
+        yield return new WaitForSeconds(5f);
+
+        StoryPanel1.SetActive(false);
+    }
+    IEnumerator ShowS3Dialogue()
+    {
+        yield return new WaitForSeconds(3f);
+        S1P1Panel.SetActive(true);
+        P1Talk.SetMsg("고생하셨어요...");
+        yield return new WaitForSeconds(3f);
+
+        S1P1Panel.SetActive(false);
+        S1P2Panel.SetActive(true);
+        P2Talk.SetMsg("이제 마지막 방만 남았네요...");
+        yield return new WaitForSeconds(5f);
+
+        S1P2Panel.SetActive(false);
+        yield return new WaitForSeconds(5f);
+
         StoryPanel1.SetActive(false);
     }
     IEnumerator BlinkStoryPanel1()

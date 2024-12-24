@@ -676,7 +676,7 @@ MonoBehaviour:
   scene2BGM: {fileID: 8300000, guid: 44082c09722d7f8499c1887ae58d8c7c, type: 3}
   scene3_1BGM: {fileID: 8300000, guid: 17bd59a508c2a2f4abf3cba24ad099c2, type: 3}
   scene3BGM: {fileID: 8300000, guid: 17bd59a508c2a2f4abf3cba24ad099c2, type: 3}
-  scene4BGM: {fileID: 0}
+  scene4BGM: {fileID: 8300000, guid: a516436ee30a0154b91989c47f503dd4, type: 3}
   scene5BGM: {fileID: 8300000, guid: e04581ca4fc591d4fbff4bcdfc07ef95, type: 3}
 --- !u!4 &1759711036
 Transform:

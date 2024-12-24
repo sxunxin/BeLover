@@ -39,6 +39,7 @@ public class S2SceneManager : MonoBehaviourPun
     public Image ghostImage;
     public Image Buddhahood;
 
+
     private void Awake()
     {
         tm = FindObjectOfType<TalkManager>();
@@ -230,7 +231,7 @@ public class S2SceneManager : MonoBehaviourPun
     {
         firstPanel.SetActive(true);
         yield return new WaitForSeconds(3f);
-        firstText.SetMsg(tm.s2Text[0]);
+        firstText.SetMsg(tm.S2Text[0]);
 
         yield return new WaitForSeconds(12f);
 
@@ -238,10 +239,10 @@ public class S2SceneManager : MonoBehaviourPun
         yield return new WaitForSeconds(2f);
         secondPanel.SetActive(true);
 
-        secondText.SetMsg(tm.s2Text[1]);
+        secondText.SetMsg(tm.S2Text[1]);
         yield return new WaitForSeconds(7f);
 
-        thirdText.SetMsg(tm.s2Text[2]);
+        thirdText.SetMsg(tm.S2Text[2]);
 
         yield return new WaitForSeconds(20f);
         storyPanel.SetActive(false);
@@ -250,82 +251,59 @@ public class S2SceneManager : MonoBehaviourPun
     {
         yield return new WaitForSeconds(3f);
         p1Panel.SetActive(true);
-        p1Talk.SetMsg(tm.s2Text[3]);
+        p1Talk.SetMsg(tm.S2Text[3]);
         yield return new WaitForSeconds(5f);
         p1Panel.SetActive(false);
 
         bossPanel.SetActive(true);
-        bossTalk.SetMsg(tm.s2Text[4]);
+        bossTalk.SetMsg(tm.S2Text[4]);
         yield return new WaitForSeconds(5f);
         bossPanel.SetActive(false);
 
         p2Panel.SetActive(true);
-        p2Talk.SetMsg(tm.s2Text[5]);
+        p2Talk.SetMsg(tm.S2Text[5]);
         yield return new WaitForSeconds(5f);
         p2Panel.SetActive(false);
 
         bossPanel.SetActive(true);
-        bossTalk.SetMsg(tm.s2Text[6]);
+        bossTalk.SetMsg(tm.S2Text[6]);
         yield return new WaitForSeconds(5f);
         bossPanel.SetActive(false);
 
         p2Panel.SetActive(true);
-        p2Talk.SetMsg(tm.s2Text[7]);
+        p2Talk.SetMsg(tm.S2Text[7]);
         yield return new WaitForSeconds(5f);
         p2Panel.SetActive(false);
 
         p1Panel.SetActive(true);
-        p1Talk.SetMsg(tm.s2Text[8]);
+        p1Talk.SetMsg(tm.S2Text[8]);
         yield return new WaitForSeconds(5f);
         p1Panel.SetActive(false);
 
         bossPanel.SetActive(true);
-        bossTalk.SetMsg(tm.s2Text[9]);
+        bossTalk.SetMsg(tm.S2Text[9]);
         yield return new WaitForSeconds(5f);
         bossPanel.SetActive(false);
 
         p2Panel.SetActive(true);
-        p2Talk.SetMsg(tm.s2Text[10]);
+        p2Talk.SetMsg(tm.S2Text[10]);
         yield return new WaitForSeconds(5f);
         p2Panel.SetActive(false);
 
         bossPanel.SetActive(true);
-        bossTalk.SetMsg(tm.s2Text[11]);
+        bossTalk.SetMsg(tm.S2Text[11]);
         yield return new WaitForSeconds(5f);
+
+        bossTalk.SetMsg(tm.S2Text[12]);
+        yield return new WaitForSeconds(15f);
+
         bossPanel.SetActive(false);
 
         yield return new WaitForSeconds(3f);
         ghostImage.gameObject.SetActive(true); // ghostImage 활성화
         yield return new WaitForSeconds(3f); // 3초 대기 후 크기와 투명도 변경 시작
 
-        RectTransform rectTransform = ghostImage.GetComponent<RectTransform>(); // RectTransform 가져오기
-        CanvasGroup canvasGroup = ghostImage.GetComponent<CanvasGroup>(); // Alpha 값을 제어하기 위해 CanvasGroup 사용
-        if (canvasGroup == null)
-        {
-            canvasGroup = ghostImage.gameObject.AddComponent<CanvasGroup>(); // 없으면 추가
-        }
-
-        rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x, 0); // 초기 Y 위치 설정
-        canvasGroup.alpha = 1f; // 초기 Alpha 값 설정
-
-        while (rectTransform.anchoredPosition.y < 1200)
-        {
-            rectTransform.anchoredPosition += new Vector2(0, 200) * Time.deltaTime; // Y 위치 증가
-            rectTransform.localScale = Vector3.Lerp(rectTransform.localScale, new Vector3(0.2f, 0.2f, 0.2f), Time.deltaTime); // 크기 점점 줄이기
-            canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0f, Time.deltaTime); // 투명도 점점 감소
-            yield return null; // 다음 프레임까지 대기
-        }
-
-        if(rectTransform.anchoredPosition.y > 1200)
-        {
-            Buddhahood.gameObject.SetActive(true);
-            yield return new WaitForSeconds(5f);
-
-            if (PhotonNetwork.IsMasterClient)
-            {
-                PhotonNetwork.LoadLevel("MainScene");
-            }
-        }
+        StartCoroutine(tm.ImagePadeOut(ghostImage, Buddhahood));
     }
 
     [PunRPC]
