@@ -31,6 +31,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     Rigidbody2D rd;
     Animator anim;
     SpriteRenderer spriteRenderer;
+    private AudioSource StoryPanelAudio; // AudioSource 변수 추가
     public PhotonView pv;
     public Text nicknameText;
 
@@ -58,13 +59,23 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         nicknameText.text = pv.IsMine ? PhotonNetwork.NickName : pv.Owner.NickName;
         nicknameText.color = pv.IsMine ? Color.green : Color.red;
     }
-
+    void Start()
+    {
+        if(Msm != null)
+        {
+            StoryPanelAudio = Msm.StoryPanel.GetComponent<AudioSource>(); // AudioSource 할당
+        }
+    }
     void Update()
     {
         if (pv.IsMine) // 자신의 플레이어만 동작
         {
             if (Msm != null && Msm.StoryPanel.activeSelf)
             {
+                if(StoryPanelAudio != null)
+                {
+                    StoryPanelAudio.Play();
+                }
                 if (Input.GetButtonDown("Jump") && scanObject.tag != "MainMission")
                 {   
                     Msm.StoryPanel.SetActive(false);
@@ -81,7 +92,19 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 rd.velocity = Vector2.zero; // 움직임 정지
                 return; //  더 이상 코드 실행 중지
             }
-
+            if (S3sm != null && S3sm.storyPanel.activeSelf)
+            {
+                rd.velocity = Vector2.zero; // 움직임 정지
+                return; //  더 이상 코드 실행 중지
+            }
+            if (S3sm != null && S3sm.endPanel.activeSelf)
+            {
+                if (CompareTag("player2")) anim.Play("Female_Up_Idle");
+                else anim.Play("Male_Up_Idle");
+                pv.RPC("SyncAnimationIdle", RpcTarget.Others);
+                rd.velocity = Vector2.zero; // 움직임 정지
+                return; //  더 이상 코드 실행 중지
+            }
             // 입력값 처리
             h =  Input.GetAxisRaw("Horizontal");
             v =  Input.GetAxisRaw("Vertical");

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using Photon.Pun;
 
@@ -16,6 +17,7 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
     public TextMeshProUGUI clearUIText; // Clear UI의 텍스트 변경을 위해 추가
     public bool isAction;  //활성화 상태 판단 변수
 
+    public TalkManager tm;
     public S3_1TalkManager talkManager;
     public int talkIndex;
 
@@ -27,12 +29,30 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
     public GameObject M2_2Portal; // Unity 에디터에서 할당
     public GameObject HousePortalOn;
     public GameObject FinalPortal;
-    void Start()
-    {
-        TotalItemCount = GameObject.FindGameObjectsWithTag("candle").Length;
-    }
+
+    public GameObject storyPanel;
+    public GameObject firstPanel;
+    public GameObject secondPanel;
+
+    public TypeEffect firstText;
+    public TypeEffect secondText;
+    public TypeEffect thirdText;
+
+    public GameObject endPanel;
+    public GameObject p1Panel;
+    public GameObject p2Panel;
+    public GameObject bossPanel;
+
+    public TypeEffect p1Talk;
+    public TypeEffect p2Talk;
+    public TypeEffect bossTalk;
+
+    public Image ghostImage;
+    public Image Buddhahood;
+
     private void Awake()
     {
+        tm = FindObjectOfType<TalkManager>();
         if (Instance == null)
         {
             Instance = this;
@@ -44,7 +64,103 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
         }
     }
 
+    void Start()
+    {
+        StartCoroutine(firstCinema());
+        TotalItemCount = GameObject.FindGameObjectsWithTag("candle").Length;
+    }
+    IEnumerator firstCinema()
+    {
+        firstPanel.SetActive(true);
+        yield return new WaitForSeconds(3f);
+        firstText.SetMsg(tm.S3Text[0]);
 
+        yield return new WaitForSeconds(13f);
+
+        firstPanel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+        secondPanel.SetActive(true);
+
+        secondText.SetMsg(tm.S3Text[1]);
+        yield return new WaitForSeconds(7f);
+
+        thirdText.SetMsg(tm.S3Text[2]);
+
+        yield return new WaitForSeconds(20f);
+        storyPanel.SetActive(false);
+    }
+    IEnumerator secondCinema()
+    {
+        yield return new WaitForSeconds(3f);
+        bossPanel.SetActive(true);
+        bossTalk.SetMsg(tm.S3Text[3]);
+        yield return new WaitForSeconds(12f);
+        bossPanel.SetActive(false);
+
+        p2Panel.SetActive(true);
+        p2Talk.SetMsg(tm.S3Text[4]);
+        yield return new WaitForSeconds(5f);
+        p2Panel.SetActive(false);
+
+        bossPanel.SetActive(true);
+        bossTalk.SetMsg(tm.S3Text[5]);
+        yield return new WaitForSeconds(5f);
+        bossPanel.SetActive(false);
+
+        p1Panel.SetActive(true);
+        p1Talk.SetMsg(tm.S3Text[6]);
+        yield return new WaitForSeconds(5f);
+        p1Panel.SetActive(false);
+
+        p2Panel.SetActive(true);
+        p2Talk.SetMsg(tm.S3Text[7]);
+        yield return new WaitForSeconds(5f);
+        p2Panel.SetActive(false);
+
+        bossPanel.SetActive(true);
+        bossTalk.SetMsg(tm.S3Text[8]);
+        yield return new WaitForSeconds(5f);
+        bossPanel.SetActive(false);
+
+        p1Panel.SetActive(true);
+        p1Talk.SetMsg(tm.S3Text[9]);
+        yield return new WaitForSeconds(5f);
+        p1Panel.SetActive(false);
+
+        p2Panel.SetActive(true);
+        p2Talk.SetMsg(tm.S3Text[10]);
+        yield return new WaitForSeconds(5f);
+        p2Panel.SetActive(false);
+
+        bossPanel.SetActive(true);
+        bossTalk.SetMsg(tm.S3Text[11]);
+        yield return new WaitForSeconds(5f);
+
+        bossTalk.SetMsg(tm.S2Text[12]);
+        yield return new WaitForSeconds(15f);
+
+        bossPanel.SetActive(false);
+
+        yield return new WaitForSeconds(3f);
+        ghostImage.gameObject.SetActive(true); // ghostImage 활성화
+        yield return new WaitForSeconds(3f); // 3초 대기 후 크기와 투명도 변경 시작
+
+        StartCoroutine(tm.ImagePadeOut(ghostImage, Buddhahood));
+    }
+
+    [PunRPC]
+    public void ShowEndPanel_RPC()
+    {
+        if (endPanel != null)
+        {
+            endPanel.SetActive(true);
+            StartCoroutine(secondCinema());
+        }
+        else
+        {
+            Debug.LogError("endPanel이 연결되지 않았습니다.");
+        }
+    }
     public void CompareButtonAndRoad()
     {
         string player1Button = "None";
