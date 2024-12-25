@@ -5,9 +5,15 @@ using Photon.Pun; // Photon 네임스페이스 추가
 
 public class S3Portal : MonoBehaviourPun
 {
+    S3SceneManager S3sm;
     public GameObject targetSpawnPoint;
     public GameObject pairedPortal; // 연결된 포탈을 참조합니다.
     public GameObject finalPortal;
+
+    void Awake()
+    {
+        S3sm = FindObjectOfType<S3SceneManager>();
+    }
 
     public void OnPlayerEnter(GameObject player)
     {
@@ -18,7 +24,7 @@ public class S3Portal : MonoBehaviourPun
 
             if (PhotonNetwork.IsMasterClient)
             {
-                PhotonNetwork.LoadLevel("MainScene");
+                S3sm.photonView.RPC("ShowEndPanel_RPC", RpcTarget.All); // 모든 클라이언트에서 패널 활성화
             }
 
             return; // FinalPortal은 더 이상 로직이 필요 없음

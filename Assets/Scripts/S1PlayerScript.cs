@@ -44,6 +44,11 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
             rigid.velocity = Vector2.zero; // 움직임 정지
             return; //  더 이상 코드 실행 중지
         }
+        if (S2sm != null && S2sm.endPanel.activeSelf)
+        {
+            gameObject.SetActive(false);
+            return; //  더 이상 코드 실행 중지
+        }
         if (SceneManager.GetActiveScene().name == "Scene1")
         {
 
