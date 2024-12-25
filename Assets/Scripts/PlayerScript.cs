@@ -523,7 +523,11 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 PhotonNetwork.LoadLevel("MainScene");
             }
         }
-
+        if (collision.gameObject.name == "M2_2Spawn")
+        {
+            Debug.Log("플레이어가 M2_2Spawn에 도착하여 속도가 정상화됩니다.");
+            pv.RPC("SetSpeedRPC", RpcTarget.All, 1f); // 모든 클라이언트에서 속도 동기화
+        }
         if (collision.CompareTag("Portal"))
         {
             // Portal과의 충돌 로직 추가

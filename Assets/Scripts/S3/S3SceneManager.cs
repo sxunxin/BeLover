@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Photon.Pun;
+using UnityEngine.SceneManagement;
 
 
 public class S3SceneManager : MonoBehaviourPunCallbacks
@@ -29,6 +30,7 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
     public GameObject M2_2Portal; // Unity 에디터에서 할당
     public GameObject HousePortalOn;
     public GameObject FinalPortal;
+    public GameObject LastLine;
 
     public GameObject storyPanel;
     public GameObject firstPanel;
@@ -60,6 +62,11 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
         }
         else
         {
+            if (SceneManager.GetActiveScene().name != "Scene3-1")
+            {
+                Destroy(gameObject);
+                return;
+            }
             Destroy(gameObject); // 중복 객체 삭제
         }
     }
@@ -290,6 +297,8 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
                     clearUIText.text = "3rd clear!";
                     // FinalPortal 및 House_PortalOn 활성화
                     photonView.RPC("ActivateFinalPortal", RpcTarget.All);
+                    GameManager.Instance.isMission2Clear = true;
+
                     break;
             }
 
@@ -331,6 +340,7 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
         {
             HousePortalOn.SetActive(true);
             FinalPortal.SetActive(true);
+            LastLine.SetActive(false);
             Debug.Log("House_PortalOn과 FinalPortal이 활성화되었습니다.");
         }
         else
