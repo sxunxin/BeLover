@@ -76,6 +76,9 @@ MonoBehaviour:
   - UpdateCountdownText
   - ShowEndPanel_RPC
   - SetChildActive
+  - RPC_StartScene6
+  - TriggerBlindEffect
+  - BridgeGeneratorRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

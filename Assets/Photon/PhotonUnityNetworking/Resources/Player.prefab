@@ -176,6 +176,7 @@ MonoBehaviour:
   pv: {fileID: -6096268475123890931}
   nicknameText: {fileID: 5014128133371754621}
   candlecount: 0
+  candles: 20
 --- !u!95 &8251382587938969043
 Animator:
   serializedVersion: 5
