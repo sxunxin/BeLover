@@ -46,6 +46,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     //s3 gimmick
     public int candlecount;
 
+    //s5
+    public int candles = 20;
+
     void Awake()
     {
         rd = GetComponent<Rigidbody2D>();
@@ -206,6 +209,24 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                     }
                 }
             }
+            else if (SceneManager.GetActiveScene().name == "TempScene5")
+            {
+                SetDirection(hDown, vDown);
+
+                if (Input.GetButtonDown("Jump") && scanObject != null && scanObject.name.StartsWith("BridgeGenerator"))
+                {
+                    Debug.Log(scanObject.name);
+                    string targetBridgeName = scanObject.name.Replace("Generator", "");
+                    photonView.RPC("BridgeGeneratorRPC", RpcTarget.All, targetBridgeName);
+                }
+                else if (Input.GetButtonDown("Jump") && CompareTag("player2") && candles > 0)
+                {
+                    candles--;
+
+                    // BlindPanelEffect의 코루틴 호출 (PUN RPC 사용)
+                    photonView.RPC("TriggerBlindEffect", RpcTarget.All);
+                }
+            }
         }
     }
 
@@ -280,6 +301,21 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     {
         if (CompareTag("player2")) anim.Play("Female_Down_Idle");
         else anim.Play("Male_Down_Idle");
+    }
+
+    [PunRPC]
+    private void TriggerBlindEffect()
+    {
+        // BlindPanelEffect 스크립트에서 코루틴 실행
+        BlindPanelFollow blindPanel = FindObjectOfType<BlindPanelFollow>();
+        if (blindPanel != null)
+        {
+            blindPanel.StartCoroutine(blindPanel.ScaleBlindEffect());
+        }
+        else
+        {
+            Debug.LogError("BlindPanelFollow 스크립트를 찾을 수 없습니다.");
+        }
     }
 
     void HandleMissionSelection(string missionName, NetworkManager nm)
@@ -628,6 +664,17 @@ public class PlayerScript : MonoBehaviourPunCallbacks
             else if (playerTag == "player2")
             {
                 SetPosition(-0.35f, -28.8f, 0f);
+            }
+        }
+        else if (scene.name == "TempScene5")
+        {
+            if (playerTag == "player1")
+            {
+                SetPosition(3.5f, -1f, 0f);
+            }
+            else if (playerTag == "player2")
+            {
+                SetPosition(2.8f, -1f, 0f);
             }
         }
         else
