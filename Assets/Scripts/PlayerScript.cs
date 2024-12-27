@@ -47,8 +47,34 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     //s3 gimmick
     public int candlecount;
 
+    //s4
+    S4Manager s4manager;
+
     //s5
     public int candles = 20;
+    public int mirror = 5;
+    public int bridge = 3;
+    bool isCandleUsing = false;
+    bool isMirrorUsing = false;
+    S5Manager s5manager;
+
+    // 모바일 입력
+    int up_Value;
+    int down_Value;
+    int left_Value;
+    int right_Value;
+
+    bool up_down;
+    bool down_down;
+    bool left_down;
+    bool right_down;
+    bool up_up;
+    bool down_up;
+    bool left_up;
+    bool right_up;
+
+    bool isInteract;
+    bool isMobileInteract;
 
     void Awake()
     {
@@ -108,14 +134,18 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 rd.velocity = Vector2.zero; // 움직임 정지
                 return; //  더 이상 코드 실행 중지
             }
-            // 입력값 처리
-            h =  Input.GetAxisRaw("Horizontal");
-            v =  Input.GetAxisRaw("Vertical");
+   
+            // 입력값 처리 (PC & 모바일 통합)
+            h =  Input.GetAxisRaw("Horizontal") + right_Value + left_Value;
+            v =  Input.GetAxisRaw("Vertical") + up_Value + down_Value;
 
-            bool hDown = Input.GetButtonDown("Horizontal");
-            bool vDown = Input.GetButtonDown("Vertical");
-            bool hUp =  Input.GetButtonUp("Horizontal");
-            bool vUp =  Input.GetButtonUp("Vertical");
+            bool hDown = Input.GetButtonDown("Horizontal") || right_down || left_down;
+            bool vDown = Input.GetButtonDown("Vertical") || up_down || down_down;
+            bool hUp =  Input.GetButtonUp("Horizontal") || right_up || left_up;
+            bool vUp =  Input.GetButtonUp("Vertical") || up_up || down_up;
+
+            // 상호작용 처리 (PC & 모바일 통합)
+            isInteract = Input.GetButtonDown("Jump") || isMobileInteract;
 
             if (h != 0f && v == 0f)
             {
@@ -219,34 +249,67 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                         blindObject.SetActive(false);
                     }
                 }
-                if (Input.GetButtonDown("Jump") && scanObject != null)
+                if (scanObject != null && scanObject.name == "ResetStatue")
                 {
-                    Debug.Log(scanObject.name);
-                    if (scanObject.name == "ResetStatue")
+                    s4manager.ShowImage("ResetStatue");
+                    if (isInteract)
                     {
-                        S4Manager s4manager = FindObjectOfType<S4Manager>();
                         s4manager.ResetButtons();
                     }
                 }
+                else
+                {
+                    s4manager.ShowImage("None");
+                }
+
             }
             else if (SceneManager.GetActiveScene().name == "TempScene5")
             {
                 SetDirection(hDown, vDown);
 
-                if (Input.GetButtonDown("Jump") && scanObject != null && scanObject.name.StartsWith("BridgeGenerator"))
+                if (CompareTag("player1"))
                 {
-                    Debug.Log(scanObject.name);
-                    string targetBridgeName = scanObject.name.Replace("Generator", "");
-                    photonView.RPC("BridgeGeneratorRPC", RpcTarget.All, targetBridgeName);
-                }
-                else if (Input.GetButtonDown("Jump") && CompareTag("player2") && candles > 0)
-                {
-                    candles--;
+                    if (scanObject != null && scanObject.name.StartsWith("BridgeGenerator"))
+                    {
+                        s5manager.ShowImage("Bridge");
 
-                    // BlindPanelEffect의 코루틴 호출 (PUN RPC 사용)
-                    photonView.RPC("TriggerBlindEffect", RpcTarget.All);
+                        if (isInteract && bridge > 0)
+                        {
+                            Debug.Log(scanObject.name);
+                            string targetBridgeName = scanObject.name.Replace("Generator", "");
+                            s5manager.ExecuteRPC(targetBridgeName);
+                        }
+                    }
+                    else
+                    {
+                        s5manager.ShowImage("Mirror");
+                        if (!isMirrorUsing && isInteract && mirror > 0)
+                        {
+                            StartCoroutine(UseMirror());
+                        }
+                    }
+                    
+                }
+
+                if (CompareTag("player2"))
+                {
+                    if (!isCandleUsing && isInteract && candles > 0)
+                    {
+                        StartCoroutine(UseCandle());
+                    }
                 }
             }
+
+            // 모바일 초기화
+            up_down = false;
+            down_down = false;
+            left_down = false;
+            right_down = false;
+            up_up = false;
+            down_up = false;
+            left_up = false;
+            right_up = false;
+
         }
     }
 
@@ -309,6 +372,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         }
     }
 
+
     [PunRPC]
     void SyncAnimation(int hInput, int vInput)
     {
@@ -323,6 +387,37 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         else anim.Play("Male_Down_Idle");
     }
 
+    private IEnumerator UseMirror()
+    {
+        isMirrorUsing = true; 
+
+        mirror--;
+        photonView.RPC("UpdateMirrorUI", RpcTarget.All, mirror);
+
+        yield return new WaitForSeconds(0.5f);
+
+        isMirrorUsing = false;
+    }
+
+    private IEnumerator UseCandle()
+    {
+        isCandleUsing = true; // 촛불 사용 중으로 설정
+
+        // 촛불 감소
+        candles--;
+        Debug.Log($"candles : {candles}");
+
+        // BlindPanelEffect의 코루틴 호출 (PUN RPC 사용)
+        photonView.RPC("TriggerBlindEffect", RpcTarget.All);
+        photonView.RPC("UpdateCandleUI", RpcTarget.All, candles);
+
+        // 작업 완료 후 약간의 대기 시간 추가
+        yield return new WaitForSeconds(5.5f);
+
+        // 플래그 해제
+        isCandleUsing = false;
+    }
+
     [PunRPC]
     private void TriggerBlindEffect()
     {
@@ -335,6 +430,24 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         else
         {
             Debug.LogError("BlindPanelFollow 스크립트를 찾을 수 없습니다.");
+        }
+    }
+
+    [PunRPC]
+    private void UpdateCandleUI(int candleCount)
+    {
+        if (s5manager != null)
+        {
+            s5manager.UpdateCandleUI(candleCount); // S5Manager에 UI 업데이트 요청
+        }
+    }
+
+    [PunRPC]
+    private void UpdateMirrorUI(int mirrorCount)
+    {
+        if (s5manager != null)
+        {
+            s5manager.UpdateMirrorUI(mirrorCount); // S5Manager에 UI 업데이트 요청
         }
     }
 
@@ -681,6 +794,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         }
         else if (scene.name == "Scene4")
         {
+            s4manager = FindObjectOfType<S4Manager>();
             if (playerTag == "player1")
             {
                 SetPosition(-0.4f, 3.7f, 0f);
@@ -692,12 +806,20 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         }
         else if (scene.name == "TempScene5")
         {
+            s5manager = FindObjectOfType<S5Manager>();
+            candles = 20;
+            mirror = 5;
+            bridge = 3;
+            isCandleUsing = false;
+            isMirrorUsing = false;
+
             if (playerTag == "player1")
             {
                 SetPosition(3.5f, -1f, 0f);
             }
             else if (playerTag == "player2")
             {
+                s5manager.ShowImage("Candle");
                 SetPosition(2.8f, -1f, 0f);
             }
         }
@@ -739,6 +861,65 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         {
             Debug.Log($"SetSpeedRPC 호출됨: Player 1이므로 속도 변경 없음.");
         }
+    }
+
+
+    // 모바일 입력
+    public void ButtonDown(string type)
+    {
+        if (!photonView.IsMine) return;
+
+        switch (type)
+        {
+            case "U":
+                up_Value = 1;
+                up_down = true;
+                break;
+            case "D":
+                down_Value = -1;
+                down_down = true;
+                break;
+            case "L":
+                left_Value = -1;
+                left_down = true;
+                break;
+            case "R":
+                right_Value = 1;
+                right_down = true;
+                break;
+        }
+
+    }
+
+    public void ButtonUp(string type)
+    {
+        if (!photonView.IsMine) return;
+
+        switch (type)
+        {
+            case "U":
+                up_Value = 0;
+                up_up = true;
+                break;
+            case "D":
+                down_Value = 0;
+                down_up = true;
+                break;
+            case "L":
+                left_Value = 0;
+                left_up = true;
+                break;
+            case "R":
+                right_Value = 0;
+                right_up = true;
+                break;
+        }
+    }
+
+    public void SetInteractState(bool state)
+    {
+        if (!photonView.IsMine) return;
+        isMobileInteract = state;
     }
 
 }
