@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Pun;
 
 public class S4Manager : MonoBehaviourPunCallbacks
@@ -18,6 +19,7 @@ public class S4Manager : MonoBehaviourPunCallbacks
     private Btn[] Btns;
     private bool isRight = true;
 
+    public Image ResetStatueImage;
 
     private void Start()
     {
@@ -37,6 +39,20 @@ public class S4Manager : MonoBehaviourPunCallbacks
             OnButtonPressed(currentButtonIndex); // 현재 눌러야 할 버튼을 누른 것으로 처리
         }
         // ==============================================================
+    }
+
+    public void ShowImage(string imageType)
+    {
+        // 지정된 이미지를 활성화
+        switch (imageType)
+        {
+            case "ResetStatue":
+                ResetStatueImage.gameObject.SetActive(true);
+                break;
+            default:
+                ResetStatueImage.gameObject.SetActive(false);
+                break;
+        }
     }
 
     public int OnButtonPressed(int buttonID)

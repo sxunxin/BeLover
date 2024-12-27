@@ -79,6 +79,9 @@ MonoBehaviour:
   - RPC_StartScene6
   - TriggerBlindEffect
   - BridgeGeneratorRPC
+  - UpdateCandleUI
+  - UpdateBridgeUI
+  - UpdateMirrorUI
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

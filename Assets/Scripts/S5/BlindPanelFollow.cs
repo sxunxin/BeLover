@@ -31,13 +31,6 @@ public class BlindPanelFollow : MonoBehaviour
             // Player2의 위치를 따라다니도록 설정
             transform.position = player2Transform.position + (Vector3)offset;
         }
-
-        if (Input.GetButtonDown("Jump"))
-        {
-
-            // BlindPanelEffect의 코루틴 호출 (PUN RPC 사용)
-            StartCoroutine(ScaleBlindEffect());
-        }
     }
 
 

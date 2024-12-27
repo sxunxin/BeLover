@@ -23,7 +23,7 @@ public class PlayerDetector : MonoBehaviourPunCallbacks
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.LogError("접촉하여 위치가 노출됩니다.");
+        Debug.Log("접촉하여 위치가 노출됩니다.");
         if (other.CompareTag("player1")) // Player1 태그와 충돌 확인
         {
             childObject.SetActive(true);
