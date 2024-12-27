@@ -134,8 +134,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 rd.velocity = Vector2.zero; // 움직임 정지
                 return; //  더 이상 코드 실행 중지
             }
-
-            
+   
             // 입력값 처리 (PC & 모바일 통합)
             h =  Input.GetAxisRaw("Horizontal") + right_Value + left_Value;
             v =  Input.GetAxisRaw("Vertical") + up_Value + down_Value;
