@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,6 +11,12 @@ public class GameManager : MonoBehaviour
     public bool isMission1Clear = false;
     public bool isMission2Clear = false;
     public bool isMission3Clear = false;
+
+    private Button settingButton; // SettingBtn 참조
+    private GameObject settingUI; // SettingUI 참조
+    private Button resumeBtn;
+    private Button gamesettingBtn;
+    private Button finishBtn;
 
     private void Awake()
     {
@@ -45,6 +52,31 @@ public class GameManager : MonoBehaviour
         {
             IncrementMainSceneEnterCount();
         }
+
+        // 씬이 로드될 때 SettingBtn과 SettingUI 탐색
+        FindSettingComponents();
+
+        // SettingBtn 클릭 이벤트 등록
+        if (settingButton != null)
+        {
+            settingButton.onClick.RemoveAllListeners(); // 기존 리스너 제거
+            settingButton.onClick.AddListener(ToggleSettingUI);
+        }
+        if (resumeBtn != null)
+        {
+            resumeBtn.onClick.RemoveAllListeners(); // 기존 리스너 제거
+            resumeBtn.onClick.AddListener(GameResume);
+        }
+        if (gamesettingBtn != null)
+        {
+            gamesettingBtn.onClick.RemoveAllListeners(); // 기존 리스너 제거
+            gamesettingBtn.onClick.AddListener(OpenSettingsMenu);
+        }
+        if (finishBtn != null)
+        {
+            finishBtn.onClick.RemoveAllListeners(); // 기존 리스너 제거
+            finishBtn.onClick.AddListener(FinishGame);
+        }
     }
 
     // MainScene 입장 횟수를 증가시키는 함수
@@ -58,5 +90,45 @@ public class GameManager : MonoBehaviour
     public int GetMainSceneEnterCount()
     {
         return mainSceneEnterCount;
+    }
+
+    // Setting 버튼과 UI를 찾는 메서드
+    private void FindSettingComponents()
+    {
+        // 현재 씬에서 SettingBtn과 SettingUI 찾기
+        settingButton = GameObject.Find("SettingBtn")?.GetComponent<Button>();
+        settingUI = GameObject.Find("SettingUI");
+        resumeBtn = GameObject.Find("ResumeBtn")?.GetComponent<Button>();
+        gamesettingBtn = GameObject.Find("GameSetBtn")?.GetComponent<Button>();
+        finishBtn = GameObject.Find("FinishBtn")?.GetComponent<Button>();
+
+        if (settingUI != null)
+        {
+            // SettingUI를 처음에는 비활성화
+            settingUI.SetActive(false);
+        }
+    }
+
+    // SettingUI를 토글하는 메서드
+    private void ToggleSettingUI()
+    {
+        if (settingUI != null)
+        {
+            settingUI.SetActive(!settingUI.activeSelf);
+        }
+    }
+    private void GameResume()
+    {
+        settingUI.SetActive(false);
+    }
+    private void OpenSettingsMenu()
+    {
+        Debug.Log("Settings 메뉴 열기");
+    }
+
+    private void FinishGame()
+    {
+        Debug.Log("게임 종료");
+        Application.Quit(); // 게임 종료
     }
 }
