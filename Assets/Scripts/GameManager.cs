@@ -51,6 +51,13 @@ public class GameManager : MonoBehaviour
         if (scene.name == "MainScene")
         {
             IncrementMainSceneEnterCount();
+            //s3sm 삭제
+            S3SceneManager s3Manager = FindObjectOfType<S3SceneManager>();
+            if (s3Manager != null)
+            {
+                Destroy(s3Manager.gameObject); // MainScene에서는 S3SceneManager 제거
+                Debug.Log("MainScene에서 S3SceneManager를 제거했습니다.");
+            }
         }
 
         // 씬이 로드될 때 SettingBtn과 SettingUI 탐색

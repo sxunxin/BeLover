@@ -20,8 +20,6 @@ public class S3Portal : MonoBehaviourPun
         if (gameObject.name == "FinalPortal")
         {
             Debug.Log("FinalPortal에 플레이어가 진입했습니다.");
-            GameManager.Instance.isMission2Clear = true;
-
             if (PhotonNetwork.IsMasterClient)
             {
                 S3sm.photonView.RPC("ShowEndPanel_RPC", RpcTarget.All); // 모든 클라이언트에서 패널 활성화

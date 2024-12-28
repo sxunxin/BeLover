@@ -136,7 +136,7 @@ public class TalkManager : MonoBehaviour
 
         while (rectTransform.anchoredPosition.y < 1200)
         {
-            rectTransform.anchoredPosition = new Vector2(0, 200) * Time.deltaTime; // Y 위치 증가
+            rectTransform.anchoredPosition += new Vector2(0, 200) * Time.deltaTime; // Y 위치 증가
             rectTransform.localScale = Vector3.Lerp(rectTransform.localScale, new Vector3(0.2f, 0.2f, 0.2f), Time.deltaTime); // 크기 점점 줄이기
             canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0f, Time.deltaTime); // 투명도 점점 감소
             yield return null; // 다음 프레임까지 대기
