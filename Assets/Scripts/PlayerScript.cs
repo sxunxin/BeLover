@@ -59,6 +59,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     S5Manager s5manager;
 
     // 모바일 입력
+    GameObject mobileSetting;
+
     int up_Value;
     int down_Value;
     int left_Value;
@@ -101,7 +103,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         {
             if (Msm != null && Msm.StoryPanel.activeSelf)
             {
-                if(StoryPanelAudio != null)
+                if (mobileSetting != null) mobileSetting.SetActive(false);
+                
+                if (StoryPanelAudio != null)
                 {
                     StoryPanelAudio.Play();
                 }
@@ -115,6 +119,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks
             }
             if (Msm != null && Msm.StoryPanel1.activeSelf)
             {
+                if (mobileSetting != null) mobileSetting.SetActive(false);
+
                 if (CompareTag("player2")) anim.Play("Female_Down_Idle");
                 else anim.Play("Male_Down_Idle");
                 pv.RPC("SyncAnimationIdle", RpcTarget.Others);
@@ -123,18 +129,24 @@ public class PlayerScript : MonoBehaviourPunCallbacks
             }
             if (S3sm != null && S3sm.storyPanel.activeSelf)
             {
+                if (mobileSetting != null) mobileSetting.SetActive(false);
+
                 rd.velocity = Vector2.zero; // 움직임 정지
                 return; //  더 이상 코드 실행 중지
             }
             if (S3sm != null && S3sm.endPanel.activeSelf)
             {
+                if (mobileSetting != null) mobileSetting.SetActive(false);
+
                 if (CompareTag("player2")) anim.Play("Female_Up_Idle");
                 else anim.Play("Male_Up_Idle");
                 pv.RPC("SyncAnimationIdle", RpcTarget.Others);
                 rd.velocity = Vector2.zero; // 움직임 정지
                 return; //  더 이상 코드 실행 중지
             }
-   
+
+            if (mobileSetting != null) mobileSetting.SetActive(true);
+
             // 입력값 처리 (PC & 모바일 통합)
             h =  Input.GetAxisRaw("Horizontal") + right_Value + left_Value;
             v =  Input.GetAxisRaw("Vertical") + up_Value + down_Value;
@@ -731,6 +743,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     // 특정 장면이 로드될 때 호출할 함수
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        mobileSetting = GameObject.Find("MobileSetting");
+
         if (pv.IsMine)
         {
             AttachCameraToPlayer(); // 씬이 전환되었을 때 카메라 타겟 다시 연결
