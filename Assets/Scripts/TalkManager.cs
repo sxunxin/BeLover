@@ -85,9 +85,9 @@ public class TalkManager : MonoBehaviour
         "서로 도움을 줘서 모든 불을 순서대로 전부 켜보자.\n\n모든 불은 순서가 있고 잘못되면\n\n조각상과 상호작용하여 초기화 하라.",
         "당신들은...누구세요?",
         "너를 찾고 있었어.",
-        "저를…요?",
+        "저를...요?",
         "응. 이 어두운 곳에서 힘들지 않아?",
-        "저는 지금 편한데... 어둠 속에 있으면 누군가를 볼 일도 없고 마음이 편한... 걸요...",
+        "저는 지금 편한데... 어둠 속에 있으면 누군가를 볼 일도 없고 마음이 편한걸요...",
         "하지만 아무도 못 봐서 외롭지 않아?",
         "여기 촛불 가져왔어. 한번 켜볼래? 따듯할거야.",
         "(촛불에 불을 붙이고 서로의 얼굴이 보인다.)\n\n정말 따뜻하네요... 감사합니다...",
@@ -220,6 +220,9 @@ public class TalkManager : MonoBehaviour
         EndingPanel.SetActive(false);
         EndingCreditPanel.SetActive(true);
         StartCoroutine(ScrollCredits());
+
+        yield return new WaitForSeconds(60f);
+        Application.Quit(); // 게임 종료
     }
     private IEnumerator FadeToWhite(float duration)
     {

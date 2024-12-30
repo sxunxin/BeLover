@@ -143,7 +143,7 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(15f);
 
         bossTalk.SetMsg(tm.S3Text[10]);
-        yield return new WaitForSeconds(13f);
+        yield return new WaitForSeconds(15f);
         bossTalk.SetMsg(tm.S3Text[11]);
         yield return new WaitForSeconds(5f);
         bossPanel.SetActive(false);

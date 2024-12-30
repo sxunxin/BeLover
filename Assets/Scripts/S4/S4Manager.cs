@@ -121,7 +121,7 @@ public class S4Manager : MonoBehaviourPunCallbacks
         bossPanel.SetActive(false);
 
         p1Panel.SetActive(true);
-        p1Talk.SetMsg(tm.S2Text[9]);
+        p1Talk.SetMsg(tm.S4Text[9]);
         yield return new WaitForSeconds(5f);
         p1Panel.SetActive(false);
 
@@ -136,7 +136,7 @@ public class S4Manager : MonoBehaviourPunCallbacks
         p2Panel.SetActive(false);
 
         p1Panel.SetActive(true);
-        p1Talk.SetMsg(tm.S2Text[12]);
+        p1Talk.SetMsg(tm.S4Text[12]);
         yield return new WaitForSeconds(5f);
         p1Panel.SetActive(false);
 
