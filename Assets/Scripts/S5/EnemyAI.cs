@@ -135,9 +135,13 @@ public class EnemyAI : MonoBehaviourPun
         }
 
         // 완전히 비활성화
-        gameObject.SetActive(false);
         isEnd = true;
         EndHouse.SetActive(true);
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel("MainScene");
+        }
+        gameObject.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
