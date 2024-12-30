@@ -15,6 +15,9 @@ public class S5Manager : MonoBehaviourPun
     public Image candleImage; // 촛불 이미지
     public Image mirrorImage; // 거울 이미지
     public Image bridgeImage; // 분리 이미지
+    public Image mirrorNeedImage; // 거울 엔딩 이미지;
+    public Image bridgeNeedImage; // 분리 엔딩 이미지;
+    public Image candleNeedImage; // 촛불 엔딩 이미지;
 
     public TMP_Text candleText;
     public TMP_Text mirrorText;
@@ -32,6 +35,25 @@ public class S5Manager : MonoBehaviourPun
     public GameObject BridgeGenerator6;
     public GameObject BridgeGenerator7;
 
+    [Header("Ending Objects")]
+    public GameObject[] endCandles;
+    public GameObject mirrorNeed; // 비활성화할 mirrorNeed
+    public GameObject ENDMirror; // 활성화할 ENDMirror
+    public GameObject bridgeNeed; 
+    public GameObject ENDBridge;
+    public GameObject EndZone;
+
+    public bool EndCandleCnt = false;
+    public bool isEndMirror = false;
+    public bool isEndBridge = false;
+    public bool canEnd = false;
+
+    [Header("Sound")]
+    public AudioSource audioSource;
+    public AudioClip candleSound;
+    public AudioClip mirrorSound;
+    public AudioClip bridgeSound;
+
     void Start()
     {
         if (PhotonNetwork.IsMasterClient)
@@ -44,6 +66,52 @@ public class S5Manager : MonoBehaviourPun
 
             // 모든 클라이언트에 정답을 공유
             photonView.RPC("SetCorrectAnswer", RpcTarget.All, correctAnswer, correctAnswer2);
+        }
+    }
+
+    void Update()
+    {
+        if (EndCandleCnt && isEndMirror && isEndBridge)
+        {
+            canEnd = true;
+            EndZone.SetActive(true);
+            Debug.Log("CAN END!!!");
+        }
+    }
+
+    public void EndCandle()
+    {
+        photonView.RPC("EndCandleRPC", RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void EndCandleRPC()
+    {
+        EndCandleCnt = true;
+    }
+
+    public void ProcessEndMirror()
+    {
+        // mirrorNeed 비활성화
+        if (mirrorNeed != null)
+        {
+            mirrorNeed.SetActive(false);
+            Debug.Log("mirrorNeed 비활성화 완료");
+        }
+        else
+        {
+            Debug.LogWarning("mirrorNeed가 설정되지 않았습니다.");
+        }
+
+        // ENDMirror 활성화
+        if (ENDMirror != null)
+        {
+            ENDMirror.SetActive(true);
+            Debug.Log("ENDMirror 활성화 완료");
+        }
+        else
+        {
+            Debug.LogWarning("ENDMirror가 설정되지 않았습니다.");
         }
     }
 
@@ -121,6 +189,56 @@ public class S5Manager : MonoBehaviourPun
 
         // PunRPC 실행
         photonView.RPC("BridgeGeneratorRPC", RpcTarget.All, bridgeName);
+    }
+
+    public void ExecuteRPCEndBridge()
+    {
+        photonView.RPC("ENDBridgeRPC", RpcTarget.All);
+    }
+
+    public void ExecuteRPCEndMirror()
+    {
+        photonView.RPC("ENDMirrorRPC", RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void ENDBridgeRPC()
+    {
+        PlayerScript localPlayer = FindLocalPlayer();
+        if (localPlayer != null && localPlayer.bridge > 0)
+        {
+            bridgeNeed.SetActive(false);
+            ENDBridge.SetActive(true);
+            isEndBridge = true;
+            localPlayer.bridge--; // 다리 개수 감소
+            UpdateBridgeUI(localPlayer.bridge); // UI 업데이트
+
+            StartCoroutine(DelayedSetIsEndP1ingFalse(localPlayer));
+
+        }
+    }
+
+    [PunRPC]
+    public void ENDMirrorRPC()
+    {
+        PlayerScript localPlayer = FindLocalPlayer();
+        if (localPlayer != null && localPlayer.bridge > 0)
+        {
+            mirrorNeed.SetActive(false);
+            ENDMirror.SetActive(true);
+            isEndMirror = true;
+            localPlayer.mirror--; // 다리 개수 감소
+            UpdateMirrorUI(localPlayer.mirror); // UI 업데이트
+
+            StartCoroutine(DelayedSetIsEndP1ingFalse(localPlayer));
+
+        }
+    }
+
+    private IEnumerator DelayedSetIsEndP1ingFalse(PlayerScript player)
+    {
+        yield return new WaitForSeconds(1f); // 1초 대기
+        player.isEndP1ing = false; // 값 변경
     }
 
     [PunRPC]
@@ -219,19 +337,43 @@ public class S5Manager : MonoBehaviourPun
         {
             case "Candle":
                 candleImage.gameObject.SetActive(true);
+                candleNeedImage.gameObject.SetActive(false);
+                break;
+            case "candleNeed":
+                candleNeedImage.gameObject.SetActive(true);
+                candleImage.gameObject.SetActive(false);
                 break;
             case "Mirror":
                 mirrorImage.gameObject.SetActive(true);
                 bridgeImage.gameObject.SetActive(false);
+                mirrorNeedImage.gameObject.SetActive(false);
+                bridgeNeedImage.gameObject.SetActive(false);
                 break;
             case "Bridge":
                 bridgeImage.gameObject.SetActive(true);
                 mirrorImage.gameObject.SetActive(false);
+                mirrorNeedImage.gameObject.SetActive(false);
+                bridgeNeedImage.gameObject.SetActive(false);
+                break;
+            case "mirrorNeed":
+                mirrorNeedImage.gameObject.SetActive(true);
+                bridgeNeedImage.gameObject.SetActive(false);
+                mirrorImage.gameObject.SetActive(false);
+                bridgeImage.gameObject.SetActive(false);
+                break;
+            case "bridgeNeed":
+                bridgeNeedImage.gameObject.SetActive(true);
+                mirrorNeedImage.gameObject.SetActive(false);
+                mirrorImage.gameObject.SetActive(false);
+                bridgeImage.gameObject.SetActive(false);
                 break;
             default:
                 mirrorImage.gameObject.SetActive(false);
                 bridgeImage.gameObject.SetActive(false);
                 candleImage.gameObject.SetActive(false);
+                mirrorNeedImage.gameObject.SetActive(false);
+                bridgeNeedImage.gameObject.SetActive(false);
+                candleNeedImage.gameObject.SetActive(false);
                 break;
         }
     }
@@ -251,6 +393,7 @@ public class S5Manager : MonoBehaviourPun
 
     public void UpdateCandleUI(int candleCount)
     {
+        audioSource.PlayOneShot(candleSound);
         if (candleText != null)
         {
             candleText.text = candleCount.ToString(); 
@@ -263,6 +406,7 @@ public class S5Manager : MonoBehaviourPun
 
     public void UpdateMirrorUI(int mirrorCount)
     {
+        audioSource.PlayOneShot(mirrorSound);
         if (mirrorText != null)
         {
             mirrorText.text = mirrorCount.ToString(); 
@@ -275,6 +419,7 @@ public class S5Manager : MonoBehaviourPun
 
     public void UpdateBridgeUI(int bridgeCount)
     {
+        audioSource.PlayOneShot(bridgeSound);
         if (bridgeText != null)
         {
             bridgeText.text = bridgeCount.ToString(); 
@@ -282,6 +427,31 @@ public class S5Manager : MonoBehaviourPun
         else
         {
             Debug.LogWarning("BridgeText가 설정되지 않았습니다.");
+        }
+    }
+
+    public void ProcessEndCandle(int cnt)
+    {
+        // ENDCandle 처리
+        GameObject targetObject = endCandles[cnt - 1]; // 배열은 0부터 시작하므로 cnt-1
+        if (targetObject != null)
+        {
+            targetObject.SetActive(true); // 오브젝트 활성화
+            Debug.Log($"ENDCandle {cnt} activated.");
+        }
+
+
+        // candleNeed 처리
+        string candleNeedName = $"candleNeed{cnt}";
+        GameObject candleNeedObject = GameObject.Find(candleNeedName);
+        if (candleNeedObject != null)
+        {
+            candleNeedObject.SetActive(false);
+            Debug.Log($"Object {candleNeedName} set to inactive.");
+        }
+        else
+        {
+            Debug.LogWarning($"Object {candleNeedName} not found!");
         }
     }
 }

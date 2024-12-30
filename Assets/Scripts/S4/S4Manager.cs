@@ -21,6 +21,9 @@ public class S4Manager : MonoBehaviourPunCallbacks
 
     public Image ResetStatueImage;
 
+    public AudioSource audioSource;
+    public AudioClip candleSound;
+
     private void Start()
     {
         // 모든 버튼 스크립트 가져오기
@@ -69,6 +72,12 @@ public class S4Manager : MonoBehaviourPunCallbacks
             currentButtonIndex++;
             UpdateBlindSize();
             photonView.RPC("MoveLightBezier", RpcTarget.All, mapLight.transform.position, lightPositions[currentButtonIndex]);
+
+            if (audioSource != null && candleSound != null)
+            {
+                audioSource.PlayOneShot(candleSound); // 한 번만 재생
+            }
+
 
             if (currentButtonIndex > 20) // 모든 버튼을 밟았을 때
             {

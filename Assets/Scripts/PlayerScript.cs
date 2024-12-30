@@ -20,8 +20,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     private float minY = -500f; // Y 좌표 최소값
     private float maxY = 500f;  // Y 좌표 최대값
 
-    float h;
-    float v;
+    public float h;
+    public float v;
 
     bool isHorizonMove;
     bool isVerticalMove;
@@ -61,6 +61,11 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     bool isCandleUsing = false;
     bool isMirrorUsing = false;
     S5Manager s5manager;
+
+    //ending
+    public bool isEndCandleUsing = false;
+    public bool isEndP1ing = false;
+    public int playerEndCandleCnt = 0;
 
     // 모바일 입력
     GameObject mobileSetting;
@@ -107,6 +112,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     {
         if (pv.IsMine) // 자신의 플레이어만 동작
         {
+
             if (Msm != null && Msm.StoryPanel.activeSelf)
             {
                 if (mobileSetting != null) mobileSetting.SetActive(false);
@@ -181,7 +187,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 verticalInput = 0f;
             }
 
-
             // 태그 설정
             playerTag = gameObject.CompareTag("player1") ? "player1" : "player2";
             ExitGames.Client.Photon.Hashtable playerInput = new ExitGames.Client.Photon.Hashtable
@@ -255,15 +260,33 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 {
                     s4manager.ShowImage("None");
                 }
-
+                
             }
-            else if (SceneManager.GetActiveScene().name == "TempScene5")
+            else if (SceneManager.GetActiveScene().name == "Scene5")
             {
                 SetDirection(hDown, vDown);
 
                 if (CompareTag("player1"))
                 {
-                    if (scanObject != null && scanObject.name.StartsWith("BridgeGenerator"))
+                    if (scanObject != null && scanObject.name == "mirrorNeed")
+                    {
+                        s5manager.ShowImage("mirrorNeed");
+                        if (isInteract && mirror > 0)
+                        {
+                            isEndP1ing = true;
+                            s5manager.ExecuteRPCEndMirror();
+                        }
+                    }
+                    else if (scanObject != null && scanObject.name == "bridgeNeed")
+                    {
+                        s5manager.ShowImage("bridgeNeed");
+                        if (isInteract && bridge > 0)
+                        {
+                            isEndP1ing = true;
+                            s5manager.ExecuteRPCEndBridge();
+                        }
+                    }
+                    else if (scanObject != null && scanObject.name.StartsWith("BridgeGenerator"))
                     {
                         s5manager.ShowImage("Bridge");
 
@@ -277,7 +300,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                     else
                     {
                         s5manager.ShowImage("Mirror");
-                        if (!isMirrorUsing && isInteract && mirror > 0)
+                        if (!isEndP1ing && !isMirrorUsing && isInteract && mirror > 0)
                         {
                             StartCoroutine(UseMirror());
                         }
@@ -287,7 +310,24 @@ public class PlayerScript : MonoBehaviourPunCallbacks
 
                 if (CompareTag("player2"))
                 {
-                    if (!isCandleUsing && isInteract && candles > 0)
+                    s5manager.ShowImage("Candle");
+                    if (scanObject != null && scanObject.name.StartsWith("candleNeed"))
+                    {
+                        s5manager.ShowImage("candleNeed");
+
+                       if (!isEndCandleUsing && isInteract && candles > 0)
+                       {
+                            string objectName = scanObject.name; 
+                            string numberPart = objectName.Substring("candleNeed".Length); 
+                            int candleNumber;
+
+                            if (int.TryParse(numberPart, out candleNumber)) 
+                            {
+                                StartCoroutine(UseEndCandle(candleNumber)); 
+                            }
+                        }
+                    }
+                    else if (!isEndCandleUsing && !isCandleUsing && isInteract && candles > 0)
                     {
                         StartCoroutine(UseCandle());
                     }
@@ -493,10 +533,58 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         photonView.RPC("UpdateCandleUI", RpcTarget.All, candles);
 
         // 작업 완료 후 약간의 대기 시간 추가
-        yield return new WaitForSeconds(5.5f);
+        yield return new WaitForSeconds(10.2f);
 
         // 플래그 해제
         isCandleUsing = false;
+    }
+
+    private IEnumerator UseEndCandle(int cnt)
+    {
+        isEndCandleUsing = true; // 촛불 사용 중으로 설정
+
+        // 촛불 감소
+        candles--;
+        playerEndCandleCnt++;
+        Debug.Log($"candles : {candles}");
+        Debug.Log($"EndCandleCnt : {playerEndCandleCnt}");
+
+        // BlindPanelEffect의 코루틴 호출 (PUN RPC 사용)
+        photonView.RPC("UpdateCandleUI", RpcTarget.All, candles);
+        photonView.RPC("TriggerEndCandleProcess", RpcTarget.All, cnt);
+
+        if (playerEndCandleCnt >= 5)
+        {
+            photonView.RPC("BlindEnd", RpcTarget.All);
+        }
+
+        // 작업 완료 후 약간의 대기 시간 추가
+        yield return new WaitForSeconds(1.0f);
+
+        // 플래그 해제
+        isEndCandleUsing = false;
+    }
+
+    [PunRPC]
+    public void BlindEnd()
+    {
+        s5manager.EndCandle();
+        BlindPanelFollow blindPanelFollow = FindObjectOfType<BlindPanelFollow>();
+        blindPanelFollow.ScaleAndDeactivate();
+    }
+
+    [PunRPC]
+    public void TriggerEndCandleProcess(int cnt)
+    {
+        if (s5manager != null)
+        {
+            // S5Manager의 ProcessCandle 메서드 호출
+            s5manager.ProcessEndCandle(cnt);
+        }
+        else
+        {
+            Debug.LogWarning("S5Manager not found!");
+        }
     }
 
     [PunRPC]
@@ -903,7 +991,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 SetPosition(-0.35f, -28.8f, 0f);
             }
         }
-        else if (scene.name == "TempScene5")
+        else if (scene.name == "Scene5")
         {
             s5manager = FindObjectOfType<S5Manager>();
             candles = 20;

@@ -18,6 +18,7 @@ TagManager:
   - Bridge
   - Candle
   - Boss
+  - EndTrigger
   layers:
   - Default
   - TransparentFX

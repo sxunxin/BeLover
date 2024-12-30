@@ -84,6 +84,15 @@ MonoBehaviour:
   - UpdateMirrorUI
   - SetCorrectAnswer
   - TriggerStopAndResetSpeed
+  - RPC_StartScene5
+  - ProcessCandle
+  - TriggerEndCandleProcess
+  - BlindEnd
+  - EndMirror
+  - ENDBridgeRPC
+  - ENDMirrorRPC
+  - TriggerStopAndMoveToPosition
+  - EndCandleRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

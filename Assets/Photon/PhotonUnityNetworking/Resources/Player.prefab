@@ -173,6 +173,8 @@ MonoBehaviour:
   minSortingOrder: 10
   maxSortingOrder: 1000000
   offsetMultiplier: 5
+  h: 0
+  v: 0
   pv: {fileID: -6096268475123890931}
   nicknameText: {fileID: 5014128133371754621}
   candlecount: 0
@@ -180,6 +182,9 @@ MonoBehaviour:
   candles: 20
   mirror: 5
   bridge: 3
+  isEndCandleUsing: 0
+  isEndP1ing: 0
+  playerEndCandleCnt: 0
   isUI: 0
 --- !u!95 &8251382587938969043
 Animator:

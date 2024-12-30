@@ -138,8 +138,8 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
         {
             if (photonView.IsMine)
             {
-                float localHorizontal = Input.GetAxisRaw("Horizontal");
-                float localVertical = Input.GetAxisRaw("Vertical");
+                float localHorizontal = localPlayerScript.h;
+                float localVertical = localPlayerScript.v;
 
                 // **동시 입력 방지 - 하나의 입력만 유지**
                 if (localHorizontal != 0f && localVertical != 0f)
