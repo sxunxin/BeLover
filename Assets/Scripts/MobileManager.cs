@@ -1,9 +1,11 @@
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.SceneManagement;
 
 public class MobileManager : MonoBehaviour
 {
     private PlayerScript localPlayerScript; // 로컬 플레이어 스크립트
+    string currentSceneName;
 
     void Start()
     {
@@ -17,18 +19,14 @@ public class MobileManager : MonoBehaviour
                 break;
             }
         }
-
-        if (localPlayerScript == null)
-        {
-            Debug.LogError("로컬 플레이어 스크립트를 찾을 수 없습니다.");
-        }
+        currentSceneName = SceneManager.GetActiveScene().name;
     }
 
     public void ButtonDown(string type)
     {
         if (localPlayerScript != null)
         {
-            localPlayerScript.ButtonDown(type); // PlayerScript의 ButtonDown 호출
+            localPlayerScript.ButtonDown(type, currentSceneName); // PlayerScript의 ButtonDown 호출
         }
         else
         {
@@ -40,7 +38,7 @@ public class MobileManager : MonoBehaviour
     {
         if (localPlayerScript != null)
         {
-            localPlayerScript.ButtonUp(type); // PlayerScript의 ButtonUp 호출
+            localPlayerScript.ButtonUp(type, currentSceneName); // PlayerScript의 ButtonUp 호출
         }
         else
         {
@@ -52,7 +50,7 @@ public class MobileManager : MonoBehaviour
     {
         if (localPlayerScript != null)
         {
-            localPlayerScript.SetInteractState(true); // isInteract를 1로 설정
+            localPlayerScript.SetInteractState(true, currentSceneName); // isInteract를 1로 설정
         }
         else
         {
@@ -64,7 +62,7 @@ public class MobileManager : MonoBehaviour
     {
         if (localPlayerScript != null)
         {
-            localPlayerScript.SetInteractState(false); // isInteract를 0으로 설정
+            localPlayerScript.SetInteractState(false, currentSceneName); // isInteract를 0으로 설정
         }
         else
         {

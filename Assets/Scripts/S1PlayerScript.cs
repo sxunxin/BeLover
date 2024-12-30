@@ -29,6 +29,8 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
     public GameObject blindPanel; // **블라인드 UI 패널 오브젝트 (검정색) 연결**
     private bool isBlindActive = false; // **블라인드 활성화 상태를 확인하는 변수 (false가 초기값)**
 
+    private PlayerScript localPlayerScript;
+
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -37,17 +39,36 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
         S2sm = FindObjectOfType<S2SceneManager>();
     }
 
+    void Start()
+    {
+        foreach (var player in FindObjectsOfType<PlayerScript>())
+        {
+            if (player.photonView.IsMine)
+            {
+                localPlayerScript = player;
+                break;
+            }
+        }
+    }
+
     void Update()
     {
         if (S2sm != null && S2sm.storyPanel.activeSelf)
         {
+
+            localPlayerScript.isUI = false;
             rigid.velocity = Vector2.zero; // 움직임 정지
             return; //  더 이상 코드 실행 중지
         }
-        if (S2sm != null && S2sm.endPanel.activeSelf)
+        else if (S2sm != null && S2sm.endPanel.activeSelf)
         {
+            localPlayerScript.isUI = false;
             gameObject.SetActive(false);
             return; //  더 이상 코드 실행 중지
+        }
+        else
+        {
+            localPlayerScript.isUI = true;
         }
         if (SceneManager.GetActiveScene().name == "Scene1")
         {
@@ -224,6 +245,7 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
         }
 
     }
+
     private void ActivateBlind()
     {
         if (blindPanel != null && !isBlindActive)
@@ -285,6 +307,7 @@ public class S1PlayerScript : MonoBehaviourPunCallbacks
             Debug.Log("Mission1 Clear");
             if (PhotonNetwork.IsMasterClient)
             {
+                localPlayerScript.ResetInputValues();
                 PhotonNetwork.LoadLevel("MainScene");
             }
         }

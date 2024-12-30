@@ -176,9 +176,11 @@ MonoBehaviour:
   pv: {fileID: -6096268475123890931}
   nicknameText: {fileID: 5014128133371754621}
   candlecount: 0
+  S3Interact: 1
   candles: 20
   mirror: 5
   bridge: 3
+  isUI: 0
 --- !u!95 &8251382587938969043
 Animator:
   serializedVersion: 5

@@ -38,6 +38,8 @@ public class MainSceneManager : MonoBehaviour
 
     public TextMeshProUGUI countDown;
 
+    GameObject mobileSetting;
+
     void Awake()
     {
         nm = FindObjectOfType<NetworkManager>();
@@ -52,6 +54,8 @@ public class MainSceneManager : MonoBehaviour
     }
     private void Start()
     {
+        mobileSetting = GameObject.Find("MobileSetting");
+        if (mobileSetting != null) mobileSetting.SetActive(false);
         bossAudioSource = S1BossPanel.GetComponent<AudioSource>(); // AudioSource 할당
         // 씬이 시작되면 시네마틱 애니메이션 시작
         StartCoroutine(CinemaSequence());

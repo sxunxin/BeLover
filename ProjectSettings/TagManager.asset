@@ -17,6 +17,7 @@ TagManager:
   - ResetStatue
   - Bridge
   - Candle
+  - Boss
   layers:
   - Default
   - TransparentFX
