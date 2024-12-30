@@ -805,6 +805,10 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 s4manager.photonView.RPC("ShowEndPanel_RPC", RpcTarget.All); // 모든 클라이언트에서 패널 활성화
             }
         }
+        if (collision.gameObject.tag == "Boss")
+        {
+            photonView.RPC("RPC_StartScene5", RpcTarget.All);
+        }
         if (collision.gameObject.name == "M2_2Spawn")
         {
             Debug.Log("플레이어가 M2_2Spawn에 도착하여 속도가 정상화됩니다.");
@@ -1174,6 +1178,13 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 PhotonNetwork.LoadLevel("Scene5");
             }
         }
+    }
+
+    [PunRPC]
+    void RPC_StartScene5()
+    {
+        PhotonNetwork.LoadLevel("Scene5");
+        DontDestroyOnLoad(this.gameObject);
     }
 
 }
