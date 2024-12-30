@@ -9,26 +9,35 @@ public class TalkManager : MonoBehaviour
     MainSceneManager Msm;
 
     public GameObject dialoguePanel;
+    public GameObject EndPanel;
+    public GameObject EndingPanel;
+    public GameObject EndingCreditPanel;
+    public float scrollSpeed = 50f;    // 스크롤 속도
 
     public TypeEffect CinemaP1;
     public TypeEffect CinemaP2;
 
+    public TypeEffect endP1;
+    public TypeEffect endP2;
+    public TypeEffect Ending;
+    public TypeEffect EndingText;
+    public Image EndingImage;
+
     public bool isDialogueFinished = false;
+    public bool isEnd = true;
 
     private string[] P1Text = {
         "어 여기가 어디지?",
-        "누구세요?",
-        "엥? 저는 잘 보이는데요?",
-        "잘 모르겠는데 낭떠러지 같아요...\n\n그리고 무슨 로봇에 타있는데 조종이 안돼요...",
-        "어? 앞으로 가고 있어요"
+        "자려고 누웠는데 여기네요...",
+        "에? 저는 잘 보이는데 움직여지지가 않네요",
+        "그러면 전 보이니까 저기 길 끝까지 한번 가봐요.\n\n제가 설명해  드릴게요",
     };
 
     private string[] P2Text = {
-        "거기 누구 있어요?",
-        "저도 잘 모르겠어요.\n\n아무것도 기억이 나질 않아요...\n\n그리고 눈 앞이 깜깜해서 보이지가 않아요...",
-        "그럼 여기가 어딘지 알아요?",
-        "제 앞에 운전대가 있는거 같긴 한데 움직여볼게요",
-        "저는 앞이 안 보이는데 말로 설명해주실 수 있어요?"
+        "누구세요?",
+        "저도요! 근데 여기는 어딜까요?\n\n아무것도 보이지가 않아요",
+        "전 안보이는데 앞에 조종간이 있어요!",
+        "안보여서 무서우니까 잘 설명해주세요..." 
     };
 
     private int P1Index = 0;
@@ -38,35 +47,54 @@ public class TalkManager : MonoBehaviour
 
     public string[] S2Text = {
         "외모스트레스로 인해 거울을 보지 못하고,\n\n스트레스를 받아 한이 맺힌 유령",
-        "으아아아아아 거울이 너무 싫어 다 박살내버릴거야!!!",
+        "안녕? 너가 거울의 방 유령이니?",
+        "(유령이 거울을 보자 소스라치게 놀라며 거울을 깨뜨리고 도망간다...)",
+        "도망갔네요.. 거울을 무서워하는 거 같은데 무슨 일 일까요?",
+        "우선 다시 만나게 거울을 다시 완성해봐요. 그럼 오지 않을까요?",
         "부서진 거울 조각을 찾아 거울을 완성해보자.\n\n단 두 플레이어가 조종할 수 있는 2개의 방향키가 다르고,\n\n조각을 먹을 때마다 방향키가 랜덤으로 바뀐다.",
-        "휴... 우리가 거울 조각을 모아왔어.",
-        "으악! 저리 치워!",
-        "아니야, 거울을 봐. 네가 아까와는 다르게 보여.",
-        "그래...? 똑같은거 같은데...",
-        "너의 빛나는 눈동자를 봐.",
-        "그래! 거울보다 더 반짝거리는걸? 정말 예쁘다.",
-        "정말 그렇게 생각해...?",
-        "그럼. 너는 어떤 것 같아?",
-        "나도...그런 것 같아...",
-        "한을 풀어줘서 고마워, 나중에 꼭 필요할 물건을 줄게.\n\n너희가 먹었던 거울 조각 5개를 거울 5개로 갚아줄게."
+        "(거울이 완성되자 유령이 다시 깨려고 달려든다)",
+        "왜 자꾸 거울을 깨려고 하는거야?",
+        "이리 줘! 거울이 있으면 내 모습이 보이잖아!",
+        "(남자가 거울을 주지 않는다.)",
+        "왜? 그렇게 이상하게 생기지도 않고 귀엽기만한데",
+        "진짜?... 그렇게 말해준 사람들은 너희가 처음이야...고마워,\n\n나중에 꼭 필요할 물건을 줄게.",
+        "(거울 5개를 받았다.)"
     };
     public string[] S3Text =
     {
         "외모스트레스로 인해 사람들을 무서워하고,\n\n사회와 분리되어 공황장애가 온 유령",
-        "죽을 것 같아...다시 예전으로 돌아갈 수 없어...",
+        "분리의 방이면 어떤 유령일까요? 어? 어디갔어요?",
+        "제 목소리 들려요! 전 여기 무슨 방에 있어요!",
+        "안녕! 너희들은 누구야? 내가 만든 퍼즐 풀어볼려고 왔어?\n\n(밝게 얘기하다 갑자기 힘들어한다.)",
+        "미안 일단 내가 조금 힘이 들어서...\n\n둘이서 퍼즐 먼저 풀면 나중에 내가 다시 올게...",
         "플레이어들이 각각 다른 공간에서 문제를 풀어\n\n서로에게 도움을 주고 탈출해보자.\n\n처음엔 여자의 바닥 타일에 대응하는 버튼을 남자가 눌러 해결해야한다.",
-        "나는 곧 나의 검은 자아에 잡아먹힐거야...\n\n내가 저지른 공포를 지울 수 없어.",
-        "공포...? 우리가 오면서 봤던 해골들을 말하는거야?",
-        "맞아...분명 내가 저지른 공포일거야...",
-        "잘 기억해봐. 저건 너가 저지른 공포가 아니야.",
-        "너를 잡아먹으려는 검은 자아의 짓이야.",
-        "또 찾아오면 어떡해...?",
-        "우리가 검은 자아가 오지 못하게 촛불을 켜 놓았어.",
-        "이제 너 자신을 똑바로 바라볼 수 있을거야.",
-        "고마워...이제 살 수 있을거 같아.",
-        "한을 풀어줘서 고마워, 나중에 꼭 필요할 물건을 줄게.\n\n너희가 도와준 횟수만큼 3개의 블럭 더미를 줄게."
+        "퍼즐 다 깼는데 어디있어!",
+        "나 왔어! 퍼즐 어땠어? 재미있었어?",
+        "(퍼즐에 대한 재미있었다는 이야기를 해준다.)",
+        "재밌게 즐겨줘서 고마워! 공황 때문에 항상 혼자 노니까 쓸쓸했어..\n\n너희 같이 좋은 얘들 덕분에 많이 좋아졌어",
+        "고마워, 너희 덕분이야. 여기 나중에 꼭 필요할 선물이야.\n\n너희가 푼 퍼즐만큼 블럭을 줄게.",
+        "(특별한 블럭 3개를 받았다.)",
     };
+    public string[] S4Text =
+    {
+        "외모스트레스로 인해 밖을 나가지 못하고, \n\n어두운 방에서 혼자 지내는 유령",
+        "여긴 또 어디지? 너무 어둡네...",
+        "거기 계세요? 여기 바닥에 지도 같은게 보이는데!",
+        "여기 불을 좀 켜야 할거 같은 데 거긴 어때요?",
+        "지도에 위치가 나오는거 같은데 거기서 제가 말한대로 가봐요!",
+        "서로 도움을 줘서 모든 불을 순서대로 전부 켜보자.\n\n모든 불은 순서가 있고 잘못되면\n\n조각상과 상호작용하여 초기화 하라.",
+        "당신들은...누구세요?",
+        "너를 찾고 있었어.",
+        "저를…요?",
+        "응. 이 어두운 곳에서 힘들지 않아?",
+        "저는 지금 편한데... 어둠 속에 있으면 누군가를 볼 일도 없고 마음이 편한... 걸요...",
+        "하지만 아무도 못 봐서 외롭지 않아?",
+        "여기 촛불 가져왔어. 한번 켜볼래? 따듯할거야.",
+        "(촛불에 불을 붙이고 서로의 얼굴이 보인다.)\n\n정말 따뜻하네요... 감사합니다...",
+        "저도 선물을 드릴게요.\n\n나중에 꼭 필요하실거에요.",
+        "(촛불 20개를 받았다.)"
+    };
+
     private void Awake()
     {
         Msm = FindObjectOfType<MainSceneManager>();
@@ -91,6 +119,12 @@ public class TalkManager : MonoBehaviour
         {
             dialoguePanel.SetActive(true);
             StartCoroutine(ShowDialogue());
+        }
+        if(GameManager.Instance.mainSceneEnterCount == 6 && isEnd)
+        {
+            isEnd = false;
+            EndPanel.SetActive(true);
+            StartCoroutine(ShowEnding());
         }
     }
 
@@ -152,5 +186,88 @@ public class TalkManager : MonoBehaviour
                 PhotonNetwork.LoadLevel("MainScene");
             }
         }
+    }
+    IEnumerator ShowEnding()
+    {
+        Ending.gameObject.SetActive(true);
+        yield return new WaitForSeconds(2f);
+        endP1.SetMsg("저희는 뭐였을까요");
+        yield return new WaitForSeconds(3f);
+
+        endP2.SetMsg("그리고 저희는 어떻게 되는걸까요");
+        yield return new WaitForSeconds(5f);
+
+        endP1.gameObject.SetActive(false);
+        endP2.gameObject.SetActive(false);
+
+        Ending.SetMsg("그들은 각각 한 남자의 육체, 정신적 기능을 담당하는 자아였다.\n\n" +
+            "그들로 하여금 성불된 유령들은 남자가 가지고 있던 병든 자아였고\n\n" +
+            "마지막 유령은 자기혐오로 인해 앞서 나온 자아들 간의\n\n위로와 통합을 바라지 않고 자기 자신을 가장 싫어했던 자아였다.\n\n" +
+            "그들의 노력으로 상처 받은 한 남자의 자아들을 회복한 것이다.");
+        yield return new WaitForSeconds(30f);
+        EndPanel.SetActive(false);
+
+        EndingPanel.SetActive(true);
+        StartCoroutine(FadeToWhite(7f)); // 3초 동안 페이드
+        yield return new WaitForSeconds(5f);
+        EndingText.SetMsg("남자가 잠에서 깬다.");
+        yield return new WaitForSeconds(4f);
+        EndingText.SetMsg("몸이 가볍고 더 이상 고통이 느껴지지 않는다.");
+        yield return new WaitForSeconds(7f);
+        EndingText.SetMsg("더 이상 과거에 얽매이지 않고, 내일을 시작할 용기가 생긴 것 같다.");
+        yield return new WaitForSeconds(12f);
+
+        EndingPanel.SetActive(false);
+        EndingCreditPanel.SetActive(true);
+        StartCoroutine(ScrollCredits());
+    }
+    private IEnumerator FadeToWhite(float duration)
+    {
+        if (EndingImage == null)
+        {
+            Debug.LogError("EndingImage가 할당되지 않았습니다.");
+            yield break;
+        }
+
+        Color startColor = EndingImage.color; // 현재 색상 가져오기
+        Color targetColor = new Color(1f, 1f, 1f); // 목표 색상
+
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / duration);
+
+            // 색상 선형 보간
+            EndingImage.color = Color.Lerp(startColor, targetColor, t);
+            yield return null; // 다음 프레임까지 대기
+        }
+
+        // 최종 색상 보장
+        EndingImage.color = targetColor;
+    }
+    private IEnumerator ScrollCredits()
+    {
+        RectTransform creditsPanel = EndingCreditPanel.GetComponent<RectTransform>();
+        if (creditsPanel == null)
+        {
+            Debug.LogError("Credits Panel이 할당되지 않았습니다.");
+            yield break;
+        }
+
+        // 시작 위치와 종료 위치 설정
+        float startY = creditsPanel.anchoredPosition.y;
+        float endY = creditsPanel.rect.height + Screen.height;
+
+        // 크레딧을 스크롤
+        while (creditsPanel.anchoredPosition.y < endY)
+        {
+            creditsPanel.anchoredPosition += Vector2.up * scrollSpeed * Time.deltaTime;
+            yield return null; // 다음 프레임까지 대기
+        }
+
+        // 스크롤 완료 후 처리
+        Debug.Log("크레딧이 끝났습니다.");
     }
 }

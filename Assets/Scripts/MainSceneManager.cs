@@ -10,6 +10,7 @@ public class MainSceneManager : MonoBehaviour
     NetworkManager nm;
     TalkManager tm;
 
+    public GameObject bossStage;
     public GameObject storyPanel;
     public Button StartBtn;
     public Image CinemaImage1;
@@ -342,6 +343,11 @@ public class MainSceneManager : MonoBehaviour
                 StoryPanel1.SetActive(true);
                 StartCoroutine(ShowS3Dialogue());
             }
+            else if (GameManager.Instance.mainSceneEnterCount == 5)
+            {
+                StoryPanel1.SetActive(true);
+                StartCoroutine(ShowS4Dialogue());
+            }
         }
     }
     IEnumerator ShowS1Dialogue()
@@ -362,10 +368,10 @@ public class MainSceneManager : MonoBehaviour
         S1BossPanel.SetActive(true);
         bossAudioSource.Play();
 
-        BossTalk.SetMsg("너희는 이승에 한이 맺혀 지박령이 된 유령들의 묘지에 침입했다.\n\n그 벌로 각각의 묘지에 해당하는 귀신들을 성불해야한다.");
-        yield return new WaitForSeconds(15f);
+        BossTalk.SetMsg("너희는 이승에 한이 맺힌 유령들의 묘지에 침입했다.\n\n각각의 묘지에 해당하는 귀신들을 성불시켜라");
+        yield return new WaitForSeconds(12f);
 
-        BossTalk.SetMsg("거울의 방 - 분리의 방 - 어둠의 방 순서대로 해야하며\n\n각각의 귀신들을 성불하여 얻게 되는 아이템들이 있다.");
+        BossTalk.SetMsg("거울의 방 - 분리의 방 - 어둠의 방 순서를 지키고\n\n귀신들을 성불시켜 얻게 되는 아이템들이 있다.");
         yield return new WaitForSeconds(12f);
 
         BossTalk.SetMsg("그 아이템들은 마지막 탈출에 도움이 될 것이다.\n\n그럼 이제부터 행운을 빈다.");
@@ -409,6 +415,35 @@ public class MainSceneManager : MonoBehaviour
         yield return new WaitForSeconds(5f);
 
         StoryPanel1.SetActive(false);
+    }
+    IEnumerator ShowS4Dialogue()
+    {
+        yield return new WaitForSeconds(3f);
+        S1P1Panel.SetActive(true);
+        P1Talk.SetMsg("이제 다 끝난건가...");
+        yield return new WaitForSeconds(3f);
+
+        S1P1Panel.SetActive(false);
+        S1P2Panel.SetActive(true);
+        P2Talk.SetMsg("뭐가 어떻게 되는걸까요.");
+        yield return new WaitForSeconds(5f);
+
+        S1P2Panel.SetActive(false);
+        StartCoroutine(BlinkStoryPanel1());
+        yield return new WaitForSeconds(5f);
+        S1BossPanel.SetActive(true);
+        bossAudioSource.Play();
+
+        BossTalk.SetMsg("이걸 다 해낼줄이야. 생각보다 대단한걸?\n\n하지만 이게 끝이 아니지");
+        yield return new WaitForSeconds(10f);
+
+        BossTalk.SetMsg("난 이제부터 너네를 쫓을 것이며\n\n남쪽 다리로 알아서 탈출해라");
+        yield return new WaitForSeconds(10f);
+
+        S1BossPanel.SetActive(false);
+        bossAudioSource.Stop();
+        StoryPanel1.SetActive(false);
+        bossStage.SetActive(true);
     }
     IEnumerator BlinkStoryPanel1()
     {

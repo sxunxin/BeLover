@@ -714,7 +714,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                PhotonNetwork.LoadLevel("MainScene");
+                s4manager.photonView.RPC("ShowEndPanel_RPC", RpcTarget.All); // 모든 클라이언트에서 패널 활성화
             }
         }
         if (collision.gameObject.name == "M2_2Spawn")
@@ -738,7 +738,20 @@ public class PlayerScript : MonoBehaviourPunCallbacks
             }
 
         }
+        if (collision.gameObject.tag == "BossStage")
+        {
+            Debug.Log($"{tag}이 BossStage에 접촉했습니다.");
 
+            // Photon Custom Properties에 접촉 상태 저장
+            ExitGames.Client.Photon.Hashtable properties = new ExitGames.Client.Photon.Hashtable
+        {
+            { "IsBossStageTouched", true }
+        };
+            PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
+
+            // 두 플레이어가 모두 접촉했는지 확인
+            CheckBothPlayersTouched();
+        }
         string objectName = collision.gameObject.name;
         if (CompareTag("player2") && objectName.StartsWith("Road"))
         {
@@ -1040,6 +1053,39 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         right_up = false;
 
         isMobileInteract = false;
+    }
+    private void CheckBothPlayersTouched()
+    {
+        bool player1Touched = false;
+        bool player2Touched = false;
+
+        foreach (var player in PhotonNetwork.PlayerList)
+        {
+            if (player.CustomProperties.ContainsKey("IsBossStageTouched"))
+            {
+                if (player.CustomProperties["IsBossStageTouched"] is bool isTouched && isTouched)
+                {
+                    if (player.CustomProperties.ContainsKey("Tag") && player.CustomProperties["Tag"].ToString() == "player1")
+                    {
+                        player1Touched = true;
+                    }
+                    else if (player.CustomProperties.ContainsKey("Tag") && player.CustomProperties["Tag"].ToString() == "player2")
+                    {
+                        player2Touched = true;
+                    }
+                }
+            }
+        }
+
+        // 두 플레이어가 모두 접촉했을 때 씬 전환
+        if (player1Touched && player2Touched)
+        {
+            Debug.Log("두 플레이어가 BossStage에 모두 접촉했습니다. Scene5로 전환합니다.");
+            if (PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.LoadLevel("Scene5");
+            }
+        }
     }
 
 }

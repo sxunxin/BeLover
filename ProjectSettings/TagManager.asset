@@ -18,6 +18,8 @@ TagManager:
   - Bridge
   - Candle
   - Boss
+  - HousePortal
+  - BossStage
   layers:
   - Default
   - TransparentFX
