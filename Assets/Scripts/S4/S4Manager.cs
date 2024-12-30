@@ -47,10 +47,10 @@ public class S4Manager : MonoBehaviourPunCallbacks
         switch (imageType)
         {
             case "ResetStatue":
-                ResetStatueImage.gameObject.SetActive(true);
+                //ResetStatueImage.gameObject.SetActive(true);
                 break;
             default:
-                ResetStatueImage.gameObject.SetActive(false);
+                //ResetStatueImage.gameObject.SetActive(false);
                 break;
         }
     }

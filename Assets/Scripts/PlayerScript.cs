@@ -38,6 +38,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     private float horizontalInput = 0f;
     private float verticalInput = 0f;
 
+    bool isStoryUsing = false;
+
     //s3 raycast
     Vector3 dirVec;//바라보고 있는 방향
     GameObject scanObject;
@@ -46,6 +48,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     
     //s3 gimmick
     public int candlecount;
+
+    public bool S3Interact = true;
 
     //s4
     S4Manager s4manager;
@@ -60,6 +64,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks
 
     // 모바일 입력
     GameObject mobileSetting;
+
+    public bool isUI;
 
     int up_Value;
     int down_Value;
@@ -109,10 +115,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 {
                     StoryPanelAudio.Play();
                 }
-                if (Input.GetButtonDown("Jump") && scanObject.tag != "MainMission")
-                {   
-                    Msm.StoryPanel.SetActive(false);
-                }
                 //  플레이어의 이동을 정지시킴
                 rd.velocity = Vector2.zero; // 움직임 정지
                 return; //  더 이상 코드 실행 중지
@@ -145,16 +147,20 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 return; //  더 이상 코드 실행 중지
             }
 
-            if (mobileSetting != null) mobileSetting.SetActive(true);
+            if (mobileSetting != null)
+            {
+                if (isUI) mobileSetting.SetActive(true);
+                else mobileSetting.SetActive(false);
+            }
 
             // 입력값 처리 (PC & 모바일 통합)
-            h =  Input.GetAxisRaw("Horizontal") + right_Value + left_Value;
-            v =  Input.GetAxisRaw("Vertical") + up_Value + down_Value;
+            h = Input.GetAxisRaw("Horizontal") + right_Value + left_Value;
+            v = Input.GetAxisRaw("Vertical") + up_Value + down_Value;
 
             bool hDown = Input.GetButtonDown("Horizontal") || right_down || left_down;
             bool vDown = Input.GetButtonDown("Vertical") || up_down || down_down;
-            bool hUp =  Input.GetButtonUp("Horizontal") || right_up || left_up;
-            bool vUp =  Input.GetButtonUp("Vertical") || up_up || down_up;
+            bool hUp = Input.GetButtonUp("Horizontal") || right_up || left_up;
+            bool vUp = Input.GetButtonUp("Vertical") || up_up || down_up;
 
             // 상호작용 처리 (PC & 모바일 통합)
             isInteract = Input.GetButtonDown("Jump") || isMobileInteract;
@@ -192,61 +198,37 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 // 플레이어를 화면 밖으로 이동시켜서 보이지 않게 함
                 transform.position = new Vector3(10000f, 10000f, 10000f);
             }
-            else if (SceneManager.GetActiveScene().name == "Scene3-1" || SceneManager.GetActiveScene().name == "MainScene")
+            else if (SceneManager.GetActiveScene().name == "Scene3-1")
             {
                 SetDirection(hDown, vDown);
-                if (Input.GetButtonDown("Jump") && scanObject != null)
+                if (scanObject != null)
                 {
-                    if (SceneManager.GetActiveScene().name == "Scene3-1")
+                    if (S3Interact && isInteract)
                     {
-                        Debug.Log(scanObject.name);
-                        S3sm.Action(scanObject);
-                        if (scanObject != null && scanObject.name == "Skull_True")
-                        {
-                            Debug.Log("Player 2가 Skull_True 오브젝트와 상호작용했습니다. 클리어 화면을 모든 클라이언트에 표시합니다.");
-                            S3sm.photonView.RPC("ShowClearUI_RPC", RpcTarget.All, 2);
-                        }
-                        if (scanObject != null && scanObject.CompareTag("Candle"))
-                        {
-                            S3ObjectData objData = scanObject.GetComponent<S3ObjectData>();
-                            if (objData != null && objData.isActivated)
-                            {
-                                Debug.Log($"이미 활성화된 {scanObject.name}과는 더 이상 상호작용할 수 없습니다.");
-                                return;
-                            }
-
-                            if (objData != null && objData.linkedCandleFire != null)
-                            {
-                                objData.linkedCandleFire.SetActive(true);
-                                Debug.Log($"{scanObject.name}의 CandleFire 활성화 완료");
-                            }
-                            else
-                            {
-                                Debug.LogWarning($"CandleFire가 {scanObject.name}와 연결되지 않았습니다.");
-                                return;
-                            }
-
-                            objData.isActivated = true;
-                            candlecount++;
-                            Debug.Log($"캔들 카운트 증가: {candlecount}");
-                            S3sm.CheckStageClear(candlecount);
-                        }
-
+                        Debug.Log("S3 Interact 실행");
+                        StartCoroutine(S3HandleInteraction());
                     }
+                }  
+            }
+            else if (SceneManager.GetActiveScene().name == "MainScene")
+            {
+                SetDirection(hDown, vDown);
 
+                if (scanObject != null && scanObject.tag == "MainMission")
+                {
+                    if (isInteract && !isStoryUsing)
+                    {
+                        StartCoroutine(HandleMissionSelectionWithDelay(0.2f, scanObject.name));
+                        isStoryUsing = true;
+                    }
+                    
                 }
-                if (Input.GetButtonDown("Jump") && scanObject != null)
+                else if (scanObject != null)
                 {
-                    NetworkManager nm = FindAnyObjectByType<NetworkManager>();
-                    Debug.Log(scanObject.name);
-
-                    if (scanObject.tag == "MainMission")
+                    if (isInteract && !isStoryUsing)
                     {
-                        HandleMissionSelection(scanObject.name, nm);
-                    }
-                    else
-                    {
-                        HandleMissionClearCheck(scanObject.name);
+                        StartCoroutine(HandleMissionWithDelay(0.2f, scanObject.name));
+                        isStoryUsing = true;
                     }
                 }
             }
@@ -384,6 +366,83 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         }
     }
 
+    private IEnumerator S3HandleInteraction()
+    {
+        // S3Interact = false;
+
+        S3sm.Action(scanObject);
+        S3ObjectData objData = scanObject.GetComponent<S3ObjectData>();
+
+        if (scanObject.name == "Skull_True")
+        {
+            S3sm.Action(scanObject);
+            Debug.Log("Player 2가 Skull_True 오브젝트와 상호작용했습니다. 클리어 화면을 모든 클라이언트에 표시합니다.");
+            S3sm.photonView.RPC("ShowClearUI_RPC", RpcTarget.All, 2);
+        }
+
+        if (scanObject.CompareTag("Candle"))
+        {
+            if (objData != null && objData.isActivated)
+            {
+                Debug.Log($"이미 활성화된 {scanObject.name}과는 더 이상 상호작용할 수 없습니다.");
+                yield break;
+            }
+
+            if (objData != null && objData.linkedCandleFire != null)
+            {
+                objData.linkedCandleFire.SetActive(true);
+                Debug.Log($"{scanObject.name}의 CandleFire 활성화 완료");
+            }
+            else
+            {
+                Debug.LogWarning($"CandleFire가 {scanObject.name}와 연결되지 않았습니다.");
+                yield break;
+            }
+
+            objData.isActivated = true;
+            candlecount++;
+            Debug.Log($"캔들 카운트 증가: {candlecount}");
+            S3sm.CheckStageClear(candlecount);
+        }
+
+        yield return new WaitForSeconds(0.5f); // 0.2초 대기
+        S3Interact = true; // 상호작용 다시 활성화
+    }
+
+
+    private IEnumerator HandleMissionSelectionWithDelay(float delay, string objectName)
+    {
+        yield return new WaitForSeconds(delay); // 0.2초 대기
+
+        NetworkManager nm = FindAnyObjectByType<NetworkManager>();
+        HandleMissionSelection(objectName, nm); // 0.2초 뒤에 실행
+    }
+
+    private IEnumerator HandleMissionWithDelay(float delay, string objectName)
+    {
+        yield return new WaitForSeconds(delay); // 0.5초 대기
+
+        // HandleMissionClearCheck 호출
+        HandleMissionClearCheck(objectName);
+
+        // 3초 후 StoryPanel 비활성화
+        StartCoroutine(DisableStoryPanelAfterDelay(3f));
+    }
+
+    private IEnumerator DisableStoryPanelAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay); // 3초 대기
+        if (Msm != null && Msm.StoryPanel != null)
+        {
+            isInteract = false;
+            isStoryUsing = false;
+            Msm.StoryPanel.SetActive(false); // StoryPanel 비활성화
+        }
+        else
+        {
+            Debug.LogWarning("Msm 또는 StoryPanel이 설정되지 않았습니다.");
+        }
+    }
 
     [PunRPC]
     void SyncAnimation(int hInput, int vInput)
@@ -406,7 +465,17 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         mirror--;
         photonView.RPC("UpdateMirrorUI", RpcTarget.All, mirror);
 
-        yield return new WaitForSeconds(0.5f);
+        GameObject boss = GameObject.FindWithTag("Boss"); // Enemy 태그로 적을 찾음
+        if (boss != null)
+        {
+            PhotonView bossPhotonView = boss.GetComponent<PhotonView>();
+            if (bossPhotonView != null)
+            {
+                bossPhotonView.RPC("TriggerStopAndResetSpeed", RpcTarget.All); // PunRPC 호출
+            }
+        }
+
+        yield return new WaitForSeconds(1.1f);
 
         isMirrorUsing = false;
     }
@@ -747,6 +816,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks
     // 특정 장면이 로드될 때 호출할 함수
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        isUI = true;
         mobileSetting = GameObject.Find("MobileSetting");
 
         if (pv.IsMine)
@@ -755,11 +825,26 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         }
         if (scene.name == "MainScene")
         {
+            isStoryUsing = false;
+
             horizontalInput = 0f;
             verticalInput = 0f;
             Vector2 moveVec = new Vector2(horizontalInput, verticalInput);
             rd.velocity = Vector2.zero;
-           
+
+            up_Value = 0;
+            down_Value = 0;
+            left_Value = 0;
+            right_Value = 0;
+
+            up_down = false;
+            down_down = false;
+            left_down = false;
+            right_down = false;
+            up_up = false;
+            down_up = false;
+            left_up = false;
+            right_up = false;
 
             Msm = FindObjectOfType<MainSceneManager>(); // **씬이 로드될 때 Msm 다시 할당**
             if (Msm != null)
@@ -829,12 +914,12 @@ public class PlayerScript : MonoBehaviourPunCallbacks
 
             if (playerTag == "player1")
             {
-                SetPosition(3.5f, -1f, 0f);
+                SetPosition(-0.4f, -0.9f, 0f);
             }
             else if (playerTag == "player2")
             {
                 s5manager.ShowImage("Candle");
-                SetPosition(2.8f, -1f, 0f);
+                SetPosition(-0.2f, -0.9f, 0f);
             }
         }
         else
@@ -879,10 +964,11 @@ public class PlayerScript : MonoBehaviourPunCallbacks
 
 
     // 모바일 입력
-    public void ButtonDown(string type)
+    public void ButtonDown(string type, string sceneName)
     {
-        if (!photonView.IsMine) return;
+        if (!photonView.IsMine || SceneManager.GetActiveScene().name != sceneName) return;
 
+        S3Interact = true;
         switch (type)
         {
             case "U":
@@ -905,9 +991,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks
 
     }
 
-    public void ButtonUp(string type)
+    public void ButtonUp(string type, string sceneName)
     {
-        if (!photonView.IsMine) return;
+        if (!photonView.IsMine || SceneManager.GetActiveScene().name != sceneName) return;
 
         switch (type)
         {
@@ -930,10 +1016,30 @@ public class PlayerScript : MonoBehaviourPunCallbacks
         }
     }
 
-    public void SetInteractState(bool state)
+    public void SetInteractState(bool state, string sceneName)
     {
-        if (!photonView.IsMine) return;
+        if (!photonView.IsMine || SceneManager.GetActiveScene().name != sceneName) return;
         isMobileInteract = state;
+    }
+
+    public void ResetInputValues()
+    {
+        up_Value = 0;
+        down_Value = 0;
+        left_Value = 0;
+        right_Value = 0;
+
+        up_down = false;
+        down_down = false;
+        left_down = false;
+        right_down = false;
+
+        up_up = false;
+        down_up = false;
+        left_up = false;
+        right_up = false;
+
+        isMobileInteract = false;
     }
 
 }
