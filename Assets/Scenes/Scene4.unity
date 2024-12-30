@@ -93170,10 +93170,8 @@ MonoBehaviour:
   - {x: 0.15, y: -27.2, z: 0}
   - {x: -0.25, y: -27, z: 0}
   ResetStatueImage: {fileID: 453650509}
-
   audioSource: {fileID: 1105385367}
   candleSound: {fileID: 8300000, guid: a51022975f46c2242bf2b7c69b2550ed, type: 3}
-  tm: {fileID: 0}
   storyPanel: {fileID: 1350324478}
   firstPanel: {fileID: 73630425}
   secondPanel: {fileID: 1295673482}

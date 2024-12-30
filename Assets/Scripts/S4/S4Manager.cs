@@ -23,7 +23,7 @@ public class S4Manager : MonoBehaviourPunCallbacks
     public AudioSource audioSource;
     public AudioClip candleSound;
 
-    public TalkManager tm;
+    TalkManager tm;
 
     public GameObject storyPanel;
     public GameObject firstPanel;
