@@ -73,28 +73,28 @@ public class S4Manager : MonoBehaviourPunCallbacks
         firstPanel.SetActive(false);
         yield return new WaitForSeconds(2f);
 
-        player2Panel.SetActive(true);
-        player2Talk.SetMsg(tm.S4Text[1]);
+        player1Panel.SetActive(true);
+        player1Talk.SetMsg(tm.S4Text[1]);
         yield return new WaitForSeconds(5f);
+        player1Panel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+
+        player2Panel.SetActive(true);
+        player2Talk.SetMsg(tm.S4Text[2]);
+        yield return new WaitForSeconds(7f);
         player2Panel.SetActive(false);
         yield return new WaitForSeconds(2f);
 
         player1Panel.SetActive(true);
-        player1Talk.SetMsg(tm.S4Text[2]);
+        player1Talk.SetMsg(tm.S4Text[3]);
         yield return new WaitForSeconds(7f);
         player1Panel.SetActive(false);
         yield return new WaitForSeconds(2f);
 
-        secondPanel.SetActive(true);
-        secondText.SetMsg(tm.S4Text[3]);
-        yield return new WaitForSeconds(7f);
-        secondPanel.SetActive(false);
-        yield return new WaitForSeconds(2f);
-
-        secondPanel.SetActive(true);
-        secondText.SetMsg(tm.S4Text[4]);
-        yield return new WaitForSeconds(10f);
-        secondPanel.SetActive(false);
+        player2Panel.SetActive(true);
+        player2Talk.SetMsg(tm.S4Text[4]);
+        yield return new WaitForSeconds(8f);
+        player2Panel.SetActive(false);
         yield return new WaitForSeconds(2f);
 
         thirdText.SetMsg(tm.S4Text[5]);
