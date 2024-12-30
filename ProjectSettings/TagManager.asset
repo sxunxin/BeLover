@@ -19,6 +19,8 @@ TagManager:
   - Candle
   - Boss
   - EndTrigger
+  - HousePortal
+  - BossStage
   layers:
   - Default
   - TransparentFX

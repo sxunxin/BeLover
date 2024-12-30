@@ -16,7 +16,7 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
     public GameObject talkPanel;
     public GameObject clearPanel;
     public TextMeshProUGUI clearUIText; // Clear UI의 텍스트 변경을 위해 추가
-    public bool isAction;  //활성화 상태 판단 변수
+    public bool isAction = false;  //활성화 상태 판단 변수
 
     public TalkManager tm;
     public S3_1TalkManager talkManager;
@@ -35,10 +35,14 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
     public GameObject storyPanel;
     public GameObject firstPanel;
     public GameObject secondPanel;
+    public GameObject player1Panel;
+    public GameObject player2Panel;
 
     public TypeEffect firstText;
     public TypeEffect secondText;
     public TypeEffect thirdText;
+    public TypeEffect player1Talk;
+    public TypeEffect player2Talk;
 
     public GameObject endPanel;
     public GameObject p1Panel;
@@ -82,16 +86,36 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(3f);
         firstText.SetMsg(tm.S3Text[0]);
 
-        yield return new WaitForSeconds(13f);
+        yield return new WaitForSeconds(12f);
 
         firstPanel.SetActive(false);
         yield return new WaitForSeconds(2f);
-        secondPanel.SetActive(true);
 
-        secondText.SetMsg(tm.S3Text[1]);
+        player2Panel.SetActive(true);
+        player2Talk.SetMsg(tm.S3Text[1]);
         yield return new WaitForSeconds(7f);
+        player2Panel.SetActive(false);
+        yield return new WaitForSeconds(2f);
 
-        thirdText.SetMsg(tm.S3Text[2]);
+        player1Panel.SetActive(true);
+        player1Talk.SetMsg(tm.S3Text[2]);
+        yield return new WaitForSeconds(7f);
+        player1Panel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+
+        secondPanel.SetActive(true);
+        secondText.SetMsg(tm.S3Text[3]);
+        yield return new WaitForSeconds(10f);
+        secondPanel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+
+        secondPanel.SetActive(true);
+        secondText.SetMsg(tm.S3Text[4]);
+        yield return new WaitForSeconds(10f);
+        secondPanel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+
+        thirdText.SetMsg(tm.S3Text[5]);
 
         yield return new WaitForSeconds(20f);
         storyPanel.SetActive(false);
@@ -99,53 +123,29 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
     IEnumerator secondCinema()
     {
         yield return new WaitForSeconds(3f);
-        bossPanel.SetActive(true);
-        bossTalk.SetMsg(tm.S3Text[3]);
-        yield return new WaitForSeconds(12f);
-        bossPanel.SetActive(false);
-
-        p2Panel.SetActive(true);
-        p2Talk.SetMsg(tm.S3Text[4]);
-        yield return new WaitForSeconds(5f);
-        p2Panel.SetActive(false);
-
-        bossPanel.SetActive(true);
-        bossTalk.SetMsg(tm.S3Text[5]);
-        yield return new WaitForSeconds(5f);
-        bossPanel.SetActive(false);
-
         p1Panel.SetActive(true);
         p1Talk.SetMsg(tm.S3Text[6]);
         yield return new WaitForSeconds(5f);
         p1Panel.SetActive(false);
 
-        p2Panel.SetActive(true);
-        p2Talk.SetMsg(tm.S3Text[7]);
-        yield return new WaitForSeconds(5f);
-        p2Panel.SetActive(false);
-
         bossPanel.SetActive(true);
-        bossTalk.SetMsg(tm.S3Text[8]);
+        bossTalk.SetMsg(tm.S3Text[7]);
         yield return new WaitForSeconds(5f);
         bossPanel.SetActive(false);
 
-        p1Panel.SetActive(true);
-        p1Talk.SetMsg(tm.S3Text[9]);
-        yield return new WaitForSeconds(5f);
-        p1Panel.SetActive(false);
-
         p2Panel.SetActive(true);
-        p2Talk.SetMsg(tm.S3Text[10]);
+        p2Talk.SetMsg(tm.S3Text[8]);
         yield return new WaitForSeconds(5f);
         p2Panel.SetActive(false);
 
         bossPanel.SetActive(true);
-        bossTalk.SetMsg(tm.S3Text[11]);
-        yield return new WaitForSeconds(5f);
-
-        bossTalk.SetMsg(tm.S2Text[12]);
+        bossTalk.SetMsg(tm.S3Text[9]);
         yield return new WaitForSeconds(15f);
 
+        bossTalk.SetMsg(tm.S3Text[10]);
+        yield return new WaitForSeconds(13f);
+        bossTalk.SetMsg(tm.S3Text[11]);
+        yield return new WaitForSeconds(5f);
         bossPanel.SetActive(false);
 
         yield return new WaitForSeconds(3f);
@@ -230,18 +230,28 @@ public class S3SceneManager : MonoBehaviourPunCallbacks
     public void Action(GameObject scanObj)
     {
         if (isAction)
-        {
-            isAction = false;
-        }
-        else
-        {
-            isAction = true;
-            scanObject = scanObj;
-            S3ObjectData objData = scanObj.GetComponent<S3ObjectData>();
-            Talk(objData.id, objData.isTomb, objData.SkullTrue);
-        }
-        talkPanel.SetActive(isAction);
+            return; // 이미 동작 중이면 추가 동작 방지
+
+        isAction = true;
+        scanObject = scanObj;
+
+        S3ObjectData objData = scanObj.GetComponent<S3ObjectData>();
+        Talk(objData.id, objData.isTomb, objData.SkullTrue);
+
+        talkPanel.SetActive(true); // 패널 활성화
+
+        // 1초 후에 패널을 비활성화하는 코루틴 실행
+        StartCoroutine(HideTalkPanelAfterDelay(1f));
     }
+
+    // 1초 딜레이 후 패널을 비활성화하는 코루틴
+    private IEnumerator HideTalkPanelAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        talkPanel.SetActive(false);
+        isAction = false; // 동작 가능 상태로 복구
+    }
+
 
     //s3 m2 
     [PunRPC]

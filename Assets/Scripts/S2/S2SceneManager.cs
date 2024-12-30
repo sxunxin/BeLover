@@ -22,10 +22,14 @@ public class S2SceneManager : MonoBehaviourPun
     public GameObject storyPanel;
     public GameObject firstPanel;
     public GameObject secondPanel;
+    public GameObject player1Panel;
+    public GameObject player2Panel;
 
     public TypeEffect firstText;
     public TypeEffect secondText;
     public TypeEffect thirdText;
+    public TypeEffect player1Talk;
+    public TypeEffect player2Talk;
 
     public GameObject endPanel;
     public GameObject p1Panel;
@@ -237,12 +241,31 @@ public class S2SceneManager : MonoBehaviourPun
 
         firstPanel.SetActive(false);
         yield return new WaitForSeconds(2f);
+
+        player2Panel.SetActive(true);
+        player2Talk.SetMsg(tm.S2Text[1]);
+        yield return new WaitForSeconds(5f);
+        player2Panel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+
         secondPanel.SetActive(true);
-
-        secondText.SetMsg(tm.S2Text[1]);
+        secondText.SetMsg(tm.S2Text[2]);
         yield return new WaitForSeconds(7f);
+        secondPanel.SetActive(false);
 
-        thirdText.SetMsg(tm.S2Text[2]);
+        player1Panel.SetActive(true);
+        player1Talk.SetMsg(tm.S2Text[3]);
+        yield return new WaitForSeconds(7f);
+        player1Panel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+
+        player2Panel.SetActive(true);
+        player2Talk.SetMsg(tm.S2Text[4]);
+        yield return new WaitForSeconds(7f);
+        player2Panel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+
+        thirdText.SetMsg(tm.S2Text[5]);
 
         yield return new WaitForSeconds(20f);
         storyPanel.SetActive(false);
@@ -250,21 +273,6 @@ public class S2SceneManager : MonoBehaviourPun
     IEnumerator secondCinema()
     {
         yield return new WaitForSeconds(3f);
-        p1Panel.SetActive(true);
-        p1Talk.SetMsg(tm.S2Text[3]);
-        yield return new WaitForSeconds(5f);
-        p1Panel.SetActive(false);
-
-        bossPanel.SetActive(true);
-        bossTalk.SetMsg(tm.S2Text[4]);
-        yield return new WaitForSeconds(5f);
-        bossPanel.SetActive(false);
-
-        p2Panel.SetActive(true);
-        p2Talk.SetMsg(tm.S2Text[5]);
-        yield return new WaitForSeconds(5f);
-        p2Panel.SetActive(false);
-
         bossPanel.SetActive(true);
         bossTalk.SetMsg(tm.S2Text[6]);
         yield return new WaitForSeconds(5f);
@@ -275,15 +283,15 @@ public class S2SceneManager : MonoBehaviourPun
         yield return new WaitForSeconds(5f);
         p2Panel.SetActive(false);
 
-        p1Panel.SetActive(true);
-        p1Talk.SetMsg(tm.S2Text[8]);
-        yield return new WaitForSeconds(5f);
-        p1Panel.SetActive(false);
-
         bossPanel.SetActive(true);
-        bossTalk.SetMsg(tm.S2Text[9]);
+        bossTalk.SetMsg(tm.S2Text[8]);
         yield return new WaitForSeconds(5f);
         bossPanel.SetActive(false);
+
+        p1Panel.SetActive(true);
+        p1Talk.SetMsg(tm.S2Text[9]);
+        yield return new WaitForSeconds(5f);
+        p1Panel.SetActive(false);
 
         p2Panel.SetActive(true);
         p2Talk.SetMsg(tm.S2Text[10]);
@@ -295,7 +303,7 @@ public class S2SceneManager : MonoBehaviourPun
         yield return new WaitForSeconds(5f);
 
         bossTalk.SetMsg(tm.S2Text[12]);
-        yield return new WaitForSeconds(15f);
+        yield return new WaitForSeconds(5f);
 
         bossPanel.SetActive(false);
 

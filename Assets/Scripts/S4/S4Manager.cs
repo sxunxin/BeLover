@@ -20,19 +20,156 @@ public class S4Manager : MonoBehaviourPunCallbacks
     private bool isRight = true;
 
     public Image ResetStatueImage;
-
     public AudioSource audioSource;
     public AudioClip candleSound;
 
+    public TalkManager tm;
+
+    public GameObject storyPanel;
+    public GameObject firstPanel;
+    public GameObject secondPanel;
+    public GameObject player1Panel;
+    public GameObject player2Panel;
+
+    public TypeEffect firstText;
+    public TypeEffect secondText;
+    public TypeEffect thirdText;
+    public TypeEffect player1Talk;
+    public TypeEffect player2Talk;
+
+    public GameObject endPanel;
+    public GameObject p1Panel;
+    public GameObject p2Panel;
+    public GameObject bossPanel;
+
+    public TypeEffect p1Talk;
+    public TypeEffect p2Talk;
+    public TypeEffect bossTalk;
+
+    public Image ghostImage;
+    public Image Buddhahood;
+    private void Awake()
+    {
+        tm = FindObjectOfType<TalkManager>();
+    }
+
     private void Start()
     {
+        StartCoroutine(firstCinema());
         // 모든 버튼 스크립트 가져오기
         Btns = FindObjectsOfType<Btn>();
         resetStatue = FindObjectOfType<ResetStatue>();
 
         mapLight.transform.position = lightPositions[1];
     }
+    IEnumerator firstCinema()
+    {
+        firstPanel.SetActive(true);
+        yield return new WaitForSeconds(3f);
+        firstText.SetMsg(tm.S4Text[0]);
 
+        yield return new WaitForSeconds(12f);
+
+        firstPanel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+
+        player2Panel.SetActive(true);
+        player2Talk.SetMsg(tm.S4Text[1]);
+        yield return new WaitForSeconds(5f);
+        player2Panel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+
+        player1Panel.SetActive(true);
+        player1Talk.SetMsg(tm.S4Text[2]);
+        yield return new WaitForSeconds(7f);
+        player1Panel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+
+        secondPanel.SetActive(true);
+        secondText.SetMsg(tm.S4Text[3]);
+        yield return new WaitForSeconds(7f);
+        secondPanel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+
+        secondPanel.SetActive(true);
+        secondText.SetMsg(tm.S4Text[4]);
+        yield return new WaitForSeconds(10f);
+        secondPanel.SetActive(false);
+        yield return new WaitForSeconds(2f);
+
+        thirdText.SetMsg(tm.S4Text[5]);
+
+        yield return new WaitForSeconds(20f);
+        storyPanel.SetActive(false);
+    }
+    IEnumerator secondCinema()
+    {
+        yield return new WaitForSeconds(3f);
+        bossPanel.SetActive(true);
+        bossTalk.SetMsg(tm.S4Text[6]);
+        yield return new WaitForSeconds(5f);
+        bossPanel.SetActive(false);
+
+        p2Panel.SetActive(true);
+        p2Talk.SetMsg(tm.S4Text[7]);
+        yield return new WaitForSeconds(5f);
+        p2Panel.SetActive(false);
+
+        bossPanel.SetActive(true);
+        bossTalk.SetMsg(tm.S4Text[8]);
+        yield return new WaitForSeconds(3f);
+        bossPanel.SetActive(false);
+
+        p1Panel.SetActive(true);
+        p1Talk.SetMsg(tm.S2Text[9]);
+        yield return new WaitForSeconds(5f);
+        p1Panel.SetActive(false);
+
+        bossPanel.SetActive(true);
+        bossTalk.SetMsg(tm.S4Text[10]);
+        yield return new WaitForSeconds(12f);
+        bossPanel.SetActive(false);
+
+        p2Panel.SetActive(true);
+        p2Talk.SetMsg(tm.S4Text[11]);
+        yield return new WaitForSeconds(5f);
+        p2Panel.SetActive(false);
+
+        p1Panel.SetActive(true);
+        p1Talk.SetMsg(tm.S2Text[12]);
+        yield return new WaitForSeconds(5f);
+        p1Panel.SetActive(false);
+
+        bossPanel.SetActive(true);
+        bossTalk.SetMsg(tm.S4Text[13]);
+        yield return new WaitForSeconds(12f);
+        bossPanel.SetActive(false);
+
+        bossTalk.SetMsg(tm.S4Text[14]);
+        yield return new WaitForSeconds(10f);
+        bossTalk.SetMsg(tm.S4Text[15]);
+        yield return new WaitForSeconds(3f);
+        bossPanel.SetActive(false);
+
+        yield return new WaitForSeconds(3f);
+        ghostImage.gameObject.SetActive(true); // ghostImage 활성화
+        yield return new WaitForSeconds(3f); // 3초 대기 후 크기와 투명도 변경 시작
+
+        StartCoroutine(tm.ImagePadeOut(ghostImage, Buddhahood));
+    }
+    [PunRPC]
+    public void ShowEndPanel_RPC()
+    {
+        if (endPanel != null)
+        {
+            endPanel.SetActive(true);
+            StartCoroutine(secondCinema());
+        }
+        else
+        {
+            Debug.LogError("endPanel이 연결되지 않았습니다.");
+        }
+    }
     private void Update()
     {
         // ======================= 마지막에 지울 것 ! =======================
