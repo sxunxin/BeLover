@@ -16,13 +16,13 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public Button loginButton;
     public Button createRoomButton;
-    public Button joinRoomButton; // **JoinRoom ¹öÆ° Ãß°¡**
+    public Button joinRoomButton; // **JoinRoom ë²„íŠ¼ ì¶”ê°€**
 
     Dictionary<string, GameObject> rooms = new Dictionary<string, GameObject>();
     GameObject roomItemPrefab;
     public Transform scrollContent;
 
-    private bool isLoggedIn = false; // **·Î±×ÀÎ »óÅÂ È®ÀÎ º¯¼ö Ãß°¡**
+    private bool isLoggedIn = false; // **ë¡œê·¸ì¸ ìƒíƒœ í™•ì¸ ë³€ìˆ˜ ì¶”ê°€**
 
     private void Awake()
     {
@@ -40,7 +40,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("Connected to Master");
 
-        // **¸¶½ºÅÍ ¼­¹ö¿¡ ¿¬°á ÈÄ ´Ğ³×ÀÓ ¼³Á¤**
+        // **ë§ˆìŠ¤í„° ì„œë²„ì— ì—°ê²° í›„ ë‹‰ë„¤ì„ ì„¤ì •**
         SetUserId();
         PhotonNetwork.NickName = userId;
 
@@ -71,7 +71,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
         foreach (var player in PhotonNetwork.CurrentRoom.Players)
         {
-            Debug.Log($"ÇÃ·¹ÀÌ¾î ´Ğ³×ÀÓ: {player.Value.NickName}, À¯Àú °íÀ¯°ª: {player.Value.ActorNumber}");
+            Debug.Log($"í”Œë ˆì´ì–´ ë‹‰ë„¤ì„: {player.Value.NickName}, ìœ ì € ê³ ìœ ê°’: {player.Value.ActorNumber}");
         }
 
         if (PhotonNetwork.IsMasterClient)
@@ -85,7 +85,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         userId = PlayerPrefs.GetString("USER_ID", $"USER_{Random.Range(1, 21):00}");
         userInputField.text = userId;
 
-        DisableAllButtons(); // **¸ğµç ¹öÆ° ºñÈ°¼ºÈ­**
+        DisableAllButtons(); // **ëª¨ë“  ë²„íŠ¼ ë¹„í™œì„±í™”**
     }
 
     public void SetUserId()
@@ -102,7 +102,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         PlayerPrefs.SetString("USER_ID", userId);
         if (PhotonNetwork.IsConnected)
         {
-            PhotonNetwork.NickName = userId; // **´Ğ³×ÀÓ ¼³Á¤**
+            PhotonNetwork.NickName = userId; // **ë‹‰ë„¤ì„ ì„¤ì •**
         }
     }
 
@@ -110,7 +110,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         if (string.IsNullOrEmpty(roomInputField.text))
         {
-            roomInputField.text = $"{Random.Range(1, 101):000}¹ø ¹æ";
+            roomInputField.text = $"{Random.Range(1, 101):000}ë²ˆ ë°©";
         }
         return roomInputField.text;
     }
@@ -181,7 +181,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         if (!isLoggedIn)
         {
-            Debug.LogWarning("·Î±×ÀÎ ÈÄ¿¡ ¹æ¿¡ ÀÔÀåÇÒ ¼ö ÀÖ½À´Ï´Ù.");
+            Debug.LogWarning("ë¡œê·¸ì¸ í›„ì— ë°©ì— ì…ì¥í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.");
             return;
         }
 
@@ -192,7 +192,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         if (!isLoggedIn)
         {
-            Debug.LogWarning("·Î±×ÀÎ ÈÄ¿¡ ¹æÀ» »ı¼ºÇÒ ¼ö ÀÖ½À´Ï´Ù.");
+            Debug.LogWarning("ë¡œê·¸ì¸ í›„ì— ë°©ì„ ìƒì„±í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.");
             return;
         }
 

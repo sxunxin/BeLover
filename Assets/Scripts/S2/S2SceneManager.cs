@@ -4,20 +4,20 @@ using Photon.Realtime;
 using Photon.Pun;
 using ExitGames.Client.Photon;
 using UnityEngine;
-using UnityEngine.UI; // **UI ÀÌ¹ÌÁö Ã³¸®¸¦ À§ÇØ Ãß°¡**
+using UnityEngine.UI; // **UI ì´ë¯¸ì§€ ì²˜ë¦¬ë¥¼ ìœ„í•´ ì¶”ê°€**
 using TMPro;
 
 public class S2SceneManager : MonoBehaviourPun
 {
     TalkManager tm;
-    public Camera mainCamera; // ¿¬°áµÈ Ä«¸Ş¶ó (Camera.main ´ë½Å »ç¿ë)
-    public TextMeshProUGUI warningText; // **TMP °æ°í ¸Ş½ÃÁö ÅØ½ºÆ® ¿¬°á**
-    public Image displayImage; // **Ç¥½ÃÇÒ ÀÌ¹ÌÁö ¿¬°á**
-    public Sprite[] imageList; // **ÀÌ¹ÌÁö ¸®½ºÆ® (5°³ ½ºÇÁ¶óÀÌÆ® ÀÔ·Â)**
-    public GameObject prefabToShow; // **È°¼ºÈ­ÇÒ Prefab**
-    public int mirrorCount = 0; // ¹Ì·¯ Ä«¿îÆ®
-    private int previousMirrorCount = 0; // ÀÌÀü ¹Ì·¯ Ä«¿îÆ®¸¦ ÀúÀå
-    private bool isShaking = false; // Èçµé¸² ÁßÀÎÁö ¿©ºÎ È®ÀÎ
+    public Camera mainCamera; // ì—°ê²°ëœ ì¹´ë©”ë¼ (Camera.main ëŒ€ì‹  ì‚¬ìš©)
+    public TextMeshProUGUI warningText; // **TMP ê²½ê³  ë©”ì‹œì§€ í…ìŠ¤íŠ¸ ì—°ê²°**
+    public Image displayImage; // **í‘œì‹œí•  ì´ë¯¸ì§€ ì—°ê²°**
+    public Sprite[] imageList; // **ì´ë¯¸ì§€ ë¦¬ìŠ¤íŠ¸ (5ê°œ ìŠ¤í”„ë¼ì´íŠ¸ ì…ë ¥)**
+    public GameObject prefabToShow; // **í™œì„±í™”í•  Prefab**
+    public int mirrorCount = 0; // ë¯¸ëŸ¬ ì¹´ìš´íŠ¸
+    private int previousMirrorCount = 0; // ì´ì „ ë¯¸ëŸ¬ ì¹´ìš´íŠ¸ë¥¼ ì €ì¥
+    private bool isShaking = false; // í”ë“¤ë¦¼ ì¤‘ì¸ì§€ ì—¬ë¶€ í™•ì¸
 
     public GameObject storyPanel;
     public GameObject firstPanel;
@@ -52,45 +52,45 @@ public class S2SceneManager : MonoBehaviourPun
     {
         if (mainCamera == null)
         {
-            Debug.LogError("[S2SceneManager] mainCamera°¡ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù. Ä«¸Ş¶ó¸¦ ¿¬°áÇÏ¼¼¿ä.");
+            Debug.LogError("[S2SceneManager] mainCameraê°€ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. ì¹´ë©”ë¼ë¥¼ ì—°ê²°í•˜ì„¸ìš”.");
         }
 
         if (warningText == null)
         {
-            Debug.LogError("[S2SceneManager] warningText°¡ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù. TMP ¿ÀºêÁ§Æ®¸¦ ¿¬°áÇÏ¼¼¿ä.");
+            Debug.LogError("[S2SceneManager] warningTextê°€ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. TMP ì˜¤ë¸Œì íŠ¸ë¥¼ ì—°ê²°í•˜ì„¸ìš”.");
         }
         else
         {
-            warningText.gameObject.SetActive(false); // ½ÃÀÛÇÒ ¶§ °æ°í ¸Ş½ÃÁö´Â ¼û±è
+            warningText.gameObject.SetActive(false); // ì‹œì‘í•  ë•Œ ê²½ê³  ë©”ì‹œì§€ëŠ” ìˆ¨ê¹€
         }
 
         if (displayImage == null)
         {
-            Debug.LogError("[S2SceneManager] displayImage°¡ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù. UI Image ¿ÀºêÁ§Æ®¸¦ ¿¬°áÇÏ¼¼¿ä.");
+            Debug.LogError("[S2SceneManager] displayImageê°€ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. UI Image ì˜¤ë¸Œì íŠ¸ë¥¼ ì—°ê²°í•˜ì„¸ìš”.");
         }
         else
         {
-            displayImage.preserveAspect = false; // **Preserve Aspect ºñÈ°¼ºÈ­**
+            displayImage.preserveAspect = false; // **Preserve Aspect ë¹„í™œì„±í™”**
         }
 
         if (imageList == null || imageList.Length == 0)
         {
-            Debug.LogError("[S2SceneManager] imageList¿¡ ÀÌ¹ÌÁö°¡ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.LogError("[S2SceneManager] imageListì— ì´ë¯¸ì§€ê°€ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
         }
 
         if (prefabToShow == null)
         {
-            Debug.LogError("[S2SceneManager] prefabToShow°¡ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù. Prefab ¿ÀºêÁ§Æ®¸¦ ¿¬°áÇÏ¼¼¿ä.");
+            Debug.LogError("[S2SceneManager] prefabToShowê°€ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. Prefab ì˜¤ë¸Œì íŠ¸ë¥¼ ì—°ê²°í•˜ì„¸ìš”.");
         }
         else
         {
-            prefabToShow.SetActive(false); // **PrefabÀ» ºñÈ°¼ºÈ­µÈ »óÅÂ·Î ½ÃÀÛ**
+            prefabToShow.SetActive(false); // **Prefabì„ ë¹„í™œì„±í™”ëœ ìƒíƒœë¡œ ì‹œì‘**
         }
 
         if (imageList.Length > 0)
         {
             displayImage.sprite = imageList[0];
-            displayImage.rectTransform.sizeDelta = new Vector2(160, 180); // **ÀÌ¹ÌÁö Å©±â °íÁ¤**
+            displayImage.rectTransform.sizeDelta = new Vector2(160, 180); // **ì´ë¯¸ì§€ í¬ê¸° ê³ ì •**
         }
         StartCoroutine(firstCinema());
     }
@@ -99,20 +99,20 @@ public class S2SceneManager : MonoBehaviourPun
     {
         if (mirrorCount > previousMirrorCount)
         {
-            Debug.Log($"[S2SceneManager] mirrorCount°¡ {previousMirrorCount}¿¡¼­ {mirrorCount}·Î Áõ°¡Çß½À´Ï´Ù.");
+            Debug.Log($"[S2SceneManager] mirrorCountê°€ {previousMirrorCount}ì—ì„œ {mirrorCount}ë¡œ ì¦ê°€í–ˆìŠµë‹ˆë‹¤.");
 
-            // **mirrorCount°¡ 5°¡ ¾Æ´Ò ¶§¸¸ Ä«¸Ş¶ó Èçµé¸² ¹ß»ı**
+            // **mirrorCountê°€ 5ê°€ ì•„ë‹ ë•Œë§Œ ì¹´ë©”ë¼ í”ë“¤ë¦¼ ë°œìƒ**
             if (mirrorCount != 5)
             {
                 StartCoroutine(CameraShake(3f));
             }
 
-            StartCoroutine(ShowWarningMessage(warningText, "ÇÃ·¹ÀÌ¾îÀÇ ¹æÇâÅ°°¡ ·£´ıÀ¸·Î Àç¼³Á¤µË´Ï´Ù", Color.red));
+            StartCoroutine(ShowWarningMessage(warningText, "í”Œë ˆì´ì–´ì˜ ë°©í–¥í‚¤ê°€ ëœë¤ìœ¼ë¡œ ì¬ì„¤ì •ë©ë‹ˆë‹¤", Color.red));
             ChangeImage(mirrorCount);
 
             if (mirrorCount == 5)
             {
-                // **Prefab È°¼ºÈ­ ¹× Ä«¸Ş¶ó ÀÌµ¿**
+                // **Prefab í™œì„±í™” ë° ì¹´ë©”ë¼ ì´ë™**
                 StartCoroutine(ShowPrefabAndSwitchCamera());
             }
 
@@ -127,7 +127,7 @@ public class S2SceneManager : MonoBehaviourPun
 
         if (mainCamera == null)
         {
-            Debug.LogError("[S2SceneManager] mainCamera°¡ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù. Èçµé¸²À» Áß´ÜÇÕ´Ï´Ù.");
+            Debug.LogError("[S2SceneManager] mainCameraê°€ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. í”ë“¤ë¦¼ì„ ì¤‘ë‹¨í•©ë‹ˆë‹¤.");
             yield break;
         }
 
@@ -159,7 +159,7 @@ public class S2SceneManager : MonoBehaviourPun
     {
         if (warningText == null)
         {
-            Debug.LogError("[S2SceneManager] warningText°¡ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.LogError("[S2SceneManager] warningTextê°€ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
             yield break;
         }
 
@@ -192,25 +192,25 @@ public class S2SceneManager : MonoBehaviourPun
     {
         if (prefabToShow == null || mainCamera == null)
         {
-            Debug.LogError("[S2SceneManager] prefabToShow ¶Ç´Â mainCamera°¡ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.LogError("[S2SceneManager] prefabToShow ë˜ëŠ” mainCameraê°€ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
             yield break;
         }
 
-        Debug.Log("[S2SceneManager] Prefab È°¼ºÈ­ ¹× Ä«¸Ş¶ó ÀüÈ¯");
+        Debug.Log("[S2SceneManager] Prefab í™œì„±í™” ë° ì¹´ë©”ë¼ ì „í™˜");
 
-        // **Prefab È°¼ºÈ­**
+        // **Prefab í™œì„±í™”**
         prefabToShow.SetActive(true);
 
-        // **ÇöÀç Ä«¸Ş¶óÀÇ À§Ä¡¿Í È¸Àü ÀúÀå**
+        // **í˜„ì¬ ì¹´ë©”ë¼ì˜ ìœ„ì¹˜ì™€ íšŒì „ ì €ì¥**
         Vector3 originalCameraPosition = mainCamera.transform.position;
         Quaternion originalCameraRotation = mainCamera.transform.rotation;
 
-        // **Prefab À§Ä¡·Î Ä«¸Ş¶ó ÀÌµ¿**
+        // **Prefab ìœ„ì¹˜ë¡œ ì¹´ë©”ë¼ ì´ë™**
         Vector3 targetPosition = prefabToShow.transform.position + new Vector3(0, 0, -10);
-        float transitionTime = 2f; // **Ä«¸Ş¶ó ÀüÈ¯¿¡ °É¸®´Â ½Ã°£**
+        float transitionTime = 2f; // **ì¹´ë©”ë¼ ì „í™˜ì— ê±¸ë¦¬ëŠ” ì‹œê°„**
         float elapsedTime = 0f;
 
-        // **Ä«¸Ş¶ó¸¦ Prefab À§Ä¡·Î ÀÌµ¿ (2ÃÊ µ¿¾È ºÎµå·´°Ô ÀüÈ¯)**
+        // **ì¹´ë©”ë¼ë¥¼ Prefab ìœ„ì¹˜ë¡œ ì´ë™ (2ì´ˆ ë™ì•ˆ ë¶€ë“œëŸ½ê²Œ ì „í™˜)**
         while (elapsedTime < transitionTime)
         {
             elapsedTime += Time.deltaTime;
@@ -219,7 +219,7 @@ public class S2SceneManager : MonoBehaviourPun
             yield return null;
         }
 
-        // **PrefabÀ» ºñÃá ÈÄ ¿ø·¡ À§Ä¡·Î º¹±Í**
+        // **Prefabì„ ë¹„ì¶˜ í›„ ì›ë˜ ìœ„ì¹˜ë¡œ ë³µê·€**
         elapsedTime = -2f;
         while (elapsedTime < transitionTime)
         {
@@ -229,7 +229,7 @@ public class S2SceneManager : MonoBehaviourPun
             yield return null;
         }
 
-        Debug.Log("[S2SceneManager] Prefab ºñÈ°¼ºÈ­ ¹× Ä«¸Ş¶ó º¹¿ø ¿Ï·á");
+        Debug.Log("[S2SceneManager] Prefab ë¹„í™œì„±í™” ë° ì¹´ë©”ë¼ ë³µì› ì™„ë£Œ");
     }
     IEnumerator firstCinema()
     {
@@ -308,8 +308,8 @@ public class S2SceneManager : MonoBehaviourPun
         bossPanel.SetActive(false);
 
         yield return new WaitForSeconds(3f);
-        ghostImage.gameObject.SetActive(true); // ghostImage È°¼ºÈ­
-        yield return new WaitForSeconds(3f); // 3ÃÊ ´ë±â ÈÄ Å©±â¿Í Åõ¸íµµ º¯°æ ½ÃÀÛ
+        ghostImage.gameObject.SetActive(true); // ghostImage í™œì„±í™”
+        yield return new WaitForSeconds(3f); // 3ì´ˆ ëŒ€ê¸° í›„ í¬ê¸°ì™€ íˆ¬ëª…ë„ ë³€ê²½ ì‹œì‘
 
         StartCoroutine(tm.ImagePadeOut(ghostImage, Buddhahood));
     }
@@ -324,7 +324,7 @@ public class S2SceneManager : MonoBehaviourPun
         }
         else
         {
-            Debug.LogError("endPanelÀÌ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.LogError("endPanelì´ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
         }
     }
 }
