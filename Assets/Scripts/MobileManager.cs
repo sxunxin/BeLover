@@ -4,11 +4,36 @@ using UnityEngine.SceneManagement;
 
 public class MobileManager : MonoBehaviour
 {
+    private Canvas cv; // 상위 Canvas를 자동으로 가져옴
+    private RectTransform cvRectTransform; // Canvas의 RectTransform
+    private RectTransform thisRectTransform; // MobileManager 오브젝트의 RectTransform
+
     private PlayerScript localPlayerScript; // 로컬 플레이어 스크립트
-    string currentSceneName;
+    private string currentSceneName;
 
     void Start()
     {
+        // 상위 Canvas 가져오기
+        cv = GetComponentInParent<Canvas>();
+        if (cv != null)
+        {
+            cvRectTransform = cv.GetComponent<RectTransform>();
+            thisRectTransform = GetComponent<RectTransform>();
+
+            if (cvRectTransform != null && thisRectTransform != null)
+            {
+                SyncRectTransform();
+            }
+            else
+            {
+                Debug.LogWarning("RectTransform을 가져오지 못했습니다.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("상위 Canvas를 찾을 수 없습니다.");
+        }
+
         // 로컬 플레이어 오브젝트 찾기
         foreach (var player in FindObjectsOfType<PlayerScript>())
         {
@@ -19,7 +44,30 @@ public class MobileManager : MonoBehaviour
                 break;
             }
         }
+
         currentSceneName = SceneManager.GetActiveScene().name;
+    }
+
+    void Update()
+    {
+        // 앵커를 항상 중앙으로 고정 (Anchor Preset의 Center와 동일)
+        if (thisRectTransform != null)
+        {
+            thisRectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+            thisRectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+            thisRectTransform.pivot = new Vector2(0.5f, 0.5f);
+            thisRectTransform.anchoredPosition = Vector2.zero; // 중앙 위치 유지
+        }
+    }
+
+    private void SyncRectTransform()
+    {
+        // 크기 및 피벗 속성을 동기화
+        thisRectTransform.sizeDelta = cvRectTransform.sizeDelta;
+        thisRectTransform.pivot = cvRectTransform.pivot;
+        thisRectTransform.anchoredPosition = cvRectTransform.anchoredPosition;
+
+        Debug.Log("RectTransform이 Canvas와 동기화되었습니다.");
     }
 
     public void ButtonDown(string type)
