@@ -76,9 +76,9 @@ public class S5Manager : MonoBehaviourPun
 
             // 모든 클라이언트에 정답을 공유
             photonView.RPC("SetCorrectAnswer", RpcTarget.All, correctAnswer, correctAnswer2);
-
-            StartCoroutine(ShowMission());
         }
+
+        StartCoroutine(ShowMission());
     }
 
     void Update()
