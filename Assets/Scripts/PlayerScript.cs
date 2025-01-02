@@ -152,7 +152,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 rd.velocity = Vector2.zero; // 움직임 정지
                 return; //  더 이상 코드 실행 중지
             }
-
             if (mobileSetting != null)
             {
                 if (isUI) mobileSetting.SetActive(true);
