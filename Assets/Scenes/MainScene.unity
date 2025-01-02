@@ -11242,13 +11242,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 75
-  m_fontSizeBase: 75
+  m_fontSize: 100
+  m_fontSizeBase: 100
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -19102,9 +19102,8 @@ MonoBehaviour:
   - "\uB108\uB97C \uCC3E\uACE0 \uC788\uC5C8\uC5B4."
   - "\uC800\uB97C...\uC694?"
   - "\uC751. \uC774 \uC5B4\uB450\uC6B4 \uACF3\uC5D0\uC11C \uD798\uB4E4\uC9C0 \uC54A\uC544?"
-  - "\uC800\uB294 \uC9C0\uAE08 \uD3B8\uD55C\uB370... \uC5B4\uB460 \uC18D\uC5D0 \uC788\uC73C\uBA74
-    \uB204\uAD70\uAC00\uB97C \uBCFC \uC77C\uB3C4 \uC5C6\uACE0 \uB9C8\uC74C\uC774
-    \uD3B8\uD55C\uAC78\uC694..."
+  - "\uC5B4\uB460 \uC18D\uC5D0 \uC788\uC73C\uBA74 \uB204\uAD70\uAC00\uB97C \uBCFC
+    \uC77C\uB3C4 \uC5C6\uACE0 \uB9C8\uC74C\uC774 \uD3B8\uD55C\uAC78\uC694..."
   - "\uD558\uC9C0\uB9CC \uC544\uBB34\uB3C4 \uBABB \uBD10\uC11C \uC678\uB86D\uC9C0
     \uC54A\uC544?"
   - "\uC5EC\uAE30 \uCD1B\uBD88 \uAC00\uC838\uC654\uC5B4. \uD55C\uBC88 \uCF1C\uBCFC\uB798?

@@ -300,7 +300,7 @@ public class S2SceneManager : MonoBehaviourPun
 
         bossPanel.SetActive(true);
         bossTalk.SetMsg(tm.S2Text[11]);
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(10f);
 
         bossTalk.SetMsg(tm.S2Text[12]);
         yield return new WaitForSeconds(5f);
