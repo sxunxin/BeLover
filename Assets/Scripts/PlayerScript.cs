@@ -152,16 +152,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks
                 rd.velocity = Vector2.zero; // 움직임 정지
                 return; //  더 이상 코드 실행 중지
             }
-            if (s5manager != null && s5manager.missionPanel.activeSelf)
-            {
-                if (mobileSetting != null) mobileSetting.SetActive(false);
-
-                if (CompareTag("player2")) anim.Play("Female_Down_Idle");
-                else anim.Play("Male_Down_Idle");
-                pv.RPC("SyncAnimationIdle", RpcTarget.Others);
-                rd.velocity = Vector2.zero; // 움직임 정지
-                return; //  더 이상 코드 실행 중지
-            }
             if (mobileSetting != null)
             {
                 if (isUI) mobileSetting.SetActive(true);

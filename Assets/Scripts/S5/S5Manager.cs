@@ -54,16 +54,6 @@ public class S5Manager : MonoBehaviourPun
     public AudioClip mirrorSound;
     public AudioClip bridgeSound;
 
-    TalkManager tm;
-    public GameObject boss;
-    public GameObject missionPanel;
-    public TypeEffect missionTmp;
-    private bool isTalking = true;
-
-    void Awake()
-    {
-        tm = FindObjectOfType<TalkManager>();
-    }
     void Start()
     {
         if (PhotonNetwork.IsMasterClient)
@@ -77,8 +67,6 @@ public class S5Manager : MonoBehaviourPun
             // 모든 클라이언트에 정답을 공유
             photonView.RPC("SetCorrectAnswer", RpcTarget.All, correctAnswer, correctAnswer2);
         }
-
-        StartCoroutine(ShowMission());
     }
 
     void Update()
@@ -89,24 +77,8 @@ public class S5Manager : MonoBehaviourPun
             EndZone.SetActive(true);
             Debug.Log("CAN END!!!");
         }
-        if (missionPanel.activeSelf)
-        {
-            boss.SetActive(false);
-        }
-        else
-            boss.SetActive(true);
     }
 
-    IEnumerator ShowMission()
-    {
-        if (isTalking)
-        {
-            missionTmp.SetMsg(tm.S5Text[0]);
-            yield return new WaitForSeconds(tm.S5Text[0].Length / missionTmp.CharPerSeconds + 2f); // 대사 길이만큼 기다림
-            isTalking = false;
-            missionPanel.SetActive(false);
-        }
-    }
     public void EndCandle()
     {
         photonView.RPC("EndCandleRPC", RpcTarget.All);
